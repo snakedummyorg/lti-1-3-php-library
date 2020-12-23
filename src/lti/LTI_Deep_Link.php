@@ -25,8 +25,11 @@ class LTI_Deep_Link {
             "https://purl.imsglobal.org/spec/lti/claim/message_type" => "LtiDeepLinkingResponse",
             "https://purl.imsglobal.org/spec/lti/claim/version" => "1.3.0",
             "https://purl.imsglobal.org/spec/lti-dl/claim/content_items" => array_map(function($resource) { return $resource->to_array(); }, $resources),
-            "https://purl.imsglobal.org/spec/lti-dl/claim/data" => $this->deep_link_settings['data'],
         ];
+        // The 'https://purl.imsglobal.org/spec/lti-dl/claim/data' claim is optional and should only be returned if supplied in the launch data.
+        if (isset($this->deep_link_settings['data'])) {
+            $message_jwt["https://purl.imsglobal.org/spec/lti-dl/claim/data"] = $this->deep_link_settings['data'];
+        }
         return JWT::encode($message_jwt, $this->registration->get_tool_private_key(), 'RS256', $this->registration->get_kid());
     }
 
