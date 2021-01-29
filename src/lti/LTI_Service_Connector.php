@@ -49,7 +49,7 @@ class LTI_Service_Connector {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->registration->get_auth_token_url());
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($auth_request));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($auth_request, '', '&'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         $resp = curl_exec($ch);
