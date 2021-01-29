@@ -22,13 +22,13 @@ Add the following to your `composer.json` file
 }
 ```
 Run `composer install` or `composer update`
-In your code, you will now be able to use classes in the `\IMSGlobal\LTI` namespace to access the library.
+In your code, you will now be able to use classes in the `\IMSGlobal\LTI13` namespace to access the library.
 
 ### Manually
 To import the library, copy the `lti` folder inside `src` into your project and use the following code at the beginning of execution:
 ```php
 require_once('lti/lti.php');
-use \IMSGlobal\LTI;
+use \IMSGlobal\LTI13;
 ```
 
 ## Accessing Registration Data

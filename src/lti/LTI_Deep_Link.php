@@ -1,5 +1,5 @@
 <?php
-namespace IMSGlobal\LTI;
+namespace IMSGlobal\LTI13;
 
 use \Firebase\JWT\JWT;
 class LTI_Deep_Link {

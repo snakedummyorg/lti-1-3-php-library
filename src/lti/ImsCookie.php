@@ -1,5 +1,5 @@
 <?php
-namespace IMSGlobal\LTI;
+namespace IMSGlobal\LTI13;
 
 class ImsCookie {
     public function get_cookie($name) {

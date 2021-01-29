@@ -1,5 +1,5 @@
 <?php
-namespace IMSGlobal\LTI;
+namespace IMSGlobal\LTI13;
 
 interface Database {
     public function find_registration_by_issuer($iss);

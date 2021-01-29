@@ -1,5 +1,5 @@
 <?php
-namespace IMSGlobal\LTI;
+namespace IMSGlobal\LTI13;
 
 interface Message_Validator {
     public function validate($jwt_body);

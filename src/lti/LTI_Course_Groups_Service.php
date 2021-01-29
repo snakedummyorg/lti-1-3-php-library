@@ -1,5 +1,5 @@
 <?php
-namespace IMSGlobal\LTI;
+namespace IMSGlobal\LTI13;
 
 class LTI_Course_Groups_Service {
 

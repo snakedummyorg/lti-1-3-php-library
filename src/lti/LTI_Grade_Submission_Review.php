@@ -1,5 +1,5 @@
 <?php
-namespace IMSGlobal\LTI;
+namespace IMSGlobal\LTI13;
 
 class LTI_Grade_Submission_Review {
     private $reviewable_status;

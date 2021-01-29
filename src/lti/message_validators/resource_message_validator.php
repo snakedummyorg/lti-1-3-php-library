@@ -1,5 +1,5 @@
 <?php
-namespace IMSGlobal\LTI;
+namespace IMSGlobal\LTI13;
 
 class Resource_Message_Validator implements Message_Validator {
     public function can_validate($jwt_body) {

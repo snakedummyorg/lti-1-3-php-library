@@ -1,5 +1,5 @@
 <?php
-namespace IMSGlobal\LTI;
+namespace IMSGlobal\LTI13;
 
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
@@ -344,7 +344,7 @@ class LTI_Message_Launch {
         foreach ($classes as $class_name) {
             // Check the class implements message validator
             $reflect = new \ReflectionClass($class_name);
-            if ($reflect->implementsInterface('\IMSGlobal\LTI\Message_Validator')) {
+            if ($reflect->implementsInterface('\IMSGlobal\LTI13\Message_Validator')) {
                 // Create instance of class
                 $validators[] = new $class_name();
             }
