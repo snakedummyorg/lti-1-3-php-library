@@ -80,11 +80,13 @@ class LTI_Service_Connector {
             echo 'Request Error:' . curl_error($ch);
         }
         $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $http_code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
         curl_close ($ch);
 
         $resp_headers = substr($response, 0, $header_size);
         $resp_body = substr($response, $header_size);
         return [
+            'http_code' => $http_code,
             'headers' => array_filter(explode("\r\n", $resp_headers)),
             'body' => json_decode($resp_body, true),
         ];

@@ -27,6 +27,10 @@ class LTI_Names_Roles_Provisioning_Service {
                 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json'
             );
 
+            if ($page['http_code'] != 200) {
+                return false;
+            }
+
             $members = array_merge($members, $page['body']['members']);
 
             $next_page = false;
