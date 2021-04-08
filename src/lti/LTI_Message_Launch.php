@@ -273,8 +273,11 @@ class LTI_Message_Launch {
     }
 
     private function validate_nonce() {
+        if (!isset($this->jwt['body']['nonce'])) {
+            throw new LTI_Exception("Missing nonce in JWT body");
+        }
         if (!$this->cache->check_nonce($this->jwt['body']['nonce'])) {
-            //throw new LTI_Exception("Invalid Nonce");
+            throw new LTI_Exception("Invalid Nonce");
         }
         return $this;
     }
@@ -298,6 +301,9 @@ class LTI_Message_Launch {
     }
 
     private function validate_jwt_signature() {
+        if (empty($this->jwt['header']['kid'])) {
+            throw new LTI_Exception('Missing kid in JWT header', 1);
+        }
         // Fetch public key.
         $public_key = $this->get_public_key();
 
@@ -305,7 +311,6 @@ class LTI_Message_Launch {
         try {
             JWT::decode($this->request['id_token'], $public_key['key'], array('RS256'));
         } catch(\Exception $e) {
-            var_dump($e);
             // Error validating signature.
             throw new LTI_Exception("Invalid signature on id_token", 1);
         }
@@ -314,6 +319,9 @@ class LTI_Message_Launch {
     }
 
     private function validate_deployment() {
+        if (!isset($this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/deployment_id'])) {
+            throw new LTI_Exception("Missing https://purl.imsglobal.org/spec/lti/claim/deployment_id claim in JWT body", 1);
+        }
         // Find deployment.
         $deployment = $this->db->find_deployment($this->jwt['body']['iss'], $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/deployment_id']);
 
