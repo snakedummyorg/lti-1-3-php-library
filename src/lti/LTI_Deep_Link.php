@@ -38,7 +38,7 @@ class LTI_Deep_Link {
         ?>
         <form id="auto_submit" action="<?= $this->deep_link_settings['deep_link_return_url']; ?>" method="POST">
             <input type="hidden" name="JWT" value="<?= $jwt ?>" />
-            <input type="submit" name="Go" />
+            <input type="submit" style="display:none;" name="Go" />
         </form>
         <script>
             document.getElementById('auto_submit').submit();
