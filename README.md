@@ -38,10 +38,10 @@ Rather than dictating how this is store, the library instead provides an interfa
 The `LTI\Database` interface must be fully implemented for this to work.
 ```php
 class Example_Database implements LTI\Database {
-    public function find_registration_by_issuer($iss) {
+    public function find_registration_by_issuer($iss, $client_id = null) {
         ...
     }
-    public function find_deployment($iss, $deployment_id) {
+    public function find_deployment($iss, $deployment_id, $client_id = null) {
         ...
     }
 }

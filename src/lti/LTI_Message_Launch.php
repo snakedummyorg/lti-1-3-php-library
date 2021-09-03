@@ -284,14 +284,14 @@ class LTI_Message_Launch {
 
     private function validate_registration() {
         // Find registration.
-        $this->registration = $this->db->find_registration_by_issuer($this->jwt['body']['iss']);
+        $client_id = is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
+        $this->registration = $this->db->find_registration_by_issuer($this->jwt['body']['iss'], $client_id);
 
         if (empty($this->registration)) {
             throw new LTI_Exception("Registration not found.", 1);
         }
 
         // Check client id.
-        $client_id = is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
         if ( $client_id !== $this->registration->get_client_id()) {
             // Client not registered.
             throw new LTI_Exception("Client id not registered for this issuer", 1);
@@ -323,7 +323,8 @@ class LTI_Message_Launch {
             throw new LTI_Exception("Missing https://purl.imsglobal.org/spec/lti/claim/deployment_id claim in JWT body", 1);
         }
         // Find deployment.
-        $deployment = $this->db->find_deployment($this->jwt['body']['iss'], $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/deployment_id']);
+        $client_id = is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
+        $deployment = $this->db->find_deployment($this->jwt['body']['iss'], $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/deployment_id'], $client_id);
 
         if (empty($deployment)) {
             // deployment not recognized.
