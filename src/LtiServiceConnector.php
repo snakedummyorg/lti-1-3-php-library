@@ -3,10 +3,10 @@
 namespace Packback\Lti1p3;
 
 use Firebase\JWT\JWT;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Response;
 use Packback\Lti1p3\Interfaces\ICache;
+use Packback\Lti1p3\Interfaces\IHttpClient;
+use Packback\Lti1p3\Interfaces\IHttpException;
+use Packback\Lti1p3\Interfaces\IHttpResponse;
 use Packback\Lti1p3\Interfaces\ILtiRegistration;
 use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
 use Packback\Lti1p3\Interfaces\IServiceRequest;
@@ -22,7 +22,7 @@ class LtiServiceConnector implements ILtiServiceConnector
     private $client;
     private $debuggingMode = false;
 
-    public function __construct(ICache $cache, Client $client)
+    public function __construct(ICache $cache, IHttpClient $client)
     {
         $this->cache = $cache;
         $this->client = $client;
@@ -68,10 +68,18 @@ class LtiServiceConnector implements ILtiServiceConnector
         $url = $registration->getAuthTokenUrl();
 
         // Get Access
-        $response = $this->client->post($url, [
-            'form_params' => $authRequest,
-        ]);
-
+        $tokenRequest = new ServiceRequest('POST', $url);
+        $tokenRequest->setBody(http_build_query($authRequest, '', '&'));
+        $tokenRequest->setContentType('application/x-www-form-urlencoded');
+        $tokenRequest->setAccept('application/json');
+        $response = $this->client->request(
+            $tokenRequest->getMethod(),
+            $tokenRequest->getUrl(),
+            [
+                'headers' => $tokenRequest->getPayload()['headers'],
+                'body' => $tokenRequest->getPayload()['body']
+            ]
+        );
         $tokenData = $this->getResponseBody($response);
 
         // Cache access token
@@ -79,6 +87,7 @@ class LtiServiceConnector implements ILtiServiceConnector
 
         return $tokenData['access_token'];
     }
+
 
     public function makeRequest(IServiceRequest $request)
     {
@@ -89,7 +98,7 @@ class LtiServiceConnector implements ILtiServiceConnector
         );
     }
 
-    public function getResponseBody(Response $response): ?array
+    public function getResponseBody(IHttpResponse $response): ?array
     {
         $responseBody = (string) $response->getBody();
 
@@ -103,12 +112,10 @@ class LtiServiceConnector implements ILtiServiceConnector
         bool $shouldRetry = true
     ): array {
         $request->setAccessToken($this->getAccessToken($registration, $scopes));
-
         try {
             $response = $this->makeRequest($request);
-        } catch (ClientException $e) {
+        } catch (IHttpException $e) {
             $status = $e->getResponse()->getStatusCode();
-
             // If the error was due to invalid authentication and the request
             // should be retried, clear the access token and retry it.
             if ($status === 401 && $shouldRetry) {
@@ -117,13 +124,10 @@ class LtiServiceConnector implements ILtiServiceConnector
 
                 return $this->makeServiceRequest($registration, $scopes, $request, false);
             }
-
             throw $e;
         }
+
         $responseHeaders = $response->getHeaders();
-        array_walk($responseHeaders, function (&$value) {
-            $value = $value[0];
-        });
         $responseBody = $this->getResponseBody($response);
 
         if ($this->debuggingMode) {

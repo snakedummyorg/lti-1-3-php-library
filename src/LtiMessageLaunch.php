@@ -5,11 +5,10 @@ namespace Packback\Lti1p3;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
 use Packback\Lti1p3\Interfaces\ICache;
 use Packback\Lti1p3\Interfaces\ICookie;
 use Packback\Lti1p3\Interfaces\IDatabase;
+use Packback\Lti1p3\Interfaces\IHttpException;
 use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
 use Packback\Lti1p3\MessageValidators\DeepLinkMessageValidator;
 use Packback\Lti1p3\MessageValidators\ResourceMessageValidator;
@@ -272,7 +271,7 @@ class LtiMessageLaunch
         // Download key set
         try {
             $response = $this->serviceConnector->makeRequest($request);
-        } catch (TransferException $e) {
+        } catch (IHttpException $e) {
             throw new LtiException(static::ERR_NO_PUBLIC_KEY);
         }
         $publicKeySet = $this->serviceConnector->getResponseBody($response);
