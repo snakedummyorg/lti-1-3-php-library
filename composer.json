@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "firebase/php-jwt": "^5.2"
+        "firebase/php-jwt": "^6.0"
     },
     "require-dev": {
         "matt-allan/laravel-code-style": "dev-main",
