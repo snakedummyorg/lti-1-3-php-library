@@ -30,7 +30,7 @@ class LtiDeepLink
             LtiConstants::MESSAGE_TYPE => 'LtiDeepLinkingResponse',
             LtiConstants::VERSION => LtiConstants::V1_3,
             LtiConstants::DL_CONTENT_ITEMS => array_map(function ($resource) {
-            return $resource->toArray();
+                return $resource->toArray();
             }, $resources),
         ];
 

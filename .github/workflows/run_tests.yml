@@ -17,4 +17,4 @@ jobs:
       - name: Run tests
         run: composer test
       - name: Check style
-        run: php --version; composer lint
+        run: composer lint
