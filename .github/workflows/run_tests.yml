@@ -15,5 +15,6 @@ jobs:
           composer install -q --no-ansi --no-interaction --no-scripts --no-suggest \
             --no-progress --prefer-dist
       - name: Run tests
+        run: composer test
       - name: Check style
         run: php --version; composer lint
