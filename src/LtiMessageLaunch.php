@@ -11,7 +11,6 @@ use Packback\Lti1p3\Interfaces\ICache;
 use Packback\Lti1p3\Interfaces\ICookie;
 use Packback\Lti1p3\Interfaces\IDatabase;
 use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
-use Packback\Lti1p3\Interfaces\IMessageValidator;
 use Packback\Lti1p3\MessageValidators\DeepLinkMessageValidator;
 use Packback\Lti1p3\MessageValidators\ResourceMessageValidator;
 use Packback\Lti1p3\MessageValidators\SubmissionReviewMessageValidator;
@@ -70,10 +69,10 @@ class LtiMessageLaunch
     /**
      * Constructor.
      *
-     * @param IDatabase $database Instance of the database interface used for looking up registrations and deployments
-     * @param ICache $cache Instance of the Cache interface used to loading and storing launches
-     * @param ICookie $cookie Instance of the Cookie interface used to set and read cookies
-     * @param ILtiServiceConnector $serviceConnector Instance of the LtiServiceConnector used to by LTI services to make API requests
+     * @param  IDatabase  $database Instance of the database interface used for looking up registrations and deployments
+     * @param  ICache  $cache Instance of the Cache interface used to loading and storing launches
+     * @param  ICookie  $cookie Instance of the Cookie interface used to set and read cookies
+     * @param  ILtiServiceConnector  $serviceConnector Instance of the LtiServiceConnector used to by LTI services to make API requests
      */
     public function __construct(
         IDatabase $database,
@@ -105,19 +104,20 @@ class LtiMessageLaunch
     /**
      * Load an LtiMessageLaunch from a Cache using a launch id.
      *
-     * @param string    $launch_id the launch id of the LtiMessageLaunch object that is being pulled from the cache
-     * @param IDatabase $database  instance of the database interface used for looking up registrations and deployments
-     * @param ICache    $cache     Instance of the Cache interface used to loading and storing launches. If non is provided launch data will be store in $_SESSION.
+     * @param  string  $launch_id the launch id of the LtiMessageLaunch object that is being pulled from the cache
+     * @param  IDatabase  $database  instance of the database interface used for looking up registrations and deployments
+     * @param  ICache  $cache     Instance of the Cache interface used to loading and storing launches. If non is provided launch data will be store in $_SESSION.
      *
      * @throws LtiException Will throw an LtiException if validation fails or launch cannot be found
      *
      * @return LtiMessageLaunch A populated and validated LtiMessageLaunch
      */
-    public static function fromCache($launch_id,
+    public static function fromCache(
+        $launch_id,
         IDatabase $database,
         ICache $cache = null,
-        ILtiServiceConnector $serviceConnector = null)
-    {
+        ILtiServiceConnector $serviceConnector = null
+    ) {
         $new = new LtiMessageLaunch($database, $cache, null, $serviceConnector);
         $new->launch_id = $launch_id;
         $new->jwt = ['body' => $new->cache->getLaunchData($launch_id)];
@@ -128,7 +128,7 @@ class LtiMessageLaunch
     /**
      * Validates all aspects of an incoming LTI message launch and caches the launch if successful.
      *
-     * @param array|string $request An array of post request parameters. If not set will default to $_POST.
+     * @param  array|string  $request An array of post request parameters. If not set will default to $_POST.
      *
      * @throws LtiException Will throw an LtiException if validation fails
      *
@@ -171,7 +171,8 @@ class LtiMessageLaunch
         return new LtiNamesRolesProvisioningService(
             $this->serviceConnector,
             $this->registration,
-            $this->jwt['body'][LtiConstants::NRPS_CLAIM_SERVICE]);
+            $this->jwt['body'][LtiConstants::NRPS_CLAIM_SERVICE]
+        );
     }
 
     /**
@@ -194,7 +195,8 @@ class LtiMessageLaunch
         return new LtiCourseGroupsService(
             $this->serviceConnector,
             $this->registration,
-            $this->jwt['body'][LtiConstants::GS_CLAIM_SERVICE]);
+            $this->jwt['body'][LtiConstants::GS_CLAIM_SERVICE]
+        );
     }
 
     /**
@@ -217,7 +219,8 @@ class LtiMessageLaunch
         return new LtiAssignmentsGradesService(
             $this->serviceConnector,
             $this->registration,
-            $this->jwt['body'][LtiConstants::AGS_CLAIM_ENDPOINT]);
+            $this->jwt['body'][LtiConstants::AGS_CLAIM_ENDPOINT]
+        );
     }
 
     /**
@@ -240,7 +243,8 @@ class LtiMessageLaunch
         return new LtiDeepLink(
             $this->registration,
             $this->jwt['body'][LtiConstants::DEPLOYMENT_ID],
-            $this->jwt['body'][LtiConstants::DL_DEEP_LINK_SETTINGS]);
+            $this->jwt['body'][LtiConstants::DL_DEEP_LINK_SETTINGS]
+        );
     }
 
     /**
@@ -376,7 +380,7 @@ class LtiMessageLaunch
     private function validateState()
     {
         // Check State for OIDC.
-        if ($this->cookie->getCookie(LtiOidcLogin::COOKIE_PREFIX.$this->request['state']) !== $this->request['state']) {
+        if ($this->cookie->getCookie(LtiOidcLogin::COOKIE_PREFIX . $this->request['state']) !== $this->request['state']) {
             // Error if state doesn't match
             throw new LtiException(static::ERR_STATE_NOT_FOUND);
         }

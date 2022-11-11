@@ -20,18 +20,22 @@ class LtiServiceConnectorTest extends TestCase
      * @var Mockery\MockInterface
      */
     private $registration;
+
     /**
      * @var Mockery\MockInterface
      */
     private $cache;
+
     /**
      * @var Mockery\MockInterface
      */
     private $client;
+
     /**
      * @var Mockery\MockInterface
      */
     private $response;
+
     /**
      * @var LtiServiceConnector
      */
@@ -52,7 +56,7 @@ class LtiServiceConnectorTest extends TestCase
         $this->url = 'https://example.com';
         $this->body = json_encode(['userId' => 'id']);
         $this->requestHeaders = [
-            'Authorization' => 'Bearer '.$this->token,
+            'Authorization' => 'Bearer ' . $this->token,
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ];
@@ -90,7 +94,7 @@ class LtiServiceConnectorTest extends TestCase
             'clientId' => 'client_id',
             'issuer' => 'issuer',
             'authServer' => 'auth_server',
-            'toolPrivateKey' => file_get_contents(__DIR__.'/data/private.key'),
+            'toolPrivateKey' => file_get_contents(__DIR__ . '/data/private.key'),
             'kid' => 'kid',
             'authTokenUrl' => 'auth_token_url',
         ]);
@@ -149,7 +153,7 @@ class LtiServiceConnectorTest extends TestCase
         $this->url = 'https://example.com';
         $this->body = json_encode(['userId' => 'id']);
         $this->requestHeaders = [
-            'Authorization' => 'Bearer '.$this->token,
+            'Authorization' => 'Bearer ' . $this->token,
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ];
@@ -219,7 +223,7 @@ class LtiServiceConnectorTest extends TestCase
         $this->url = 'https://example.com';
         $this->body = json_encode(['post' => 'body']);
         $this->requestHeaders = [
-            'Authorization' => 'Bearer '.$this->token,
+            'Authorization' => 'Bearer ' . $this->token,
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ];
@@ -276,7 +280,7 @@ class LtiServiceConnectorTest extends TestCase
         $key = 'lineitems';
         $lineitems = ['lineitem'];
         $firstResponseHeaders = [
-            'Link' => ['Something<'.$this->url.'>;rel="next"'],
+            'Link' => ['Something<' . $this->url . '>;rel="next"'],
             'Content-Type' => ['application/json'],
             'Server' => ['nginx'],
         ];

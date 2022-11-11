@@ -64,9 +64,9 @@ class ImsCache implements ICache
 
     private function loadCache()
     {
-        $cache = file_get_contents(sys_get_temp_dir().'/lti_cache.txt');
+        $cache = file_get_contents(sys_get_temp_dir() . '/lti_cache.txt');
         if (empty($cache)) {
-            file_put_contents(sys_get_temp_dir().'/lti_cache.txt', '{}');
+            file_put_contents(sys_get_temp_dir() . '/lti_cache.txt', '{}');
             $this->cache = [];
         }
         $this->cache = json_decode($cache, true);
@@ -74,6 +74,6 @@ class ImsCache implements ICache
 
     private function saveCache()
     {
-        file_put_contents(sys_get_temp_dir().'/lti_cache.txt', json_encode($this->cache));
+        file_put_contents(sys_get_temp_dir() . '/lti_cache.txt', json_encode($this->cache));
     }
 }

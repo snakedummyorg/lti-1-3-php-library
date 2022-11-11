@@ -50,7 +50,7 @@ class LtiServiceConnector implements ILtiServiceConnector
             'aud' => $registration->getAuthServer(),
             'iat' => time() - 5,
             'exp' => time() + 60,
-            'jti' => 'lti-service-token'.hash('sha256', random_bytes(64)),
+            'jti' => 'lti-service-token' . hash('sha256', random_bytes(64)),
         ];
 
         // Sign the JWT with our private key (given by the platform on registration)
@@ -207,7 +207,7 @@ class LtiServiceConnector implements ILtiServiceConnector
         sort($scopes);
         $scopeKey = md5(implode('|', $scopes));
 
-        return $registration->getIssuer().$registration->getClientId().$scopeKey;
+        return $registration->getIssuer() . $registration->getClientId() . $scopeKey;
     }
 
     private function getNextUrl(array $headers)

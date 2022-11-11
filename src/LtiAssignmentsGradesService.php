@@ -40,7 +40,7 @@ class LtiAssignmentsGradesService extends LtiAbstractService
 
         // Place '/scores' before url params
         $pos = strpos($scoreUrl, '?');
-        $scoreUrl = $pos === false ? $scoreUrl.'/scores' : substr_replace($scoreUrl, '/scores', $pos, 0);
+        $scoreUrl = $pos === false ? $scoreUrl . '/scores' : substr_replace($scoreUrl, '/scores', $pos, 0);
 
         $request = new ServiceRequest(
             ServiceRequest::METHOD_POST,
@@ -110,7 +110,7 @@ class LtiAssignmentsGradesService extends LtiAbstractService
 
         // Place '/results' before url params
         $pos = strpos($resultsUrl, '?');
-        $resultsUrl = $pos === false ? $resultsUrl.'/results' : substr_replace($resultsUrl, '/results', $pos, 0);
+        $resultsUrl = $pos === false ? $resultsUrl . '/results' : substr_replace($resultsUrl, '/results', $pos, 0);
 
         $request = new ServiceRequest(
             ServiceRequest::METHOD_GET,

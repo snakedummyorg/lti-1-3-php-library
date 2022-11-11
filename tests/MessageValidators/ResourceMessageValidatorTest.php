@@ -2,26 +2,13 @@
 
 namespace Tests\MessageValidators;
 
-use Packback\Lti1p3\MessageValidators\ResourceMessageValidator;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiException;
+use Packback\Lti1p3\MessageValidators\ResourceMessageValidator;
 use Tests\TestCase;
 
 class ResourceMessageValidatorTest extends TestCase
 {
-    private static function validJwtBody()
-    {
-        return [
-            'sub' => 'subscriber',
-            LtiConstants::MESSAGE_TYPE => ResourceMessageValidator::getMessageType(),
-            LtiConstants::VERSION => LtiConstants::V1_3,
-            LtiConstants::ROLES => [],
-            LtiConstants::RESOURCE_LINK => [
-                'id' => 'unique-id',
-            ],
-        ];
-    }
-
     public function testItCanValidate()
     {
         $this->assertTrue(ResourceMessageValidator::canValidate(static::validJwtBody()));
@@ -88,5 +75,17 @@ class ResourceMessageValidatorTest extends TestCase
         $this->expectException(LtiException::class);
 
         ResourceMessageValidator::validate($jwtBody);
+    }
+    private static function validJwtBody()
+    {
+        return [
+            'sub' => 'subscriber',
+            LtiConstants::MESSAGE_TYPE => ResourceMessageValidator::getMessageType(),
+            LtiConstants::VERSION => LtiConstants::V1_3,
+            LtiConstants::ROLES => [],
+            LtiConstants::RESOURCE_LINK => [
+                'id' => 'unique-id',
+            ],
+        ];
     }
 }

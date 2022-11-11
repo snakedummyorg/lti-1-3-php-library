@@ -101,8 +101,8 @@ class Lti13CertificationTest extends TestCase
 {
     public const ISSUER_URL = 'https://ltiadvantagevalidator.imsglobal.org';
     public const JWKS_FILE = '/tmp/jwks.json';
-    public const CERT_DATA_DIR = __DIR__.'/../data/certification/';
-    public const PRIVATE_KEY = __DIR__.'/../data/private.key';
+    public const CERT_DATA_DIR = __DIR__ . '/../data/certification/';
+    public const PRIVATE_KEY = __DIR__ . '/../data/private.key';
 
     public const STATE = 'state';
 
@@ -209,7 +209,7 @@ class Lti13CertificationTest extends TestCase
         $this->cache = new TestCache();
         $this->cookie = new TestCookie();
         $this->cookie->setCookie(
-            LtiOidcLogin::COOKIE_PREFIX.static::STATE,
+            LtiOidcLogin::COOKIE_PREFIX . static::STATE,
             static::STATE
         );
         $this->serviceConnector = Mockery::mock(ILtiServiceConnector::class);
@@ -331,7 +331,7 @@ class Lti13CertificationTest extends TestCase
 
     public function testInvalidCertificationCases()
     {
-        $testCasesDir = static::CERT_DATA_DIR.'invalid';
+        $testCasesDir = static::CERT_DATA_DIR . 'invalid';
 
         $testCases = scandir($testCasesDir);
         // Remove . and ..
@@ -351,25 +351,25 @@ class Lti13CertificationTest extends TestCase
             ->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
 
         foreach ($testCases as $testCase) {
-            $testCaseDir = $testCasesDir.DIRECTORY_SEPARATOR.$testCase.DIRECTORY_SEPARATOR;
+            $testCaseDir = $testCasesDir . DIRECTORY_SEPARATOR . $testCase . DIRECTORY_SEPARATOR;
 
             $jwtHeader = null;
-            if (file_exists($testCaseDir.'header.json')) {
+            if (file_exists($testCaseDir . 'header.json')) {
                 $jwtHeader = json_decode(
-                    file_get_contents($testCaseDir.'header.json'),
+                    file_get_contents($testCaseDir . 'header.json'),
                     true
                 );
             }
 
             $payload = json_decode(
-                file_get_contents($testCaseDir.'payload.json'),
+                file_get_contents($testCaseDir . 'payload.json'),
                 true
             );
 
             $keep = null;
-            if (file_exists($testCaseDir.'keep.json')) {
+            if (file_exists($testCaseDir . 'keep.json')) {
                 $keep = json_decode(
-                    file_get_contents($testCaseDir.'keep.json'),
+                    file_get_contents($testCaseDir . 'keep.json'),
                     true
                 );
             }
@@ -382,7 +382,7 @@ class Lti13CertificationTest extends TestCase
             }
 
             // I couldn't find a better output function
-            echo PHP_EOL."--> TESTING INVALID TEST CASE: {$testCase}";
+            echo PHP_EOL . "--> TESTING INVALID TEST CASE: {$testCase}";
 
             $jwt = $this->buildJWT($payload, $this->issuer, $jwtHeader);
             if (isset($payload['nonce'])) {
@@ -402,7 +402,7 @@ class Lti13CertificationTest extends TestCase
                 $this->assertInstanceOf(LtiException::class, $e);
             }
 
-            ++$testedCases;
+            $testedCases++;
         }
         echo PHP_EOL;
         $this->assertEquals($casesCount, $testedCases);
@@ -410,7 +410,7 @@ class Lti13CertificationTest extends TestCase
 
     public function testValidCertificationCases()
     {
-        $testCasesDir = static::CERT_DATA_DIR.'valid';
+        $testCasesDir = static::CERT_DATA_DIR . 'valid';
 
         $testCases = scandir($testCasesDir);
         // Remove . and ..
@@ -422,7 +422,7 @@ class Lti13CertificationTest extends TestCase
 
         foreach ($testCases as $testCase) {
             $payload = json_decode(
-                file_get_contents($testCasesDir.DIRECTORY_SEPARATOR.$testCase.DIRECTORY_SEPARATOR.'payload.json'),
+                file_get_contents($testCasesDir . DIRECTORY_SEPARATOR . $testCase . DIRECTORY_SEPARATOR . 'payload.json'),
                 true
             );
 
@@ -434,7 +434,7 @@ class Lti13CertificationTest extends TestCase
             $payload['sub'] = 'lms-user-id';
 
             // I couldn't find a better output function
-            echo PHP_EOL."--> TESTING VALID TEST CASE: {$testCase}";
+            echo PHP_EOL . "--> TESTING VALID TEST CASE: {$testCase}";
 
             $jwt = $this->buildJWT($payload, $this->issuer);
             $this->cache->cacheNonce($payload['nonce'], static::STATE);
@@ -457,7 +457,7 @@ class Lti13CertificationTest extends TestCase
             // Assertions
             $this->assertInstanceOf(LtiMessageLaunch::class, $result);
 
-            ++$testedCases;
+            $testedCases++;
         }
         echo PHP_EOL;
         $this->assertEquals($casesCount, $testedCases);

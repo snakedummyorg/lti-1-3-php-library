@@ -118,7 +118,7 @@ class LtiRegistration implements ILtiRegistration
 
     public function getKid()
     {
-        return $this->kid ?? hash('sha256', trim($this->issuer.$this->clientId));
+        return $this->kid ?? hash('sha256', trim($this->issuer . $this->clientId));
     }
 
     public function setKid($kid)

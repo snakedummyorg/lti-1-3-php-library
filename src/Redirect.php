@@ -18,7 +18,7 @@ class Redirect
 
     public function doRedirect()
     {
-        header('Location: '.$this->location, true, 302);
+        header('Location: ' . $this->location, true, 302);
         exit;
     }
 
@@ -46,7 +46,7 @@ class Redirect
         if (empty($this->referer_query)) {
             echo 'window.location.href';
         } else {
-            echo "window.location.origin + window.location.pathname + '?".$this->referer_query."'";
+            echo "window.location.origin + window.location.pathname + '?" . $this->referer_query . "'";
         } ?>;
 
         var canAccessCookies = function() {
