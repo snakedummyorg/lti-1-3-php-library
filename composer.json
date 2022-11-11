@@ -43,7 +43,7 @@
     },
     "scripts": {
         "test": "phpunit",
-        "lint": "pint --test",
+        "lint": "pint -v --test",
         "lint-fix": "pint -v"
     }
 }
