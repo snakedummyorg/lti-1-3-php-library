@@ -1,6 +1,11 @@
 {
     "preset": "laravel",
     "rules": {
+        "class_attributes_separation": {
+            "elements": {
+                "property": "none"
+            }
+        },
         "not_operator_with_successor_space": false,
         "concat_space": {
             "spacing": "one"
