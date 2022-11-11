@@ -24,7 +24,7 @@ class ResourceMessageValidatorTest extends TestCase
 
     public function testJwtBodyIsValid()
     {
-        $this->assertTrue(ResourceMessageValidator::validate(static::validJwtBody()));
+        $this->assertNull(ResourceMessageValidator::validate(static::validJwtBody()));
     }
 
     public function testJwtBodyIsInvalidMissingSub()
@@ -76,6 +76,7 @@ class ResourceMessageValidatorTest extends TestCase
 
         ResourceMessageValidator::validate($jwtBody);
     }
+
     private static function validJwtBody()
     {
         return [

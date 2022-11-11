@@ -6,7 +6,7 @@ interface IMessageValidator
 {
     public static function getMessageType(): string;
 
-    public static function validate(array $jwtBody): bool;
-
     public static function canValidate(array $jwtBody): bool;
+
+    public static function validate(array $jwtBody): void;
 }

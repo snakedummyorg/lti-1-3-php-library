@@ -495,9 +495,7 @@ class LtiMessageLaunch
             throw new LtiException(static::ERR_UNRECOGNIZED_MESSAGE_TYPE);
         }
 
-        if (!$validator::validate($this->jwt['body'])) {
-            throw new LtiException(static::ERR_INVALID_MESSAGE);
-        }
+        $validator::validate($this->jwt['body']);
 
         return $this;
     }

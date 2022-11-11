@@ -12,7 +12,7 @@ class SubmissionReviewMessageValidator extends AbstractMessageValidator
         return LtiConstants::MESSAGE_TYPE_SUBMISSIONREVIEW;
     }
 
-    public static function validate(array $jwtBody): bool
+    public static function validate(array $jwtBody): void
     {
         static::validateGenericMessage($jwtBody);
 
@@ -22,7 +22,5 @@ class SubmissionReviewMessageValidator extends AbstractMessageValidator
         if (empty($jwtBody[LtiConstants::FOR_USER])) {
             throw new LtiException('Missing For User');
         }
-
-        return true;
     }
 }

@@ -24,7 +24,7 @@ class SubmissionReviewMessageValidatorTest extends TestCase
 
     public function testJwtBodyIsValid()
     {
-        $this->assertTrue(SubmissionReviewMessageValidator::validate(static::validJwtBody()));
+        $this->assertNull(SubmissionReviewMessageValidator::validate(static::validJwtBody()));
     }
 
     public function testJwtBodyIsInvalidMissingSub()
@@ -86,6 +86,7 @@ class SubmissionReviewMessageValidatorTest extends TestCase
 
         SubmissionReviewMessageValidator::validate($jwtBody);
     }
+
     private static function validJwtBody()
     {
         return [

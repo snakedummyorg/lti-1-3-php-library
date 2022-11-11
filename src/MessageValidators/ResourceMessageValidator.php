@@ -12,14 +12,12 @@ class ResourceMessageValidator extends AbstractMessageValidator
         return LtiConstants::MESSAGE_TYPE_RESOURCE;
     }
 
-    public static function validate(array $jwtBody): bool
+    public static function validate(array $jwtBody): void
     {
         static::validateGenericMessage($jwtBody);
 
         if (empty($jwtBody[LtiConstants::RESOURCE_LINK]['id'])) {
             throw new LtiException('Missing Resource Link Id');
         }
-
-        return true;
     }
 }

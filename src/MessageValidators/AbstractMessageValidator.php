@@ -15,7 +15,7 @@ abstract class AbstractMessageValidator implements IMessageValidator
         return $jwtBody[LtiConstants::MESSAGE_TYPE] === static::getMessageType();
     }
 
-    abstract public static function validate(array $jwtBody): bool;
+    abstract public static function validate(array $jwtBody): void;
 
     public static function validateGenericMessage(array $jwtBody): void
     {

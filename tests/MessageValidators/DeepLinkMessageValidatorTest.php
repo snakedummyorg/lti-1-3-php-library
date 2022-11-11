@@ -24,7 +24,7 @@ class DeepLinkMessageValidatorTest extends TestCase
 
     public function testJwtBodyIsValid()
     {
-        $this->assertTrue(DeepLinkMessageValidator::validate(static::validJwtBody()));
+        $this->assertNull(DeepLinkMessageValidator::validate(static::validJwtBody()));
     }
 
     public function testJwtBodyIsInvalidMissingSub()
@@ -116,6 +116,7 @@ class DeepLinkMessageValidatorTest extends TestCase
 
         DeepLinkMessageValidator::validate($jwtBody);
     }
+
     private static function validJwtBody()
     {
         return [

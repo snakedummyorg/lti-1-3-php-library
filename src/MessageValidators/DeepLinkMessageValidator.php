@@ -12,7 +12,7 @@ class DeepLinkMessageValidator extends AbstractMessageValidator
         return LtiConstants::MESSAGE_TYPE_DEEPLINK;
     }
 
-    public static function validate(array $jwtBody): bool
+    public static function validate(array $jwtBody): void
     {
         static::validateGenericMessage($jwtBody);
 
@@ -29,7 +29,5 @@ class DeepLinkMessageValidator extends AbstractMessageValidator
         if (empty($deep_link_settings['accept_presentation_document_targets'])) {
             throw new LtiException('Must support a presentation type');
         }
-
-        return true;
     }
 }
