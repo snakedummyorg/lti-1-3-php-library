@@ -5,9 +5,6 @@ require __DIR__.'/vendor/autoload.php';
 return (new \Jubeki\LaravelCodeStyle\Config())
     ->setFinder(
         \PhpCsFixer\Finder::create()
-            ->exclude(['bootstrap', 'docker', 'public', 'resources', 'storage'])
-            ->notPath('tsugi-config.php')
-            ->notPath('server.php')
             ->ignoreVCS(true)
             ->ignoreVCSIgnored(true)
             ->in(__DIR__)
