@@ -3,6 +3,7 @@
 namespace Certification;
 
 use Carbon\Carbon;
+use Exception;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Psr7\Response;
 use Mockery;
@@ -398,7 +399,7 @@ class Lti13CertificationTest extends TestCase
             try {
                 LtiMessageLaunch::new($this->db, $this->cache, $this->cookie, $this->serviceConnector)
                     ->validate($params);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->assertInstanceOf(LtiException::class, $e);
             }
 

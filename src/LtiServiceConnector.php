@@ -2,6 +2,7 @@
 
 namespace Packback\Lti1p3;
 
+use Exception;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -156,7 +157,7 @@ class LtiServiceConnector implements ILtiServiceConnector
         string $key = null
     ): array {
         if ($request->getMethod() !== ServiceRequest::METHOD_GET) {
-            throw new \Exception('An invalid method was specified by an LTI service requesting all items.');
+            throw new Exception('An invalid method was specified by an LTI service requesting all items.');
         }
 
         $results = [];

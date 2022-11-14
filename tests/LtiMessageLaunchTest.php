@@ -407,6 +407,38 @@ class LtiMessageLaunchTest extends TestCase
         $actual = $this->messageLaunch->validate($payload);
     }
 
+    public function testALaunchFailsIfThePayloadIsInvalid()
+    {
+        $payload = $this->payload;
+        unset($payload[LtiConstants::MESSAGE_TYPE]);
+        $params = [
+            'utf8' => '✓',
+            'id_token' => $this->buildJWT($payload, $this->issuer),
+            'state' => static::STATE,
+        ];
+
+        $this->cookie->shouldReceive('getCookie')
+            ->once()->andReturn($params['state']);
+        $this->cache->shouldReceive('checkNonceIsValid')
+            ->once()->andReturn(true);
+        $this->database->shouldReceive('findRegistrationByIssuer')
+            ->once()->andReturn($this->registration);
+        $this->registration->shouldReceive('getClientId')
+            ->once()->andReturn($this->issuer['client_id']);
+        $this->registration->shouldReceive('getKeySetUrl')
+            ->once()->andReturn($this->issuer['key_set_url']);
+        $this->serviceConnector->shouldReceive('makeRequest')
+            ->once()->andReturn(Mockery::mock(Response::class));
+        $this->serviceConnector->shouldReceive('getResponseBody')
+            ->once()->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
+        $this->database->shouldReceive('findDeployment')
+            ->once()->andReturn(['a deployment']);
+
+        $this->expectException(LtiException::class);
+
+        $this->messageLaunch->validate($params);
+    }
+
     public function testALaunchHasNrps()
     {
         $payload = $this->payload;
