@@ -26,10 +26,10 @@
         "phpseclib/phpseclib": "^2.0"
     },
     "require-dev": {
+        "jubeki/laravel-code-style": "^1.0",
         "mockery/mockery": "^1.4",
         "nesbot/carbon": "^2.43",
-        "phpunit/phpunit": "^9.5",
-        "jubeki/laravel-code-style": "^1.0"
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
