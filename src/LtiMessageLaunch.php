@@ -105,8 +105,8 @@ class LtiMessageLaunch
     /**
      * Load an LtiMessageLaunch from a Cache using a launch id.
      *
-     * @param string    $launch_id the launch id of the LtiMessageLaunch object that is being pulled from the cache
-     * @param IDatabase $database  instance of the database interface used for looking up registrations and deployments
+     * @param string    $launch_id The launch id of the LtiMessageLaunch object that is being pulled from the cache
+     * @param IDatabase $database  Instance of the database interface used for looking up registrations and deployments
      * @param ICache    $cache     Instance of the Cache interface used to loading and storing launches. If non is provided launch data will be store in $_SESSION.
      *
      * @throws LtiException Will throw an LtiException if validation fails or launch cannot be found
@@ -155,7 +155,7 @@ class LtiMessageLaunch
     /**
      * Returns whether or not the current launch can use the names and roles service.
      *
-     * @return bool returns a boolean indicating the availability of names and roles
+     * @return bool Returns a boolean indicating the availability of names and roles
      */
     public function hasNrps()
     {
@@ -165,7 +165,7 @@ class LtiMessageLaunch
     /**
      * Fetches an instance of the names and roles service for the current launch.
      *
-     * @return LtiNamesRolesProvisioningService an instance of the names and roles service that can be used to make calls within the scope of the current launch
+     * @return LtiNamesRolesProvisioningService An instance of the names and roles service that can be used to make calls within the scope of the current launch
      */
     public function getNrps()
     {
@@ -179,7 +179,7 @@ class LtiMessageLaunch
     /**
      * Returns whether or not the current launch can use the groups service.
      *
-     * @return bool returns a boolean indicating the availability of groups
+     * @return bool Returns a boolean indicating the availability of groups
      */
     public function hasGs()
     {
@@ -189,7 +189,7 @@ class LtiMessageLaunch
     /**
      * Fetches an instance of the groups service for the current launch.
      *
-     * @return LtiCourseGroupsService an instance of the groups service that can be used to make calls within the scope of the current launch
+     * @return LtiCourseGroupsService An instance of the groups service that can be used to make calls within the scope of the current launch
      */
     public function getGs()
     {
@@ -203,7 +203,7 @@ class LtiMessageLaunch
     /**
      * Returns whether or not the current launch can use the assignments and grades service.
      *
-     * @return bool returns a boolean indicating the availability of assignments and grades
+     * @return bool Returns a boolean indicating the availability of assignments and grades
      */
     public function hasAgs()
     {
@@ -227,7 +227,7 @@ class LtiMessageLaunch
     /**
      * Returns whether or not the current launch is a deep linking launch.
      *
-     * @return bool returns true if the current launch is a deep linking launch
+     * @return bool Returns true if the current launch is a deep linking launch
      */
     public function isDeepLinkLaunch()
     {
@@ -237,7 +237,7 @@ class LtiMessageLaunch
     /**
      * Fetches a deep link that can be used to construct a deep linking response.
      *
-     * @return LtiDeepLink an instance of a deep link to construct a deep linking response for the current launch
+     * @return LtiDeepLink An instance of a deep link to construct a deep linking response for the current launch
      */
     public function getDeepLink()
     {
@@ -251,7 +251,7 @@ class LtiMessageLaunch
     /**
      * Returns whether or not the current launch is a submission review launch.
      *
-     * @return bool returns true if the current launch is a submission review launch
+     * @return bool Returns true if the current launch is a submission review launch
      */
     public function isSubmissionReviewLaunch()
     {
@@ -261,7 +261,7 @@ class LtiMessageLaunch
     /**
      * Returns whether or not the current launch is a resource launch.
      *
-     * @return bool returns true if the current launch is a resource launch
+     * @return bool Returns true if the current launch is a resource launch
      */
     public function isResourceLaunch()
     {
@@ -271,7 +271,7 @@ class LtiMessageLaunch
     /**
      * Fetches the decoded body of the JWT used in the current launch.
      *
-     * @return array|object returns the decoded json body of the launch as an array
+     * @return array|object Returns the decoded json body of the launch as an array
      */
     public function getLaunchData()
     {
@@ -281,7 +281,7 @@ class LtiMessageLaunch
     /**
      * Get the unique launch id for the current launch.
      *
-     * @return string a unique identifier used to re-reference the current launch in subsequent requests
+     * @return string A unique identifier used to re-reference the current launch in subsequent requests
      */
     public function getLaunchId()
     {
