@@ -87,6 +87,7 @@ class LtiOidcLoginTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testValidatesFailsIfRegistrationNotFound()
@@ -100,7 +101,7 @@ class LtiOidcLoginTest extends TestCase
 
         // Use an alias to mock LtiMessageLaunch::getMissingRegistrationErrorMsg()
         $expectedError = 'Registration not found!';
-        Mockery::mock('alias:' . LtiMessageLaunch::class)
+        Mockery::mock('alias:'.LtiMessageLaunch::class)
             ->shouldReceive('getMissingRegistrationErrorMsg')
             ->andReturn($expectedError);
 

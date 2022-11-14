@@ -2,6 +2,7 @@
 
 namespace Packback\Lti1p3;
 
+use Exception;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -50,7 +51,7 @@ class LtiServiceConnector implements ILtiServiceConnector
             'aud' => $registration->getAuthServer(),
             'iat' => time() - 5,
             'exp' => time() + 60,
-            'jti' => 'lti-service-token' . hash('sha256', random_bytes(64)),
+            'jti' => 'lti-service-token'.hash('sha256', random_bytes(64)),
         ];
 
         // Sign the JWT with our private key (given by the platform on registration)
@@ -156,7 +157,7 @@ class LtiServiceConnector implements ILtiServiceConnector
         string $key = null
     ): array {
         if ($request->getMethod() !== ServiceRequest::METHOD_GET) {
-            throw new \Exception('An invalid method was specified by an LTI service requesting all items.');
+            throw new Exception('An invalid method was specified by an LTI service requesting all items.');
         }
 
         $results = [];
@@ -207,7 +208,7 @@ class LtiServiceConnector implements ILtiServiceConnector
         sort($scopes);
         $scopeKey = md5(implode('|', $scopes));
 
-        return $registration->getIssuer() . $registration->getClientId() . $scopeKey;
+        return $registration->getIssuer().$registration->getClientId().$scopeKey;
     }
 
     private function getNextUrl(array $headers)

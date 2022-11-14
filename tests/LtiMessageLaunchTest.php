@@ -24,8 +24,8 @@ class LtiMessageLaunchTest extends TestCase
 {
     public const ISSUER_URL = 'https://ltiadvantagevalidator.imsglobal.org';
     public const JWKS_FILE = '/tmp/jwks.json';
-    public const CERT_DATA_DIR = __DIR__ . '/data/certification/';
-    public const PRIVATE_KEY = __DIR__ . '/data/private.key';
+    public const CERT_DATA_DIR = __DIR__.'/data/certification/';
+    public const PRIVATE_KEY = __DIR__.'/data/private.key';
 
     public const STATE = 'state';
 

@@ -82,7 +82,7 @@ class ServiceRequest implements IServiceRequest
 
     public function setAccessToken(string $accessToken): IServiceRequest
     {
-        $this->accessToken = 'Bearer ' . $accessToken;
+        $this->accessToken = 'Bearer '.$accessToken;
 
         return $this;
     }

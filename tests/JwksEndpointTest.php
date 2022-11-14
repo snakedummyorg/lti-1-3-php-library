@@ -60,7 +60,7 @@ class JwksEndpointTest extends TestCase
     public function testItGetsJwksForTheProvidedKeys()
     {
         $jwks = new JwksEndpoint([
-            'kid' => file_get_contents(__DIR__ . '/data/private.key'),
+            'kid' => file_get_contents(__DIR__.'/data/private.key'),
         ]);
 
         $result = $jwks->getPublicJwks();

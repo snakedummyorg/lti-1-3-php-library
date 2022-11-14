@@ -12,8 +12,8 @@ class ImsCookie implements ICookie
             return $_COOKIE[$name];
         }
         // Look for backup cookie if same site is not supported by the user's browser.
-        if (isset($_COOKIE['LEGACY_' . $name])) {
-            return $_COOKIE['LEGACY_' . $name];
+        if (isset($_COOKIE['LEGACY_'.$name])) {
+            return $_COOKIE['LEGACY_'.$name];
         }
 
         return null;
@@ -34,6 +34,6 @@ class ImsCookie implements ICookie
         setcookie($name, $value, array_merge($cookie_options, $same_site_options, $options));
 
         // Set a second fallback cookie in the event that "SameSite" is not supported
-        setcookie('LEGACY_' . $name, $value, array_merge($cookie_options, $options));
+        setcookie('LEGACY_'.$name, $value, array_merge($cookie_options, $options));
     }
 }
