@@ -19,10 +19,12 @@ return (new \Jubeki\LaravelCodeStyle\Config())
         /* Packback-specific style preferences */
         'not_operator_with_successor_space' => false,
         'concat_space' => ['spacing' => 'one'],
-        "class_attributes_separation" => [
-            "elements" => [
-                "property" => "none"
-            ]
+        'class_attributes_separation' => [
+            'elements' => [ 'property' => 'none' ],
+        ],
+        'global_namespace_import' => [
+            'import_classes' => true,
+            'import_functions' => false,
         ],
         'explicit_indirect_variable' => true,
         'explicit_string_variable' => true,
