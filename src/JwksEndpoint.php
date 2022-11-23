@@ -37,7 +37,7 @@ class JwksEndpoint
     {
         $jwks = [];
         foreach ($this->keys as $kid => $private_key) {
-            $key = new RSA();
+            $key = RSA::createKey();
             $key->setHash('sha256');
             $key->loadKey($private_key);
             $key->setPublicKey(false, RSA::PUBLIC_FORMAT_PKCS8);
