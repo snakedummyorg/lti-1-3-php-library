@@ -37,22 +37,13 @@ class JwksEndpoint
     {
         $jwks = [];
         foreach ($this->keys as $kid => $private_key) {
-            $key = RSA::createKey();
-            $key->setHash('sha256');
-            $key->loadKey($private_key);
-            $key->setPublicKey(false, RSA::PUBLIC_FORMAT_PKCS8);
-            if (!$key->publicExponent) {
-                continue;
-            }
-            $components = [
-                'kty' => 'RSA',
+            $key = RSA::load($private_key);
+            $jwk = json_decode($key->getPublicKey()->toString('JWK'), true);
+            $jwks[] = array_merge($jwk['keys'][0], [
                 'alg' => 'RS256',
                 'use' => 'sig',
-                'e' => JWT::urlsafeB64Encode($key->publicExponent->toBytes()),
-                'n' => JWT::urlsafeB64Encode($key->modulus->toBytes()),
                 'kid' => $kid,
-            ];
-            $jwks[] = $components;
+            ]);
         }
 
         return ['keys' => $jwks];
