@@ -6,35 +6,33 @@ on:
     branches:
       - master
 jobs:
-  run-tests:
+  lint:
+    name: Linting
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install Composer Dependencies
-        run: |
-          composer install -q --no-ansi --no-interaction --no-scripts --no-suggest \
-            --no-progress --prefer-dist
-      - name: Run tests
-        run: composer test
+      - uses: "ramsey/composer-install@v2"
       - name: Check style
         run: composer lint
 
-  build:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      matrix:
-        operating-system: [ ubuntu-latest ]
-        php: [ '5.6', '8.1' ]
-    name: PHP ${{ matrix.php }} sample
+  test-php56:
+    name: Test in PHP 5.6
     steps:
       - uses: actions/checkout@v3
-      - name: Setup PHP
-        uses: nanasess/setup-php@v3
+      - uses: "shivammathur/setup-php@v2"
         with:
-          php-version: ${{ matrix.php }}
-      - name: Install Composer Dependencies
-        run: |
-          composer install -q --no-ansi --no-interaction --no-scripts --no-suggest \
-            --no-progress --prefer-dist
+          php-version: "5.6"
+      - uses: "ramsey/composer-install@v2"
+      - name: Run tests
+        run: composer test
+
+  test-php-latest:
+    name: Test in PHP 5.6
+    steps:
+      - uses: actions/checkout@v3
+      - uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "latest"
+      - uses: "ramsey/composer-install@v2"
       - name: Run tests
         run: composer test
