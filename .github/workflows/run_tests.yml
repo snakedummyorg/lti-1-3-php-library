@@ -6,7 +6,7 @@ on:
     branches:
       - master
 jobs:
-  - lint:
+  lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
@@ -15,8 +15,9 @@ jobs:
       - name: Check style
         run: composer lint
 
-  - test-php:
+  test:
     name: Test
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: "ramsey/composer-install@v2"
