@@ -18,19 +18,22 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php:
+          - "5.6"
+          - "8.1"
+        dependencies:
+          - "lowest"
+          - "highest"
     steps:
-      - uses: actions/checkout@v3
+      - uses: "actions/checkout@v3"
+      - uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "${{ matrix.php }}"
       - uses: "ramsey/composer-install@v2"
+        with:
+          dependency-versions: "${{ matrix.dependencies }}"
+          composer-options: "${{ matrix.composer-options }}"
       - name: Run tests
         run: composer test
-
-  # test-php-latest:
-  #   name: Test in PHP 5.6
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: "shivammathur/setup-php@v2"
-  #       with:
-  #         php-version: "latest"
-  #     - uses: "ramsey/composer-install@v2"
-  #     - name: Run tests
-  #       run: composer test
