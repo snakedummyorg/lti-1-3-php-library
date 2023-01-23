@@ -2,6 +2,7 @@
 
 namespace Packback\Lti1p3\Interfaces;
 
+/** @internal */
 interface IMessageValidator
 {
     public static function getMessageType(): string;
