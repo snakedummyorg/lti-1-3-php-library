@@ -2,9 +2,9 @@
 
 namespace Packback\Lti1p3;
 
+use Firebase\JWT\JWT;
 use Packback\Lti1p3\Interfaces\IDatabase;
 use Packback\Lti1p3\Interfaces\ILtiRegistration;
-use phpseclib3\Crypt\RSA;
 
 class JwksEndpoint
 {
@@ -33,13 +33,17 @@ class JwksEndpoint
     {
         $jwks = [];
         foreach ($this->keys as $kid => $private_key) {
-            $key = RSA::load($private_key);
-            $jwk = json_decode($key->getPublicKey()->toString('JWK'), true);
-            $jwks[] = array_merge($jwk['keys'][0], [
+            $key_res = openssl_pkey_get_private($private_key);
+            $key_details = openssl_pkey_get_details($key_res);
+            $components = [
+                'kty' => 'RSA',
                 'alg' => 'RS256',
                 'use' => 'sig',
+                'e' => JWT::urlsafeB64Encode($key_details['rsa']['e']),
+                'n' => JWT::urlsafeB64Encode($key_details['rsa']['n']),
                 'kid' => $kid,
-            ]);
+            ];
+            $jwks[] = $components;
         }
 
         return ['keys' => $jwks];
