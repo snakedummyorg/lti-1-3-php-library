@@ -1,3 +1,7 @@
+## 5.2.7
+
+Add `AssignmentGradesService::deleteLineitem()` to update a line item [#83](https://github.com/packbackbooks/lti-1-3-php-library/pull/83).
+
 ## 5.1.7
 
 Add `AssignmentGradesService::updateLineitem()` to update a line item [#58](https://github.com/packbackbooks/lti-1-3-php-library/pull/58).
