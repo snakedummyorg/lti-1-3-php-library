@@ -69,6 +69,6 @@ class LtiAssignmentsGradesServiceTest extends TestCase
 
         $result = $service->deleteLineitem();
 
-        $this->assertEquals($result, $result);
+        $this->assertEquals($response, $result);
     }
 }
