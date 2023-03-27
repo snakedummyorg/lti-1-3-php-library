@@ -50,7 +50,25 @@ class LtiAssignmentsGradesServiceTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /*
-     * @todo Test this
-     */
+    public function testItDeletesALineItem()
+    {
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
+            'lineitem' => 'https://canvas.localhost/api/lti/courses/8/line_items/27',
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $response = [
+            'status' => 204,
+            'body' => null,
+        ];
+
+        $this->connector->shouldReceive('makeServiceRequest')
+            ->once()->andReturn($response);
+
+        $result = $service->deleteLineitem();
+
+        $this->assertEquals($response, $result);
+    }
 }

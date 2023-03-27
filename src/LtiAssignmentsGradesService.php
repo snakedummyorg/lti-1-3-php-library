@@ -98,6 +98,17 @@ class LtiAssignmentsGradesService extends LtiAbstractService
         return new LtiLineitem($createdLineItem['body']);
     }
 
+    public function deleteLineitem(): array
+    {
+        $request = new ServiceRequest(
+            ServiceRequest::METHOD_DELETE,
+            $this->getServiceData()['lineitem'],
+            ServiceRequest::TYPE_DELETE_LINEITEM
+        );
+
+        return $this->makeServiceRequest($request);
+    }
+
     public function findOrCreateLineitem(LtiLineitem $newLineItem): LtiLineitem
     {
         return $this->findLineItem($newLineItem) ?? $this->createLineitem($newLineItem);
