@@ -50,6 +50,32 @@ class LtiAssignmentsGradesServiceTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function testItGetsSingleLineItemWithReadonlyScope()
+    {
+        $ltiLineitemData = [
+            'id' => 'testId',
+        ];
+
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM_READONLY],
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $response = [
+            'body' => $ltiLineitemData,
+        ];
+
+        $this->connector->shouldReceive('makeServiceRequest')
+            ->once()->andReturn($response);
+
+        $expected = new LtiLineitem($ltiLineitemData);
+
+        $result = $service->getLineItem('someUrl');
+
+        $this->assertEquals($expected, $result);
+    }
+
     public function testItDeletesALineItem()
     {
         $serviceData = [
