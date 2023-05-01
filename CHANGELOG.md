@@ -1,6 +1,10 @@
+## 5.3.2
+
+Fix URL for updating a line item [#87](https://github.com/packbackbooks/lti-1-3-php-library/pull/87).
+
 ## 5.3.1
 
-Fix URL for updating a line item [#87](https://github.com/packbackbooks/lti-1-3-php-library/pull/87).s
+Validate scopes before a request [#86](https://github.com/packbackbooks/lti-1-3-php-library/pull/86).
 
 ## 5.3.0
 
