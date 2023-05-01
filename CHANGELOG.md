@@ -1,6 +1,6 @@
 ## 5.3.2
 
-Fix URL for updating a line item [#87](https://github.com/packbackbooks/lti-1-3-php-library/pull/87).
+Fix URL for updating a line item [#89](https://github.com/packbackbooks/lti-1-3-php-library/pull/89).
 
 ## 5.3.1
 
