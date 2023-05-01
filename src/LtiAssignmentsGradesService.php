@@ -68,7 +68,7 @@ class LtiAssignmentsGradesService extends LtiAbstractService
     {
         $request = new ServiceRequest(
             ServiceRequest::METHOD_PUT,
-            $this->getServiceData()['lineitems'],
+            $this->getServiceData()['lineitem'],
             ServiceRequest::TYPE_UPDATE_LINEITEM
         );
 

@@ -1,3 +1,7 @@
+## 5.3.1
+
+Fix URL for updating a line item [#87](https://github.com/packbackbooks/lti-1-3-php-library/pull/87).s
+
 ## 5.3.0
 
 Add `AssignmentGradesService::deleteLineitem()` to update a line item [#83](https://github.com/packbackbooks/lti-1-3-php-library/pull/83).
