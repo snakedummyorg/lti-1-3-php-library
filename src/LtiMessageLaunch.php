@@ -79,7 +79,8 @@ class LtiMessageLaunch
         IDatabase $database,
         ICache $cache = null,
         ICookie $cookie = null,
-        ILtiServiceConnector $serviceConnector = null
+        ILtiServiceConnector $serviceConnector = null,
+        bool $serviceConnectorDebuggingMode = false
     ) {
         $this->db = $database;
 
@@ -88,6 +89,10 @@ class LtiMessageLaunch
         $this->cache = $cache;
         $this->cookie = $cookie;
         $this->serviceConnector = $serviceConnector;
+
+        if ($this->serviceConnector) {
+            $this->serviceConnector->setDebuggingMode($serviceConnectorDebuggingMode);
+        }
     }
 
     /**
@@ -97,9 +102,16 @@ class LtiMessageLaunch
         IDatabase $database,
         ICache $cache = null,
         ICookie $cookie = null,
-        ILtiServiceConnector $serviceConnector = null
+        ILtiServiceConnector $serviceConnector = null,
+        bool $serviceConnectorDebuggingMode = false
     ) {
-        return new LtiMessageLaunch($database, $cache, $cookie, $serviceConnector);
+        return new LtiMessageLaunch(
+            $database,
+            $cache,
+            $cookie,
+            $serviceConnector,
+            $serviceConnectorDebuggingMode
+        );
     }
 
     /**
@@ -117,9 +129,16 @@ class LtiMessageLaunch
         $launch_id,
         IDatabase $database,
         ICache $cache = null,
-        ILtiServiceConnector $serviceConnector = null
+        ILtiServiceConnector $serviceConnector = null,
+        bool $serviceConnectorDebuggingMode = false
     ) {
-        $new = new LtiMessageLaunch($database, $cache, null, $serviceConnector);
+        $new = new LtiMessageLaunch(
+            $database,
+            $cache,
+            null,
+            $serviceConnector,
+            $serviceConnectorDebuggingMode
+        );
         $new->launch_id = $launch_id;
         $new->jwt = ['body' => $new->cache->getLaunchData($launch_id)];
 
