@@ -127,17 +127,6 @@ class LtiMessageLaunch
     }
 
     /**
-     * Toggles the debugging mode of the service connector. This is useful for
-     * getting logs of requests for the public key.
-     */
-    public function setServiceConnectorDebuggingMode(bool $debuggingMode): void
-    {
-        if ($this->serviceConnector) {
-            $this->serviceConnector->setDebuggingMode($debuggingMode);
-        }
-    }
-
-    /**
      * Validates all aspects of an incoming LTI message launch and caches the launch if successful.
      *
      * @param array|string $request An array of post request parameters. If not set will default to $_POST.
