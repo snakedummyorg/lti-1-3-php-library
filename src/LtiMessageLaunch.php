@@ -79,8 +79,7 @@ class LtiMessageLaunch
         IDatabase $database,
         ICache $cache = null,
         ICookie $cookie = null,
-        ILtiServiceConnector $serviceConnector = null,
-        bool $serviceConnectorDebuggingMode = false
+        ILtiServiceConnector $serviceConnector = null
     ) {
         $this->db = $database;
 
@@ -89,10 +88,6 @@ class LtiMessageLaunch
         $this->cache = $cache;
         $this->cookie = $cookie;
         $this->serviceConnector = $serviceConnector;
-
-        if ($this->serviceConnector && $serviceConnectorDebuggingMode) {
-            $this->serviceConnector->setDebuggingMode($serviceConnectorDebuggingMode);
-        }
     }
 
     /**
@@ -102,16 +97,9 @@ class LtiMessageLaunch
         IDatabase $database,
         ICache $cache = null,
         ICookie $cookie = null,
-        ILtiServiceConnector $serviceConnector = null,
-        bool $serviceConnectorDebuggingMode = false
+        ILtiServiceConnector $serviceConnector = null
     ) {
-        return new LtiMessageLaunch(
-            $database,
-            $cache,
-            $cookie,
-            $serviceConnector,
-            $serviceConnectorDebuggingMode
-        );
+        return new LtiMessageLaunch($database, $cache, $cookie, $serviceConnector);
     }
 
     /**
@@ -129,20 +117,20 @@ class LtiMessageLaunch
         $launch_id,
         IDatabase $database,
         ICache $cache = null,
-        ILtiServiceConnector $serviceConnector = null,
-        bool $serviceConnectorDebuggingMode = false
+        ILtiServiceConnector $serviceConnector = null
     ) {
-        $new = new LtiMessageLaunch(
-            $database,
-            $cache,
-            null,
-            $serviceConnector,
-            $serviceConnectorDebuggingMode
-        );
+        $new = new LtiMessageLaunch($database, $cache, null, $serviceConnector);
         $new->launch_id = $launch_id;
         $new->jwt = ['body' => $new->cache->getLaunchData($launch_id)];
 
         return $new->validateRegistration();
+    }
+
+    public function setServiceConnectorDebuggingMode(bool $debuggingMode): void
+    {
+        if ($this->serviceConnector) {
+            $this->serviceConnector->setDebuggingMode($debuggingMode);
+        }
     }
 
     /**
