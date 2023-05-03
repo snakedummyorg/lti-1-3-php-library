@@ -90,7 +90,7 @@ class LtiMessageLaunch
         $this->cookie = $cookie;
         $this->serviceConnector = $serviceConnector;
 
-        if ($this->serviceConnector) {
+        if ($this->serviceConnector && $serviceConnectorDebuggingMode) {
             $this->serviceConnector->setDebuggingMode($serviceConnectorDebuggingMode);
         }
     }

@@ -79,7 +79,7 @@ class TestCookie implements ICookie
 class TestDb implements IDatabase
 {
     private $registrations = [];
-    private $deplomyments = [];
+    private $deployments = [];
 
     public function __construct($registration, $deployment)
     {
@@ -462,15 +462,6 @@ class Lti13CertificationTest extends TestCase
         }
         echo PHP_EOL;
         $this->assertEquals($casesCount, $testedCases);
-    }
-
-    private function login($loginData = null)
-    {
-        $loginData = $loginData ?? [
-            'iss' => $this->issuer['issuer'],
-            'login_hint' => '535fa085f22b4655f48cd5a36a9215f64c062838',
-        ];
-        $loginData['client_id'] = $this->issuer['client_id'];
     }
 
     private function launch($payload)
