@@ -126,6 +126,10 @@ class LtiMessageLaunch
         return $new->validateRegistration();
     }
 
+    /**
+     * Toggles the debugging mode of the service connector. This is useful for
+     * getting logs of requests for the public key.
+     */
     public function setServiceConnectorDebuggingMode(bool $debuggingMode): void
     {
         if ($this->serviceConnector) {
