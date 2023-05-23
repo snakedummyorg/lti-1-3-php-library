@@ -27,6 +27,7 @@ class LtiConstants
     public const DL_CONTENT_ITEMS = 'https://purl.imsglobal.org/spec/lti-dl/claim/content_items';
     public const DL_DATA = 'https://purl.imsglobal.org/spec/lti-dl/claim/data';
     public const DL_DEEP_LINK_SETTINGS = 'https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings';
+    public const DL_RESOURCE_LINK_TYPE = 'ltiResourceLink';
 
     // LTI NRPS
     public const NRPS_CLAIM_SERVICE = 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice';
