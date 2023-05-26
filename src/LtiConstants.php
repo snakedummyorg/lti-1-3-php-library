@@ -95,6 +95,7 @@ class LtiConstants
 
     // Message Types
     public const MESSAGE_TYPE_DEEPLINK = 'LtiDeepLinkingRequest';
+    public const MESSAGE_TYPE_DEEPLINK_RESPONSE = 'LtiDeepLinkingResponse';
     public const MESSAGE_TYPE_RESOURCE = 'LtiResourceLinkRequest';
     public const MESSAGE_TYPE_SUBMISSIONREVIEW = 'LtiSubmissionReviewRequest';
 }
