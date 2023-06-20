@@ -48,7 +48,7 @@ class LtiDeepLink
      */
     public function outputResponseForm($resources)
     {
-        trigger_error('Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
 
         $jwt = $this->getResponseJwt($resources);
         /*

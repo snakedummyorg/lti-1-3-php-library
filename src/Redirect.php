@@ -41,7 +41,7 @@ class Redirect
      */
     public function doJsRedirect()
     {
-        trigger_error('Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
 
         ?>
         <a id="try-again" target="_blank">If you are not automatically redirected, click here to continue</a>
