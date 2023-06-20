@@ -104,9 +104,7 @@ class Lti13CertificationTest extends TestCase
     public const JWKS_FILE = '/tmp/jwks.json';
     public const CERT_DATA_DIR = __DIR__.'/../data/certification/';
     public const PRIVATE_KEY = __DIR__.'/../data/private.key';
-
     public const STATE = 'state';
-
     private $issuer;
     private $key;
 
@@ -403,7 +401,7 @@ class Lti13CertificationTest extends TestCase
                 $this->assertInstanceOf(LtiException::class, $e);
             }
 
-            ++$testedCases;
+            $testedCases++;
         }
         echo PHP_EOL;
         $this->assertEquals($casesCount, $testedCases);
@@ -458,7 +456,7 @@ class Lti13CertificationTest extends TestCase
             // Assertions
             $this->assertInstanceOf(LtiMessageLaunch::class, $result);
 
-            ++$testedCases;
+            $testedCases++;
         }
         echo PHP_EOL;
         $this->assertEquals($casesCount, $testedCases);
