@@ -43,8 +43,13 @@ class LtiDeepLink
         return JWT::encode($message_jwt, $this->registration->getToolPrivateKey(), 'RS256', $this->registration->getKid());
     }
 
+    /**
+     * @deprecated
+     */
     public function outputResponseForm($resources)
     {
+        trigger_error('Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+
         $jwt = $this->getResponseJwt($resources);
         /*
          * @todo Fix this
