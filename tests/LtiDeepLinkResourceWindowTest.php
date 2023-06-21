@@ -10,7 +10,6 @@ class LtiDeepLinkResourceWindowTest extends TestCase
     public const INITIAL_WIDTH = 1;
     public const INITIAL_HEIGHT = 2;
     public const INITIAL_WINDOW_FEATURES = 'example-feature=value';
-
     private LtiDeepLinkResourceWindow $ltiDeepLinkResourceWindow;
 
     public function setUp(): void

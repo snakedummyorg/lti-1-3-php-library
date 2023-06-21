@@ -48,7 +48,7 @@ class LtiDeepLink
      * back to platform, as per LTI-DL 2.0 specification. The resulting HTML is then written to standard output,
      * so calling this method will automatically send an HTTP response to conclude the content selection flow.
      *
-     * @param LtiDeepLinkResource[] $resources The list of selected resources to be sent to the platform
+     * @param  LtiDeepLinkResource[]  $resources The list of selected resources to be sent to the platform
      *
      * @todo Consider wrapping the content inside a well-formed HTML document,
      * and returning it instead of directly writing to standard output

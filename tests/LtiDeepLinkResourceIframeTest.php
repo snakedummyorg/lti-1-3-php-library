@@ -8,7 +8,6 @@ class LtiDeepLinkResourceIframeTest extends TestCase
 {
     public const INITIAL_WIDTH = 1;
     public const INITIAL_HEIGHT = 2;
-
     private LtiDeepLinkResourceIframe $ltiDeepLinkResourceIframe;
 
     public function setUp(): void

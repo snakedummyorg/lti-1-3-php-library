@@ -10,7 +10,6 @@ class LtiDeepLinkDateTimeIntervalTest extends TestCase
 {
     private DateTime $initialStart;
     private DateTime $initialEnd;
-
     private LtiDeepLinkDateTimeInterval $ltiDeepLinkDateTimeInterval;
 
     public function setUp(): void

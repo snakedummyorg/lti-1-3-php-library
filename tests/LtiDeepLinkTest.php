@@ -17,7 +17,6 @@ class LtiDeepLinkTest extends TestCase
     public const ISSUER = 'issuer';
     public const DEPLOYMENT_ID = 'deployment-id';
     public const LTI_RESOURCE_ARRAY = ['resource'];
-
     private $registrationMock;
     private $ltiResourceMock;
 
