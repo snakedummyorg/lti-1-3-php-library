@@ -15,8 +15,10 @@ class ServiceRequest implements IServiceRequest
     // Request types
     public const TYPE_UNSUPPORTED = 'unsupported';
     public const TYPE_AUTH = 'auth';
+
     // MessageLaunch
     public const TYPE_GET_KEYSET = 'get_keyset';
+
     // AGS
     public const TYPE_GET_GRADES = 'get_grades';
     public const TYPE_SYNC_GRADE = 'sync_grades';
@@ -25,12 +27,13 @@ class ServiceRequest implements IServiceRequest
     public const TYPE_GET_LINEITEMS = 'get_lineitems';
     public const TYPE_GET_LINEITEM = 'get_lineitem';
     public const TYPE_UPDATE_LINEITEM = 'update_lineitem';
+
     // CGS
     public const TYPE_GET_GROUPS = 'get_groups';
     public const TYPE_GET_SETS = 'get_sets';
+
     // NRPS
     public const TYPE_GET_MEMBERSHIPS = 'get_memberships';
-
     private $method;
     private $url;
     private $type;
