@@ -334,6 +334,7 @@ class LtiMessageLaunch
 
         return str_replace($search, $replace, static::ERR_MISSING_REGISTRATION);
     }
+
     private function getPublicKey()
     {
         $request = new ServiceRequest(
