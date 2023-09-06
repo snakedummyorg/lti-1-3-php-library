@@ -122,6 +122,49 @@ class LtiMessageLaunch
         return $new->validateRegistration();
     }
 
+    public function initialize(array $request = null): static
+    {
+        $this->setRequest($request);
+
+        // Ideally this would just be abstracted to a validator. But how when, halfway through, we need to migrate?
+        $this->validateState()
+            ->validateJwtFormat()
+            ->validateNonce()
+            ->validateRegistration()
+            ->validateJwtSignature();
+
+        // This feels kinda icky in the middle of all the validation. How can I move it?
+        if ($this->shouldMigrate()) {
+            $this->deployment = $this->db->migrateFromLti11($this->getLaunchData());
+        }
+
+        $this->validateDeployment()
+            ->validateMessage();
+
+        $this->cacheLaunchData();
+
+        return $this;
+    }
+
+    public function setRequest(array $request = null)
+    {
+        if ($request === null) {
+            $request = $_POST;
+        }
+
+        $this->request = $request;
+
+        return $this;
+    }
+
+    private function shouldMigrate(): bool
+    {
+        return $this->hasMigrationStrategy()
+            // I don't like this here. Move it later
+            && isset($this->jwt['body'][LtiConstants::DEPLOYMENT_ID])
+            && $this->db->hasMatchingLti11Key($this->getLaunchData()['oauth_consumer_key_sign']);
+    }
+
     /**
      * Validates all aspects of an incoming LTI message launch and caches the launch if successful.
      *
@@ -130,13 +173,9 @@ class LtiMessageLaunch
      *
      * @throws LtiException Will throw an LtiException if validation fails
      */
-    public function validate(array $request = null)
+    public function validate()
     {
-        if ($request === null) {
-            $request = $_POST;
-        }
-        $this->request = $request;
-
+        // Deprecate? Move to it's own validator?
         return $this->validateState()
             ->validateJwtFormat()
             ->validateNonce()
@@ -295,7 +334,6 @@ class LtiMessageLaunch
 
         return str_replace($search, $replace, static::ERR_MISSING_REGISTRATION);
     }
-
     private function getPublicKey()
     {
         $request = new ServiceRequest(
