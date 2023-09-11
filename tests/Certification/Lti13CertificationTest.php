@@ -12,6 +12,7 @@ use Packback\Lti1p3\Interfaces\ICookie;
 use Packback\Lti1p3\Interfaces\IDatabase;
 use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
 use Packback\Lti1p3\JwksEndpoint;
+use Packback\Lti1p3\Lti1p1Installation;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiDeployment;
 use Packback\Lti1p3\LtiException;
@@ -95,6 +96,16 @@ class TestDb implements IDatabase
     public function findDeployment($iss, $deployment_id, $client_id = null)
     {
         return $this->deployments[$iss];
+    }
+
+    public function getMatchingLti1p1Install(array $launchData): ?Lti1p1Installation
+    {
+        return null;
+    }
+
+    public function migrateFromLti1p1(array $launchData): void
+    {
+        return;
     }
 }
 

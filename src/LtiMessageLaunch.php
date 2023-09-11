@@ -183,7 +183,7 @@ class LtiMessageLaunch
         return false;
     }
 
-    private function lti1p1InstallationSignatureMatches (Lti1p1Installation $ltiInstall, array $launchData): bool
+    private function lti1p1InstallationSignatureMatches(Lti1p1Installation $ltiInstall, array $launchData): bool
     {
         // Check to see if we have params to calculate oauth_consumer_key_sign
         if (!isset($launchData[LtiConstants::LTI1P1]) || !isset($launchData[LtiConstants::LTI1P1]['oauth_consumer_key_sign'])) {
@@ -193,21 +193,7 @@ class LtiMessageLaunch
         $lti1p1Claim = $launchData[LtiConstants::LTI1P1];
         $signature = $lti1p1Claim['oauth_consumer_key_sign'];
 
-        $clientId = is_array($launchData['aud']) ? $launchData['aud'][0] : $launchData['aud'];
-        $issuerUrl = $launchData['iss'];
-        $exp = $launchData['exp'];
-        $nonce = $launchData['nonce'];
-
-        // Create signature
-        $baseString = "{$ltiInstall->getOauthConsumerKey()}&\
-            {$launchData[LtiConstants::DEPLOYMENT_ID]}&\
-            {$issuerUrl}&\
-            {$clientId}&\
-            {$exp}&\
-            {$nonce}";
-
-        $computedSignature = base64_encode(hash_hmac('sha256', $baseString, $ltiInstall->getOauthConsumerSecret(), true));
-        if ($computedSignature !== $signature) {
+        if ($ltiInstall->computeOauthConsumerKeySign($launchData) !== $signature) {
             throw new LtiException(static::ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH);
         }
 
