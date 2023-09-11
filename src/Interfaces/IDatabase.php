@@ -2,16 +2,39 @@
 
 namespace Packback\Lti1p3\Interfaces;
 
-use Packback\Lti1p3\LtiDepoyment;
+use Packback\Lti1p3\Lti1p1Installation;
+use Packback\Lti1p3\LtiDeployment;
 use Packback\Lti1p3\LtiRegistration;
 
 interface IDatabase
 {
     public function findRegistrationByIssuer($iss, $clientId = null): ?LtiRegistration;
 
-    public function findDeployment($iss, $deploymentId, $clientId = null): ?LtiDepoyment;
+    public function findDeployment($iss, $deploymentId, $clientId = null): ?LtiDeployment;
 
-    public function hasMatchingLti11Key(string $oauthConsumerKeySign): bool;
+    /**
+     * A method to assist with 1.1 -> 1.3 migrations. If you don't support migrations
+     * simply have this method return false.
+     * 
+     * Otherwise, using the $launchData from
+     * a 1.3 launch attempt, determine if you have a matching 1.1 install and return
+     * it from this method.
+     *
+     * @param array $launchData
+     * @return Lti1p1Installation|null
+     */
+    public function getMatchingLti1p1Install(array $launchData): ?Lti1p1Installation;
 
-    public function migrateFromLti11(array $launchData);
+    /**
+     * Another method to assist with 1.1 -> 1.3 migrations. Simply have this method do nothing
+     * if you don't support migrations.
+     * 
+     * Otherwise, this method create a 1.3 deployment in your DB based on the $launchData.
+     * Previous to this, we validated the oauth_consumer_key_sign to ensure this migration
+     * can safely occur.
+     *
+     * @param array $launchData
+     * @return void
+     */
+    public function migrateFromLti1p1(array $launchData);
 }

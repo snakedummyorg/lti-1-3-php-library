@@ -14,6 +14,7 @@ use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
 use Packback\Lti1p3\MessageValidators\DeepLinkMessageValidator;
 use Packback\Lti1p3\MessageValidators\ResourceMessageValidator;
 use Packback\Lti1p3\MessageValidators\SubmissionReviewMessageValidator;
+use Throwable;
 
 class LtiMessageLaunch
 {
@@ -28,6 +29,8 @@ class LtiMessageLaunch
     public const ERR_INVALID_ID_TOKEN = 'Invalid id_token, JWT must contain 3 parts';
     public const ERR_MISSING_NONCE = 'Missing Nonce.';
     public const ERR_INVALID_NONCE = 'Invalid Nonce.';
+    public const ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH = 'Failed to migrate from 1.1 -> 1.3, oauth_consumer_key_sign did not match';
+    public const ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN = 'Failed to migrate from 1.1 -> 1.3, oauth_consumer_key_sign was not provided';
 
     /**
      * :issuerUrl and :clientId are used to substitute the queried issuerUrl
@@ -135,7 +138,7 @@ class LtiMessageLaunch
 
         // This feels kinda icky in the middle of all the validation. How can I move it?
         if ($this->shouldMigrate()) {
-            $this->deployment = $this->db->migrateFromLti11($this->getLaunchData());
+            $this->db->migrateFromLti1p1($this->getLaunchData());
         }
 
         $this->validateDeployment()
@@ -159,10 +162,56 @@ class LtiMessageLaunch
 
     private function shouldMigrate(): bool
     {
-        return $this->hasMigrationStrategy()
-            // I don't like this here. Move it later
-            && isset($this->jwt['body'][LtiConstants::DEPLOYMENT_ID])
-            && $this->db->hasMatchingLti11Key($this->getLaunchData()['oauth_consumer_key_sign']);
+        $missingDeployment = false;
+
+        try {
+            $this->validateDeployment();
+        } catch (LtiException $e) {
+            if ($e->getMessage() === static::ERR_NO_DEPLOYMENT) {
+                $missingDeployment = true;
+            }
+        } catch (Throwable $e) {
+            return false;
+        }
+
+        $launchData = $this->getLaunchData();
+        $lti1p1Install = $this->db->getMatchingLti1p1Install($launchData);
+        if ($missingDeployment && $lti1p1Install !== null) {
+            return $this->lti1p1InstallationSignatureMatches($lti1p1Install, $launchData);
+        }
+
+        return false;
+    }
+
+    private function lti1p1InstallationSignatureMatches (Lti1p1Installation $ltiInstall, array $launchData): bool
+    {
+        // Check to see if we have params to calculate oauth_consumer_key_sign
+        if (!isset($launchData[LtiConstants::LTI1P1]) || !isset($launchData[LtiConstants::LTI1P1]['oauth_consumer_key_sign'])) {
+            throw new LtiException(static::ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN);
+        }
+
+        $lti1p1Claim = $launchData[LtiConstants::LTI1P1];
+        $signature = $lti1p1Claim['oauth_consumer_key_sign'];
+
+        $clientId = is_array($launchData['aud']) ? $launchData['aud'][0] : $launchData['aud'];
+        $issuerUrl = $launchData['iss'];
+        $exp = $launchData['exp'];
+        $nonce = $launchData['nonce'];
+
+        // Create signature
+        $baseString = "{$ltiInstall->getOauthConsumerKey()}&\
+            {$launchData[LtiConstants::DEPLOYMENT_ID]}&\
+            {$issuerUrl}&\
+            {$clientId}&\
+            {$exp}&\
+            {$nonce}";
+
+        $computedSignature = base64_encode(hash_hmac('sha256', $baseString, $ltiInstall->getOauthConsumerSecret(), true));
+        if ($computedSignature !== $signature) {
+            throw new LtiException(static::ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH);
+        }
+
+        return true;
     }
 
     /**
@@ -172,10 +221,12 @@ class LtiMessageLaunch
      * @return LtiMessageLaunch Will return $this if validation is successful
      *
      * @throws LtiException Will throw an LtiException if validation fails
+     * @deprecated Does not support LTI 1.1 migration. Use `initialize` instead.
      */
-    public function validate()
+    public function validate(array $request = null)
     {
-        // Deprecate? Move to it's own validator?
+        $this->setRequest($request);
+
         return $this->validateState()
             ->validateJwtFormat()
             ->validateNonce()
