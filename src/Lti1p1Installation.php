@@ -28,13 +28,13 @@ class Lti1p1Installation
             $secret = $secrets[$i];
 
             // Create signature
-            $baseString = "{$key}&" .
-                "{$lti1p3LaunchData[LtiConstants::DEPLOYMENT_ID]}&" .
-                "{$issuerUrl}&" .
-                "{$clientId}&" .
-                "{$exp}&" .
+            $baseString = "{$key}&".
+                "{$lti1p3LaunchData[LtiConstants::DEPLOYMENT_ID]}&".
+                "{$issuerUrl}&".
+                "{$clientId}&".
+                "{$exp}&".
                 "{$nonce}";
-    
+
             if (base64_encode(hash_hmac('sha256', mb_convert_encoding($baseString, 'utf8', mb_detect_encoding($baseString)), $secret, true)) === $signature) {
                 return true;
             }

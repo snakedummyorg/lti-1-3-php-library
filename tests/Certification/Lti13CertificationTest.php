@@ -377,7 +377,7 @@ class Lti13CertificationTest extends TestCase
             ->setOauthConsumerSecrets(['somesecret']);
 
         $payload[LtiConstants::LTI1P1] = [
-            'oauth_consumer_key' => 'somekey'
+            'oauth_consumer_key' => 'somekey',
         ];
 
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN);
@@ -396,7 +396,7 @@ class Lti13CertificationTest extends TestCase
 
         $payload[LtiConstants::LTI1P1] = [
             'oauth_consumer_key' => 'somekey',
-            'oauth_consumer_key_sign' => 'badsignature'
+            'oauth_consumer_key_sign' => 'badsignature',
         ];
 
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH);
@@ -419,7 +419,7 @@ class Lti13CertificationTest extends TestCase
         $payload['exp'] = 1694721589; // To ensure signature match
         $payload[LtiConstants::LTI1P1] = [
             'oauth_consumer_key' => 'key',
-            'oauth_consumer_key_sign' => '5Vz/hYbr/GNTyWCQM4l5qrhgkowGjAbamNLNPsYjuwk='
+            'oauth_consumer_key_sign' => '5Vz/hYbr/GNTyWCQM4l5qrhgkowGjAbamNLNPsYjuwk=',
         ];
 
         $launch = $this->launch($payload);

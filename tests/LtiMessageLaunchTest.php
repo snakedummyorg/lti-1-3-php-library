@@ -28,7 +28,6 @@ class LtiMessageLaunchTest extends TestCase
     public const CERT_DATA_DIR = __DIR__.'/data/certification/';
     public const PRIVATE_KEY = __DIR__.'/data/private.key';
     public const STATE = 'state';
-
     private LtiMessageLaunch $messageLaunch;
     private MockInterface|ICache $cache;
     private MockInterface|ICookie $cookie;

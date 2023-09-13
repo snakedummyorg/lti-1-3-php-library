@@ -5,23 +5,24 @@ namespace Packback\Lti1p3\Interfaces;
 use Packback\Lti1p3\Lti1p1Installation;
 use Packback\Lti1p3\LtiDeployment;
 
+/**
+ * This is an optional interface if an LTI 1.3 tool supports migrations
+ * from LTI 1.1 compatible installations.
+ *
+ * To use this, just have whatever class you create that implements IDatabase
+ * also implement this interface.
+ */
 interface IMigrationDatabase
 {
     /**
-     * A method to assist with 1.1 -> 1.3 migrations. If you don't support migrations
-     * simply have this method return false.
-     *
-     * Otherwise, using the $launchData from
+     * Using the $launchData from
      * a 1.3 launch attempt, determine if you have a matching 1.1 install and return
      * it from this method.
      */
     public function getMatchingLti1p1Install(array $launchData): ?Lti1p1Installation;
 
     /**
-     * Another method to assist with 1.1 -> 1.3 migrations. Simply have this method do nothing
-     * if you don't support migrations.
-     *
-     * Otherwise, this method create a 1.3 deployment in your DB based on the $launchData.
+     * This method should create a 1.3 deployment in your DB based on the $launchData.
      * Previous to this, we validated the oauth_consumer_key_sign to ensure this migration
      * can safely occur.
      */
