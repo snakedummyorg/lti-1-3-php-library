@@ -200,7 +200,7 @@ class LtiMessageLaunch
      * @return LtiMessageLaunch Will return $this if validation is successful
      *
      * @throws LtiException Will throw an LtiException if validation fails
-     * 
+     *
      * @deprecated Does not support LTI 1.1 migration. Use `initialize` instead.
      */
     public function validate(array $request = null)
