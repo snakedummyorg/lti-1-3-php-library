@@ -134,17 +134,11 @@ class LtiMessageLaunch
             ->validateJwtFormat()
             ->validateNonce()
             ->validateRegistration()
-            ->validateJwtSignature();
-
-        // This feels kinda icky in the middle of all the validation. How can I move it?
-        if ($this->shouldMigrate()) {
-            $this->db->migrateFromLti1p1($this->getLaunchData());
-        }
-
-        $this->validateDeployment()
-            ->validateMessage();
-
-        $this->cacheLaunchData();
+            ->validateJwtSignature()
+            ->migrateIfNeeded()
+            ->validateDeployment()
+            ->validateMessage()
+            ->cacheLaunchData();
 
         return $this;
     }
@@ -588,5 +582,14 @@ class LtiMessageLaunch
 
         // There should be 0-1 validators. This will either return the validator, or null if none apply.
         return array_shift($applicableValidators);
+    }
+
+    protected function migrateIfNeeded ()
+    {
+        if ($this->shouldMigrate()) {
+            $this->db->migrateFromLti1p1($this->getLaunchData());
+        }
+
+        return $this;
     }
 }
