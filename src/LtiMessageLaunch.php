@@ -129,7 +129,6 @@ class LtiMessageLaunch
     {
         $this->setRequest($request);
 
-        // Ideally this would just be abstracted to a validator. But how when, halfway through, we need to migrate?
         $this->validateState()
             ->validateJwtFormat()
             ->validateNonce()
@@ -201,6 +200,7 @@ class LtiMessageLaunch
      * @return LtiMessageLaunch Will return $this if validation is successful
      *
      * @throws LtiException Will throw an LtiException if validation fails
+     * 
      * @deprecated Does not support LTI 1.1 migration. Use `initialize` instead.
      */
     public function validate(array $request = null)
@@ -584,7 +584,7 @@ class LtiMessageLaunch
         return array_shift($applicableValidators);
     }
 
-    protected function migrateIfNeeded ()
+    protected function migrateIfNeeded()
     {
         if ($this->shouldMigrate()) {
             $this->db->migrateFromLti1p1($this->getLaunchData());

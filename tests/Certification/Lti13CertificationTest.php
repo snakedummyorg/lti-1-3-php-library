@@ -105,7 +105,7 @@ class TestDb implements IDatabase
 
     public function migrateFromLti1p1(array $launchData): void
     {
-        return;
+
     }
 }
 
