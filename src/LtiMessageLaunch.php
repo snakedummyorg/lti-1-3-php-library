@@ -125,7 +125,7 @@ class LtiMessageLaunch
         return $new->validateRegistration();
     }
 
-    public function initialize(array $request = null): static
+    public function initialize(array $request = null)
     {
         $this->setRequest($request);
 
@@ -138,8 +138,6 @@ class LtiMessageLaunch
             ->validateDeployment()
             ->validateMessage()
             ->cacheLaunchData();
-
-        return $this;
     }
 
     public function setRequest(array $request = null)
