@@ -29,11 +29,11 @@ class LtiMessageLaunchTest extends TestCase
     public const PRIVATE_KEY = __DIR__.'/data/private.key';
     public const STATE = 'state';
     private LtiMessageLaunch $messageLaunch;
-    private MockInterface|ICache $cache;
-    private MockInterface|ICookie $cookie;
-    private MockInterface|IDatabase $database;
-    private MockInterface|ILtiServiceConnector $serviceConnector;
-    private MockInterface|ILtiRegistration $registration;
+    private MockInterface $cache;
+    private MockInterface $cookie;
+    private MockInterface $database;
+    private MockInterface $serviceConnector;
+    private MockInterface $registration;
     private array $issuer;
     private array $key;
     private array $payload;

@@ -128,7 +128,7 @@ class Lti13CertificationTest extends TestCase
     public const CERT_DATA_DIR = __DIR__.'/../data/certification/';
     public const PRIVATE_KEY = __DIR__.'/../data/private.key';
     public const STATE = 'state';
-    public TestDb|TestMigrateDb $db;
+    public TestDb $db;
     public TestMigrateDb $migrateDb;
     private $issuer;
     private $key;
