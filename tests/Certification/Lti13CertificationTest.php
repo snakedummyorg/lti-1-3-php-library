@@ -88,12 +88,12 @@ class TestDb implements IDatabase
         $this->deployments[$deployment->getDeploymentId()] = $deployment;
     }
 
-    public function findRegistrationByIssuer($iss, $client_id = null): ?LtiRegistration
+    public function findRegistrationByIssuer($iss, $client_id = null)
     {
         return $this->registrations[$iss];
     }
 
-    public function findDeployment($iss, $deployment_id, $client_id = null): ?LtiDeployment
+    public function findDeployment($iss, $deployment_id, $client_id = null)
     {
         return $this->deployments[$iss];
     }

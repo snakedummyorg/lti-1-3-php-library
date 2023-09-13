@@ -3,14 +3,12 @@
 namespace Packback\Lti1p3\Interfaces;
 
 use Packback\Lti1p3\Lti1p1Installation;
-use Packback\Lti1p3\LtiDeployment;
-use Packback\Lti1p3\LtiRegistration;
 
 interface IDatabase
 {
-    public function findRegistrationByIssuer($iss, $clientId = null): ?LtiRegistration;
+    public function findRegistrationByIssuer($iss, $clientId = null);
 
-    public function findDeployment($iss, $deploymentId, $clientId = null): ?LtiDeployment;
+    public function findDeployment($iss, $deploymentId, $clientId = null);
 
     /**
      * A method to assist with 1.1 -> 1.3 migrations. If you don't support migrations
