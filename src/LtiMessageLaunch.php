@@ -138,6 +138,8 @@ class LtiMessageLaunch
             ->validateDeployment()
             ->validateMessage()
             ->cacheLaunchData();
+
+        return $this;
     }
 
     public function setRequest(array $request = null)
@@ -184,7 +186,7 @@ class LtiMessageLaunch
         $lti1p1Claim = $launchData[LtiConstants::LTI1P1];
         $signature = $lti1p1Claim['oauth_consumer_key_sign'];
 
-        if ($ltiInstall->computeOauthConsumerKeySign($launchData) !== $signature) {
+        if (!$ltiInstall->compareOauthConsumerKeySign($launchData, $signature)) {
             throw new LtiException(static::ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH);
         }
 
