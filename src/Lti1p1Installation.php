@@ -4,8 +4,8 @@ namespace Packback\Lti1p3;
 
 class Lti1p1Installation
 {
-    private array $oauth_consumer_keys;
-    private array $oauth_consumer_secrets;
+    private ?array $oauth_consumer_keys;
+    private ?array $oauth_consumer_secrets;
 
     public static function new()
     {
@@ -28,14 +28,14 @@ class Lti1p1Installation
             $secret = $secrets[$i];
 
             // Create signature
-            $baseString = "{$key}&\
-                {$lti1p3LaunchData[LtiConstants::DEPLOYMENT_ID]}&\
-                {$issuerUrl}&\
-                {$clientId}&\
-                {$exp}&\
-                {$nonce}";
+            $baseString = "{$key}&" .
+                "{$lti1p3LaunchData[LtiConstants::DEPLOYMENT_ID]}&" .
+                "{$issuerUrl}&" .
+                "{$clientId}&" .
+                "{$exp}&" .
+                "{$nonce}";
     
-            if (base64_encode(hash_hmac('sha256', $baseString, $secret, true)) === $signature) {
+            if (base64_encode(hash_hmac('sha256', mb_convert_encoding($baseString, 'utf8', mb_detect_encoding($baseString)), $secret, true)) === $signature) {
                 return true;
             }
         }
@@ -48,7 +48,7 @@ class Lti1p1Installation
         return $this->oauth_consumer_keys;
     }
 
-    public function setOauthConsumerKeys($oauth_consumer_keys)
+    public function setOauthConsumerKeys(array $oauth_consumer_keys)
     {
         $this->oauth_consumer_keys = $oauth_consumer_keys;
 
@@ -60,7 +60,7 @@ class Lti1p1Installation
         return $this->oauth_consumer_secrets;
     }
 
-    public function setOauthConsumerSecrets($oauth_consumer_secrets)
+    public function setOauthConsumerSecrets(array $oauth_consumer_secrets)
     {
         $this->oauth_consumer_secrets = $oauth_consumer_secrets;
 

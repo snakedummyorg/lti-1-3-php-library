@@ -11,6 +11,7 @@ use Packback\Lti1p3\Interfaces\ICache;
 use Packback\Lti1p3\Interfaces\ICookie;
 use Packback\Lti1p3\Interfaces\IDatabase;
 use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
+use Packback\Lti1p3\Interfaces\IMigrationDatabase;
 use Packback\Lti1p3\JwksEndpoint;
 use Packback\Lti1p3\Lti1p1Installation;
 use Packback\Lti1p3\LtiConstants;
@@ -90,22 +91,33 @@ class TestDb implements IDatabase
 
     public function findRegistrationByIssuer($iss, $client_id = null)
     {
-        return $this->registrations[$iss];
+        return $this->registrations[$iss] ?? null;
     }
 
     public function findDeployment($iss, $deployment_id, $client_id = null)
     {
-        return $this->deployments[$iss];
+        return $this->deployments[$iss] ?? null;
     }
+
+    public function clearDeployments()
+    {
+        $this->deployments = [];
+    }
+}
+
+class TestMigrateDb extends TestDb implements IMigrationDatabase
+{
+    public ?Lti1p1Installation $matchingInstall = null;
+    public ?LtiDeployment $createdDeployment = null;
 
     public function getMatchingLti1p1Install(array $launchData): ?Lti1p1Installation
     {
-        return null;
+        return $this->matchingInstall;
     }
 
-    public function migrateFromLti1p1(array $launchData): void
+    public function migrateFromLti1p1(array $launchData): LtiDeployment
     {
-
+        return $this->createdDeployment;
     }
 }
 
@@ -116,8 +128,11 @@ class Lti13CertificationTest extends TestCase
     public const CERT_DATA_DIR = __DIR__.'/../data/certification/';
     public const PRIVATE_KEY = __DIR__.'/../data/private.key';
     public const STATE = 'state';
+    public TestDb|TestMigrateDb $db;
+    public TestMigrateDb $migrateDb;
     private $issuer;
     private $key;
+    private array $payload;
 
     public function setUp(): void
     {
@@ -209,6 +224,14 @@ class Lti13CertificationTest extends TestCase
         ];
 
         $this->db = new TestDb(
+            new LtiRegistration([
+                'issuer' => static::ISSUER_URL,
+                'clientId' => $this->issuer['client_id'],
+                'keySetUrl' => static::JWKS_FILE,
+            ]),
+            (new LtiDeployment())->setDeploymentId(static::ISSUER_URL)
+        );
+        $this->migrateDb = new TestMigrateDb(
             new LtiRegistration([
                 'issuer' => static::ISSUER_URL,
                 'clientId' => $this->issuer['client_id'],
@@ -327,6 +350,80 @@ class Lti13CertificationTest extends TestCase
         $this->expectExceptionMessage('No deployment ID was specified');
 
         $this->launch($payload);
+    }
+
+    public function testDoesNotMigrate1p1IfMissing1p1Claim()
+    {
+        $payload = $this->payload;
+        $this->db = $this->migrateDb;
+        $this->db->clearDeployments();
+
+        $this->db->matchingInstall = Lti1p1Installation::new()
+            ->setOauthConsumerKeys(['somekey'])
+            ->setOauthConsumerSecrets(['somesecret']);
+
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN);
+        $this->launch($payload);
+    }
+
+    public function testDoesNotMigrate1p1IfMissing1p1ClaimWithOauthKeySign()
+    {
+        $payload = $this->payload;
+        $this->db = $this->migrateDb;
+        $this->db->clearDeployments();
+
+        $this->db->matchingInstall = Lti1p1Installation::new()
+            ->setOauthConsumerKeys(['somekey'])
+            ->setOauthConsumerSecrets(['somesecret']);
+
+        $payload[LtiConstants::LTI1P1] = [
+            'oauth_consumer_key' => 'somekey'
+        ];
+
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN);
+        $this->launch($payload);
+    }
+
+    public function testDoesNotMigrate1p1IfOauthKeySignDoesntMatch()
+    {
+        $payload = $this->payload;
+        $this->db = $this->migrateDb;
+        $this->db->clearDeployments();
+
+        $this->db->matchingInstall = Lti1p1Installation::new()
+            ->setOauthConsumerKeys(['somekey'])
+            ->setOauthConsumerSecrets(['somesecret']);
+
+        $payload[LtiConstants::LTI1P1] = [
+            'oauth_consumer_key' => 'somekey',
+            'oauth_consumer_key_sign' => 'badsignature'
+        ];
+
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH);
+        $this->launch($payload);
+    }
+
+    public function testLti1p1MigrationSuccessfullyMakesDeployment()
+    {
+        $payload = $this->payload;
+        $this->db = $this->migrateDb;
+        $this->db->clearDeployments();
+
+        $this->db->matchingInstall = Lti1p1Installation::new()
+            ->setOauthConsumerKeys(['key'])
+            ->setOauthConsumerSecrets(['secret']);
+
+        $this->db->createdDeployment = LtiDeployment::new()
+            ->setDeploymentId($payload[LtiConstants::DEPLOYMENT_ID]);
+
+        $payload['exp'] = 1694721589; // To ensure signature match
+        $payload[LtiConstants::LTI1P1] = [
+            'oauth_consumer_key' => 'key',
+            'oauth_consumer_key_sign' => '5Vz/hYbr/GNTyWCQM4l5qrhgkowGjAbamNLNPsYjuwk='
+        ];
+
+        $launch = $this->launch($payload);
+        $this->assertInstanceOf(LtiMessageLaunch::class, $launch);
     }
 
     public function testLaunchWithMissingResourceLinkId()

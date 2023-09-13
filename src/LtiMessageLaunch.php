@@ -11,10 +11,10 @@ use Packback\Lti1p3\Interfaces\ICache;
 use Packback\Lti1p3\Interfaces\ICookie;
 use Packback\Lti1p3\Interfaces\IDatabase;
 use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
+use Packback\Lti1p3\Interfaces\IMigrationDatabase;
 use Packback\Lti1p3\MessageValidators\DeepLinkMessageValidator;
 use Packback\Lti1p3\MessageValidators\ResourceMessageValidator;
 use Packback\Lti1p3\MessageValidators\SubmissionReviewMessageValidator;
-use Throwable;
 
 class LtiMessageLaunch
 {
@@ -125,23 +125,6 @@ class LtiMessageLaunch
         return $new->validateRegistration();
     }
 
-    public function initialize(array $request = null)
-    {
-        $this->setRequest($request);
-
-        $this->validateState()
-            ->validateJwtFormat()
-            ->validateNonce()
-            ->validateRegistration()
-            ->validateJwtSignature()
-            ->migrateIfNeeded()
-            ->validateDeployment()
-            ->validateMessage()
-            ->cacheLaunchData();
-
-        return $this;
-    }
-
     public function setRequest(array $request = null)
     {
         if ($request === null) {
@@ -155,21 +138,11 @@ class LtiMessageLaunch
 
     private function shouldMigrate(): bool
     {
-        $missingDeployment = false;
-
-        try {
-            $this->validateDeployment();
-        } catch (LtiException $e) {
-            if ($e->getMessage() === static::ERR_NO_DEPLOYMENT) {
-                $missingDeployment = true;
-            }
-        } catch (Throwable $e) {
-            return false;
-        }
+        assert($this->db instanceof IMigrationDatabase);
 
         $launchData = $this->getLaunchData();
         $lti1p1Install = $this->db->getMatchingLti1p1Install($launchData);
-        if ($missingDeployment && $lti1p1Install !== null) {
+        if ($lti1p1Install !== null) {
             return $this->lti1p1InstallationSignatureMatches($lti1p1Install, $launchData);
         }
 
@@ -200,8 +173,6 @@ class LtiMessageLaunch
      * @return LtiMessageLaunch Will return $this if validation is successful
      *
      * @throws LtiException Will throw an LtiException if validation fails
-     *
-     * @deprecated Does not support LTI 1.1 migration. Use `initialize` instead.
      */
     public function validate(array $request = null)
     {
@@ -541,8 +512,12 @@ class LtiMessageLaunch
         $client_id = is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
         $deployment = $this->db->findDeployment($this->jwt['body']['iss'], $this->jwt['body'][LtiConstants::DEPLOYMENT_ID], $client_id);
 
+        if (empty($deployment) && $this->db instanceof IMigrationDatabase && $this->shouldMigrate()) {
+            // deployment not recognized. Check for migration
+            $deployment = $this->db->migrateFromLti1p1($this->getLaunchData());
+        }
+
         if (empty($deployment)) {
-            // deployment not recognized.
             throw new LtiException(static::ERR_NO_DEPLOYMENT);
         }
 
@@ -582,14 +557,5 @@ class LtiMessageLaunch
 
         // There should be 0-1 validators. This will either return the validator, or null if none apply.
         return array_shift($applicableValidators);
-    }
-
-    protected function migrateIfNeeded()
-    {
-        if ($this->shouldMigrate()) {
-            $this->db->migrateFromLti1p1($this->getLaunchData());
-        }
-
-        return $this;
     }
 }
