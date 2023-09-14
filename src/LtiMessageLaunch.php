@@ -48,14 +48,16 @@ class LtiMessageLaunch
     public const ERR_INVALID_MESSAGE = 'Message validation failed.';
     public const ERR_INVALID_ALG = 'Invalid alg was specified in the JWT header.';
     public const ERR_MISMATCHED_ALG_KEY = 'The alg specified in the JWT header is incompatible with the JWK key type.';
-    private $db;
-    private $cache;
-    private $cookie;
-    private $serviceConnector;
+    private IDatabase $db;
+    private ICache $cache;
+    private ICookie $cookie;
+    private ILtiServiceConnector $serviceConnector;
+    private IMigrationDatabase $migrationDatabase;
     private $request;
     private $jwt;
     private $registration;
     private $launch_id;
+    private $shouldMigrate;
 
     // See https://www.imsglobal.org/spec/security/v1p1#approved-jwt-signing-algorithms.
     private static $ltiSupportedAlgs = [
@@ -125,45 +127,35 @@ class LtiMessageLaunch
         return $new->validateRegistration();
     }
 
-    public function setRequest(array $request = null)
+    public function setRequest(array $request)
     {
-        if ($request === null) {
-            $request = $_POST;
-        }
-
         $this->request = $request;
 
         return $this;
     }
 
-    private function shouldMigrate(): bool
+    public function setMigrationDatabase(IMigrationDatabase $migrationDatabase)
     {
-        assert($this->db instanceof IMigrationDatabase);
+        $this->migrationDatabase = $migrationDatabase;
 
-        $launchData = $this->getLaunchData();
-        $lti1p1Install = $this->db->getMatchingLti1p1Install($launchData);
-        if ($lti1p1Install !== null) {
-            return $this->lti1p1InstallationSignatureMatches($lti1p1Install, $launchData);
-        }
-
-        return false;
+        return $this;
     }
 
-    private function lti1p1InstallationSignatureMatches(Lti1p1Installation $ltiInstall, array $launchData): bool
+    public function initialize(array $request)
     {
-        // Check to see if we have params to calculate oauth_consumer_key_sign
-        if (!isset($launchData[LtiConstants::LTI1P1]) || !isset($launchData[LtiConstants::LTI1P1]['oauth_consumer_key_sign'])) {
-            throw new LtiException(static::ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN);
+        return $this->setRequest($request)
+            ->validate()
+            ->migrate()
+            ->cacheLaunchData();
+    }
+
+    private function migrate()
+    {
+        if ($this->shouldMigrate()) {
+            $deployment = $this->migrationDatabase->migrateFromLti1p1($this->getLaunchData());
         }
 
-        $lti1p1Claim = $launchData[LtiConstants::LTI1P1];
-        $signature = $lti1p1Claim['oauth_consumer_key_sign'];
-
-        if (!$ltiInstall->compareOauthConsumerKeySign($launchData, $signature)) {
-            throw new LtiException(static::ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH);
-        }
-
-        return true;
+        return $this;
     }
 
     /**
@@ -174,18 +166,15 @@ class LtiMessageLaunch
      *
      * @throws LtiException Will throw an LtiException if validation fails
      */
-    public function validate(array $request = null)
+    public function validate()
     {
-        $this->setRequest($request);
-
         return $this->validateState()
             ->validateJwtFormat()
             ->validateNonce()
             ->validateRegistration()
             ->validateJwtSignature()
             ->validateDeployment()
-            ->validateMessage()
-            ->cacheLaunchData();
+            ->validateMessage();
     }
 
     /**
@@ -512,12 +501,7 @@ class LtiMessageLaunch
         $client_id = is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
         $deployment = $this->db->findDeployment($this->jwt['body']['iss'], $this->jwt['body'][LtiConstants::DEPLOYMENT_ID], $client_id);
 
-        if (empty($deployment) && $this->db instanceof IMigrationDatabase && $this->shouldMigrate()) {
-            // deployment not recognized. Check for migration
-            $deployment = $this->db->migrateFromLti1p1($this->getLaunchData());
-        }
-
-        if (empty($deployment)) {
+        if (empty($deployment) && !$this->shouldMigrate()) {
             throw new LtiException(static::ERR_NO_DEPLOYMENT);
         }
 
@@ -557,5 +541,61 @@ class LtiMessageLaunch
 
         // There should be 0-1 validators. This will either return the validator, or null if none apply.
         return array_shift($applicableValidators);
+    }
+
+    private function shouldMigrate(): bool
+    {
+        if (!isset($this->shouldMigrate)) {
+            // Prevent potential unneeded calls to the database
+            $this->shouldMigrate = isset($this->migrationDatabase)
+                && isset($this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign'])
+                && $this->matchingLti1p1KeyExists();
+        }
+
+        return $this->shouldMigrate;
+    }
+
+    private function matchingLti1p1KeyExists(): bool
+    {
+        $keys = $this->migrationDatabase->getMatchingLti1p1Keys($this);
+
+        foreach ($keys as $key) {
+            if ($this->oauthConsumerKeySignMatches($key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getOauthConsumerKeySign(): ?string
+    {
+        return $this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign'];
+    }
+
+    private function getOauthSignature(string $key, string $secret): string
+    {
+        $launchData = $this->getLaunchData();
+
+        $signatureComponents = [
+            $key,
+            $launchData[LtiConstants::DEPLOYMENT_ID],
+            $launchData['iss'],
+            $launchData['aud'][0] ?? $launchData['aud'],
+            $launchData['exp'],
+            $launchData['nonce'],
+        ];
+
+        // Create signature
+        $baseString = implode('&', $signatureComponents);
+        $utf8String = mb_convert_encoding($baseString, 'utf8', mb_detect_encoding($baseString));
+        $hash = hash_hmac('sha256', $utf8String, $secret, true);
+
+        return base64_encode($hash);
+    }
+
+    private function oauthConsumerKeySignMatches(Lti1p1Key $key)
+    {
+        return $this->getOauthSignature($key->key, $key->secret) === $this->getOauthConsumerKeySign();
     }
 }

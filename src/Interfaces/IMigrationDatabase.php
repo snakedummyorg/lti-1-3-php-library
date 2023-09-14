@@ -15,16 +15,14 @@ use Packback\Lti1p3\LtiDeployment;
 interface IMigrationDatabase
 {
     /**
-     * Using the $launchData from
-     * a 1.3 launch attempt, determine if you have a matching 1.1 install and return
-     * it from this method.
+     * Using the LtiMessageLaunch return an array of matching LTI 1.1 keys
      */
-    public function getMatchingLti1p1Install(array $launchData): ?Lti1p1Installation;
+    public function getMatchingLti1p1Keys(LtiMessageLaunch $launch): array;
 
     /**
-     * This method should create a 1.3 deployment in your DB based on the $launchData.
+     * This method should create a 1.3 deployment in your DB based on the LtiMessageLaunch.
      * Previous to this, we validated the oauth_consumer_key_sign to ensure this migration
      * can safely occur.
      */
-    public function migrateFromLti1p1(array $launchData): LtiDeployment;
+    public function migrateFromLti1p1(LtiMessageLaunch $launch): LtiDeployment;
 }
