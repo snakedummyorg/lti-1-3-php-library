@@ -13,14 +13,13 @@ use Packback\Lti1p3\Interfaces\IDatabase;
 use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
 use Packback\Lti1p3\Interfaces\IMigrationDatabase;
 use Packback\Lti1p3\JwksEndpoint;
-use Packback\Lti1p3\Lti1p1Installation;
+use Packback\Lti1p3\Lti1p1Key;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiDeployment;
 use Packback\Lti1p3\LtiException;
 use Packback\Lti1p3\LtiMessageLaunch;
 use Packback\Lti1p3\LtiOidcLogin;
 use Packback\Lti1p3\LtiRegistration;
-use Packback\Lti1p3\Lti1p1Key;
 use Tests\TestCase;
 
 class TestCache implements ICache
@@ -362,8 +361,8 @@ class Lti13CertificationTest extends TestCase
         $this->db->matchingInstall = [
             Lti1p1Key::new([
                 'somekey',
-                'somesecret'
-            ])
+                'somesecret',
+            ]),
         ];
 
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN);
@@ -379,8 +378,8 @@ class Lti13CertificationTest extends TestCase
         $this->db->matchingInstall = [
             Lti1p1Key::new([
                 'somekey',
-                'somesecret'
-            ])
+                'somesecret',
+            ]),
         ];
 
         $payload[LtiConstants::LTI1P1] = [
@@ -400,8 +399,8 @@ class Lti13CertificationTest extends TestCase
         $this->db->matchingInstall = [
             Lti1p1Key::new([
                 'somekey',
-                'somesecret'
-            ])
+                'somesecret',
+            ]),
         ];
 
         $payload[LtiConstants::LTI1P1] = [
@@ -419,11 +418,11 @@ class Lti13CertificationTest extends TestCase
         $this->db = $this->migrateDb;
         $this->db->clearDeployments();
 
-        $this->db->matchingInstall =[
+        $this->db->matchingInstall = [
             Lti1p1Key::new([
                 'key',
-                'secret'
-            ])
+                'secret',
+            ]),
         ];
 
         $this->db->createdDeployment = LtiDeployment::new()
