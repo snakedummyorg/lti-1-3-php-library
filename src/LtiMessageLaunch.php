@@ -175,7 +175,7 @@ class LtiMessageLaunch
     public function migrate()
     {
         if ($this->shouldMigrate()) {
-            $this->deployment = $this->db->migrateFromLti1p1($this->getLaunchData());
+            $this->deployment = $this->db->migrateFromLti1p1($this->jwt['body']);
         }
 
         if (!isset($this->deployment)) {
@@ -559,8 +559,8 @@ class LtiMessageLaunch
     private function canMigrate(): bool
     {
         return $this->db instanceof IMigrationDatabase
-            && isset($this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key'])
-            && isset($this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign']);
+            && isset($this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key'])
+            && isset($this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign']);
     }
 
     private function shouldMigrate(): bool
@@ -590,7 +590,7 @@ class LtiMessageLaunch
 
     private function getOauthSignature(Lti1p1Key $key): string
     {
-        $launchData = $this->getLaunchData();
+        $launchData = $this->jwt['body'];
 
         return $key->sign(
             $launchData[LtiConstants::DEPLOYMENT_ID],
@@ -603,6 +603,6 @@ class LtiMessageLaunch
 
     private function getOauthConsumerKeySign(): ?string
     {
-        return $this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign'] ?? null;
+        return $this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign'] ?? null;
     }
 }
