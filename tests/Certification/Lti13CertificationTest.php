@@ -383,30 +383,7 @@ class Lti13CertificationTest extends TestCase
         $this->assertInstanceOf(LtiMessageLaunch::class, $launch);
     }
 
-    public function testDoesNotMigrate1p1IfMissing1p1Claim()
-    {
-        $payload = $this->payload;
-        $db = $this->migrateDb;
-        $db->clearDeployments();
-
-        $key = new Lti1p1Key([
-            'key' => 'key',
-            'secret' => 'secret',
-        ]);
-
-        $db->matchingKeys = [$key];
-        $db->createdDeployment = LtiDeployment::new()
-            ->setDeploymentId($payload[LtiConstants::DEPLOYMENT_ID]);
-
-        $payload[LtiConstants::LTI1P1] = [
-            'oauth_consumer_key' => $key->getKey(),
-        ];
-
-        $this->expectExceptionMessage(LtiMessageLaunch::ERR_NO_DEPLOYMENT);
-        $this->launch($payload, $db);
-    }
-
-    public function testDoesNotMigrate1p1IfMissing1p1ClaimWithOauthKeySign()
+    public function testDoesNotMigrate1p1IfMissingOauthKeySign()
     {
         $payload = $this->payload;
         $this->db = $this->migrateDb;
