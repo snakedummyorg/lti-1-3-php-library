@@ -446,7 +446,7 @@ class LtiMessageLaunch
     protected function validateRegistration()
     {
         // Find registration.
-        $clientId = is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
+        $clientId = $this->getAud();
         $issuerUrl = $this->jwt['body']['iss'];
         $this->registration = $this->db->findRegistrationByIssuer($issuerUrl, $clientId);
 
@@ -491,7 +491,7 @@ class LtiMessageLaunch
         }
 
         // Find deployment.
-        $client_id = is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
+        $client_id = $this->getAud();
         $deployment = $this->db->findDeployment($this->jwt['body']['iss'], $this->jwt['body'][LtiConstants::DEPLOYMENT_ID], $client_id);
 
         if (empty($deployment) && !$this->shouldMigrate()) {
@@ -536,6 +536,13 @@ class LtiMessageLaunch
         return array_shift($applicableValidators);
     }
 
+    private function getAud(): string
+    {
+        $launchData = $this->getLaunchData();
+
+        return $launchData['aud'][0] ?? $launchData['aud'];
+    }
+
     private function shouldMigrate(): bool
     {
         if (!isset($this->shouldMigrate)) {
@@ -561,20 +568,20 @@ class LtiMessageLaunch
         return false;
     }
 
-    private function getOauthConsumerKeySign(): ?string
+    private function oauthConsumerKeySignMatches(Lti1p1Key $key): string
     {
-        return $this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign'];
+        return $this->getOauthSignature($key) === $this->getOauthConsumerKeySign();
     }
 
-    private function getOauthSignature(string $key, string $secret): string
+    private function getOauthSignature(Lti1p1Key $key): string
     {
         $launchData = $this->getLaunchData();
 
         $signatureComponents = [
-            $key,
+            $key->key,
             $launchData[LtiConstants::DEPLOYMENT_ID],
             $launchData['iss'],
-            $launchData['aud'][0] ?? $launchData['aud'],
+            $this->getAud(),
             $launchData['exp'],
             $launchData['nonce'],
         ];
@@ -582,13 +589,13 @@ class LtiMessageLaunch
         // Create signature
         $baseString = implode('&', $signatureComponents);
         $utf8String = mb_convert_encoding($baseString, 'utf8', mb_detect_encoding($baseString));
-        $hash = hash_hmac('sha256', $utf8String, $secret, true);
+        $hash = hash_hmac('sha256', $utf8String, $key->secret, true);
 
         return base64_encode($hash);
     }
 
-    private function oauthConsumerKeySignMatches(Lti1p1Key $key)
+    private function getOauthConsumerKeySign(): ?string
     {
-        return $this->getOauthSignature($key->key, $key->secret) === $this->getOauthConsumerKeySign();
+        return $this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign'];
     }
 }
