@@ -29,8 +29,8 @@ class LtiMessageLaunch
     public const ERR_INVALID_ID_TOKEN = 'Invalid id_token, JWT must contain 3 parts';
     public const ERR_MISSING_NONCE = 'Missing Nonce.';
     public const ERR_INVALID_NONCE = 'Invalid Nonce.';
-    public const ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH = 'Failed to migrate from 1.1 -> 1.3, oauth_consumer_key_sign did not match';
-    public const ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN = 'Failed to migrate from 1.1 -> 1.3, oauth_consumer_key_sign was not provided';
+    public const ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH = 'Failed to migrate from LTI 1.1 to 1.3. The oauth_consumer_key_sign did not match.';
+    public const ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN = 'Failed to migrate from LTI 1.1 to 1.3. The oauth_consumer_key_sign was not provided.';
 
     /**
      * :issuerUrl and :clientId are used to substitute the queried issuerUrl
@@ -150,15 +150,25 @@ class LtiMessageLaunch
      *
      * @throws LtiException Will throw an LtiException if validation fails
      */
-    public function validate()
+    public function validate(array $request = null)
     {
+        // @TODO: Remove this on the next major release.
+        if (!isset($this->request)) {
+            if ($request === null) {
+                $request = $_POST;
+            }
+
+            $this->setRequest($request);
+        }
+
         return $this->validateState()
             ->validateJwtFormat()
             ->validateNonce()
             ->validateRegistration()
             ->validateJwtSignature()
             ->validateDeployment()
-            ->validateMessage();
+            ->validateMessage()
+            ->cacheLaunchData();
     }
 
     public function migrate()
@@ -172,7 +182,7 @@ class LtiMessageLaunch
 
     public function cacheLaunchData()
     {
-        $this->cache->cacheLaunchData($this->launch_id, $this->getLaunchData());
+        $this->cache->cacheLaunchData($this->launch_id, $this->jwt['body']);
 
         return $this;
     }
@@ -538,9 +548,7 @@ class LtiMessageLaunch
 
     private function getAud(): string
     {
-        $launchData = $this->getLaunchData();
-
-        return $launchData['aud'][0] ?? $launchData['aud'];
+        return is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
     }
 
     private function shouldMigrate(): bool

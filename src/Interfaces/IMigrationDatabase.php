@@ -3,6 +3,7 @@
 namespace Packback\Lti1p3\Interfaces;
 
 use Packback\Lti1p3\LtiDeployment;
+use Packback\Lti1p3\LtiMessageLaunch;
 
 /**
  * This is an optional interface if an LTI 1.3 tool supports migrations

@@ -20,6 +20,7 @@ use Packback\Lti1p3\LtiException;
 use Packback\Lti1p3\LtiMessageLaunch;
 use Packback\Lti1p3\LtiOidcLogin;
 use Packback\Lti1p3\LtiRegistration;
+use Packback\Lti1p3\Lti1p1Key;
 use Tests\TestCase;
 
 class TestCache implements ICache
@@ -107,15 +108,15 @@ class TestDb implements IDatabase
 
 class TestMigrateDb extends TestDb implements IMigrationDatabase
 {
-    public ?Lti1p1Installation $matchingInstall = null;
+    public array $matchingInstall = [];
     public ?LtiDeployment $createdDeployment = null;
 
-    public function getMatchingLti1p1Install(array $launchData): ?Lti1p1Installation
+    public function findLti1p1Keys(LtiMessageLaunch $launch): array
     {
         return $this->matchingInstall;
     }
 
-    public function migrateFromLti1p1(array $launchData): LtiDeployment
+    public function migrateFromLti1p1(LtiMessageLaunch $launch): LtiDeployment
     {
         return $this->createdDeployment;
     }
@@ -358,9 +359,12 @@ class Lti13CertificationTest extends TestCase
         $this->db = $this->migrateDb;
         $this->db->clearDeployments();
 
-        $this->db->matchingInstall = Lti1p1Installation::new()
-            ->setOauthConsumerKeys(['somekey'])
-            ->setOauthConsumerSecrets(['somesecret']);
+        $this->db->matchingInstall = [
+            Lti1p1Key::new([
+                'somekey',
+                'somesecret'
+            ])
+        ];
 
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN);
         $this->launch($payload);
@@ -372,9 +376,12 @@ class Lti13CertificationTest extends TestCase
         $this->db = $this->migrateDb;
         $this->db->clearDeployments();
 
-        $this->db->matchingInstall = Lti1p1Installation::new()
-            ->setOauthConsumerKeys(['somekey'])
-            ->setOauthConsumerSecrets(['somesecret']);
+        $this->db->matchingInstall = [
+            Lti1p1Key::new([
+                'somekey',
+                'somesecret'
+            ])
+        ];
 
         $payload[LtiConstants::LTI1P1] = [
             'oauth_consumer_key' => 'somekey',
@@ -390,9 +397,12 @@ class Lti13CertificationTest extends TestCase
         $this->db = $this->migrateDb;
         $this->db->clearDeployments();
 
-        $this->db->matchingInstall = Lti1p1Installation::new()
-            ->setOauthConsumerKeys(['somekey'])
-            ->setOauthConsumerSecrets(['somesecret']);
+        $this->db->matchingInstall = [
+            Lti1p1Key::new([
+                'somekey',
+                'somesecret'
+            ])
+        ];
 
         $payload[LtiConstants::LTI1P1] = [
             'oauth_consumer_key' => 'somekey',
@@ -409,9 +419,12 @@ class Lti13CertificationTest extends TestCase
         $this->db = $this->migrateDb;
         $this->db->clearDeployments();
 
-        $this->db->matchingInstall = Lti1p1Installation::new()
-            ->setOauthConsumerKeys(['key'])
-            ->setOauthConsumerSecrets(['secret']);
+        $this->db->matchingInstall =[
+            Lti1p1Key::new([
+                'key',
+                'secret'
+            ])
+        ];
 
         $this->db->createdDeployment = LtiDeployment::new()
             ->setDeploymentId($payload[LtiConstants::DEPLOYMENT_ID]);
