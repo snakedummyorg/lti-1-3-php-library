@@ -48,8 +48,8 @@ class LtiMessageLaunch
     public const ERR_MISMATCHED_ALG_KEY = 'The alg specified in the JWT header is incompatible with the JWK key type.';
     private IDatabase $db;
     private ICache $cache;
-    private ICookie $cookie;
-    private ILtiServiceConnector $serviceConnector;
+    private $cookie;
+    private $serviceConnector;
     private IMigrationDatabase $migrationDatabase;
     private $request;
     private $jwt;
