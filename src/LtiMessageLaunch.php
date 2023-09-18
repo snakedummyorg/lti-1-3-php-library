@@ -134,28 +134,12 @@ class LtiMessageLaunch
         return $this;
     }
 
-    public function setMigrationDatabase(IMigrationDatabase $migrationDatabase)
-    {
-        $this->migrationDatabase = $migrationDatabase;
-
-        return $this;
-    }
-
     public function initialize(array $request)
     {
         return $this->setRequest($request)
             ->validate()
             ->migrate()
             ->cacheLaunchData();
-    }
-
-    private function migrate()
-    {
-        if ($this->shouldMigrate()) {
-            $deployment = $this->migrationDatabase->migrateFromLti1p1($this->getLaunchData());
-        }
-
-        return $this;
     }
 
     /**
@@ -175,6 +159,22 @@ class LtiMessageLaunch
             ->validateJwtSignature()
             ->validateDeployment()
             ->validateMessage();
+    }
+
+    public function migrate()
+    {
+        if ($this->shouldMigrate()) {
+            $this->db->migrateFromLti1p1($this->getLaunchData());
+        }
+
+        return $this;
+    }
+
+    public function cacheLaunchData()
+    {
+        $this->cache->cacheLaunchData($this->launch_id, $this->getLaunchData());
+
+        return $this;
     }
 
     /**
@@ -396,13 +396,6 @@ class LtiMessageLaunch
             static::$ltiSupportedAlgs[$jwtAlg] === $key['kty'];
     }
 
-    private function cacheLaunchData()
-    {
-        $this->cache->cacheLaunchData($this->launch_id, $this->jwt['body']);
-
-        return $this;
-    }
-
     protected function validateState()
     {
         // Check State for OIDC.
@@ -547,7 +540,7 @@ class LtiMessageLaunch
     {
         if (!isset($this->shouldMigrate)) {
             // Prevent potential unneeded calls to the database
-            $this->shouldMigrate = isset($this->migrationDatabase)
+            $this->shouldMigrate = $this->db instanceof IMigrationDatabase
                 && isset($this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign'])
                 && $this->matchingLti1p1KeyExists();
         }
@@ -557,7 +550,7 @@ class LtiMessageLaunch
 
     private function matchingLti1p1KeyExists(): bool
     {
-        $keys = $this->migrationDatabase->getMatchingLti1p1Keys($this);
+        $keys = $this->db->getMatchingLti1p1Keys($this);
 
         foreach ($keys as $key) {
             if ($this->oauthConsumerKeySignMatches($key)) {

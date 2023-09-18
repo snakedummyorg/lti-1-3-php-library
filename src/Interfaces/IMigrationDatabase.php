@@ -2,7 +2,6 @@
 
 namespace Packback\Lti1p3\Interfaces;
 
-use Packback\Lti1p3\Lti1p1Installation;
 use Packback\Lti1p3\LtiDeployment;
 
 /**
