@@ -550,7 +550,7 @@ class LtiMessageLaunch
 
     private function matchingLti1p1KeyExists(): bool
     {
-        $keys = $this->db->getMatchingLti1p1Keys($this);
+        $keys = $this->db->findLti1p1Keys($this);
 
         foreach ($keys as $key) {
             if ($this->oauthConsumerKeySignMatches($key)) {

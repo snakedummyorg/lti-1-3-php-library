@@ -16,7 +16,7 @@ interface IMigrationDatabase
     /**
      * Using the LtiMessageLaunch return an array of matching LTI 1.1 keys
      */
-    public function getMatchingLti1p1Keys(LtiMessageLaunch $launch): array;
+    public function findLti1p1Keys(LtiMessageLaunch $launch): array;
 
     /**
      * This method should create a 1.3 deployment in your DB based on the LtiMessageLaunch.
