@@ -46,6 +46,7 @@ class LtiMessageLaunch
     public const ERR_INVALID_MESSAGE = 'Message validation failed.';
     public const ERR_INVALID_ALG = 'Invalid alg was specified in the JWT header.';
     public const ERR_MISMATCHED_ALG_KEY = 'The alg specified in the JWT header is incompatible with the JWK key type.';
+    public const ERR_OAUTH_KEY_SIGN_NOT_VERIFIED = 'Unable to upgrade from LTI 1.1 to 1.3. A matching OAuth Consumer Key could not be found.';
     private IDatabase $db;
     private ICache $cache;
 
@@ -178,7 +179,7 @@ class LtiMessageLaunch
         }
 
         if (!isset($this->deployment)) {
-            throw new LtiException(static::ERR_NO_DEPLOYMENT);
+            throw new LtiException(static::ERR_OAUTH_KEY_SIGN_NOT_VERIFIED);
         }
 
         return $this;
