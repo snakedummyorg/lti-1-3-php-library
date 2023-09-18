@@ -48,15 +48,15 @@ class LtiMessageLaunch
     public const ERR_MISMATCHED_ALG_KEY = 'The alg specified in the JWT header is incompatible with the JWK key type.';
     private IDatabase $db;
     private ICache $cache;
+
+    // @TODO: Type these on the next major version
     private $cookie;
     private $serviceConnector;
-    private IMigrationDatabase $migrationDatabase;
     private $request;
     private $jwt;
     private $registration;
     private $deployment;
     private $launch_id;
-    private bool $shouldMigrate;
 
     // See https://www.imsglobal.org/spec/security/v1p1#approved-jwt-signing-algorithms.
     private static $ltiSupportedAlgs = [
@@ -119,6 +119,7 @@ class LtiMessageLaunch
         ICache $cache = null,
         ILtiServiceConnector $serviceConnector = null
     ) {
+        // @TODO: Fix the null here on the next major version
         $new = new LtiMessageLaunch($database, $cache, null, $serviceConnector);
         $new->launch_id = $launch_id;
         $new->jwt = ['body' => $new->cache->getLaunchData($launch_id)];
@@ -172,7 +173,7 @@ class LtiMessageLaunch
 
     public function migrate()
     {
-        if ($this->shouldMigrate() && $this->matchingLti1p1KeyExists()) {
+        if ($this->shouldMigrate()) {
             $this->deployment = $this->db->migrateFromLti1p1($this->getLaunchData());
         }
 
@@ -507,7 +508,7 @@ class LtiMessageLaunch
         $client_id = $this->getAud();
         $this->deployment = $this->db->findDeployment($this->jwt['body']['iss'], $this->jwt['body'][LtiConstants::DEPLOYMENT_ID], $client_id);
 
-        if (empty($this->deployment) && !$this->shouldMigrate()) {
+        if (empty($this->deployment) && !$this->canMigrate()) {
             throw new LtiException(static::ERR_NO_DEPLOYMENT);
         }
 
@@ -554,16 +555,18 @@ class LtiMessageLaunch
         return is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
     }
 
+    private function canMigrate(): bool
+    {
+        return $this->db instanceof IMigrationDatabase
+            && isset($this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key'])
+            && isset($this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign']);
+    }
+
     private function shouldMigrate(): bool
     {
-        if (!isset($this->shouldMigrate)) {
-            // Prevent potential unneeded calls to the database
-            $this->shouldMigrate = $this->db instanceof IMigrationDatabase
-                && isset($this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key'])
-                && isset($this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign']);
-        }
-
-        return $this->shouldMigrate;
+        return $this->canMigrate()
+            && !isset($this->deployment)
+            && $this->matchingLti1p1KeyExists();
     }
 
     private function matchingLti1p1KeyExists(): bool
