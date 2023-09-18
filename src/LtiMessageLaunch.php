@@ -578,7 +578,7 @@ class LtiMessageLaunch
         $launchData = $this->getLaunchData();
 
         $signatureComponents = [
-            $key->key,
+            $key->getKey(),
             $launchData[LtiConstants::DEPLOYMENT_ID],
             $launchData['iss'],
             $this->getAud(),
@@ -589,13 +589,13 @@ class LtiMessageLaunch
         // Create signature
         $baseString = implode('&', $signatureComponents);
         $utf8String = mb_convert_encoding($baseString, 'utf8', mb_detect_encoding($baseString));
-        $hash = hash_hmac('sha256', $utf8String, $key->secret, true);
+        $hash = hash_hmac('sha256', $utf8String, $key->getSecret(), true);
 
         return base64_encode($hash);
     }
 
     private function getOauthConsumerKeySign(): ?string
     {
-        return $this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign'];
+        return $this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign'] ?? null;
     }
 }
