@@ -107,12 +107,12 @@ class TestDb implements IDatabase
 
 class TestMigrateDb extends TestDb implements IMigrationDatabase
 {
-    public array $matchingInstall = [];
-    public ?LtiDeployment $createdDeployment = null;
+    public array $matchingKeys;
+    public LtiDeployment $createdDeployment;
 
     public function findLti1p1Keys(LtiMessageLaunch $launch): array
     {
-        return $this->matchingInstall;
+        return $this->matchingKeys;
     }
 
     public function migrateFromLti1p1(LtiMessageLaunch $launch): LtiDeployment
@@ -352,21 +352,58 @@ class Lti13CertificationTest extends TestCase
         $this->launch($payload);
     }
 
+    public function testLti1p1MigrationSuccessfullyMakesDeployment()
+    {
+        $payload = $this->payload;
+        $db = $this->migrateDb;
+        $db->clearDeployments();
+
+        $key = new Lti1p1Key([
+            'key' => 'key',
+            'secret' => 'secret',
+        ]);
+
+        $db->matchingKeys = [$key];
+        $db->createdDeployment = LtiDeployment::new()
+            ->setDeploymentId($payload[LtiConstants::DEPLOYMENT_ID]);
+
+        $payload['exp'] = 3272987750; // To ensure signature matches
+        $payload[LtiConstants::LTI1P1] = [
+            'oauth_consumer_key' => $key->getKey(),
+            'oauth_consumer_key_sign' => $key->sign(
+                $payload[LtiConstants::DEPLOYMENT_ID],
+                $payload['iss'],
+                $payload['aud'],
+                $payload['exp'],
+                $payload['nonce']
+            ),
+        ];
+
+        $launch = $this->launch($payload, $db);
+        $this->assertInstanceOf(LtiMessageLaunch::class, $launch);
+    }
+
     public function testDoesNotMigrate1p1IfMissing1p1Claim()
     {
         $payload = $this->payload;
-        $this->db = $this->migrateDb;
-        $this->db->clearDeployments();
+        $db = $this->migrateDb;
+        $db->clearDeployments();
 
-        $this->db->matchingInstall = [
-            Lti1p1Key::new([
-                'somekey',
-                'somesecret',
-            ]),
+        $key = new Lti1p1Key([
+            'key' => 'key',
+            'secret' => 'secret',
+        ]);
+
+        $db->matchingKeys = [$key];
+        $db->createdDeployment = LtiDeployment::new()
+            ->setDeploymentId($payload[LtiConstants::DEPLOYMENT_ID]);
+
+        $payload[LtiConstants::LTI1P1] = [
+            'oauth_consumer_key' => $key->getKey(),
         ];
 
-        $this->expectExceptionMessage(LtiMessageLaunch::ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN);
-        $this->launch($payload);
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_NO_DEPLOYMENT);
+        $this->launch($payload, $db);
     }
 
     public function testDoesNotMigrate1p1IfMissing1p1ClaimWithOauthKeySign()
@@ -375,10 +412,10 @@ class Lti13CertificationTest extends TestCase
         $this->db = $this->migrateDb;
         $this->db->clearDeployments();
 
-        $this->db->matchingInstall = [
-            Lti1p1Key::new([
-                'somekey',
-                'somesecret',
+        $this->db->matchingKeys = [
+            new Lti1p1Key([
+                'key' => 'somekey',
+                'secret' => 'somesecret',
             ]),
         ];
 
@@ -386,20 +423,21 @@ class Lti13CertificationTest extends TestCase
             'oauth_consumer_key' => 'somekey',
         ];
 
-        $this->expectExceptionMessage(LtiMessageLaunch::ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN);
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_NO_DEPLOYMENT);
+
         $this->launch($payload);
     }
 
     public function testDoesNotMigrate1p1IfOauthKeySignDoesntMatch()
     {
         $payload = $this->payload;
-        $this->db = $this->migrateDb;
-        $this->db->clearDeployments();
+        $db = $this->migrateDb;
+        $db->clearDeployments();
 
-        $this->db->matchingInstall = [
-            Lti1p1Key::new([
-                'somekey',
-                'somesecret',
+        $db->matchingKeys = [
+            new Lti1p1Key([
+                'key' => 'somekey',
+                'secret' => 'somesecret',
             ]),
         ];
 
@@ -407,35 +445,11 @@ class Lti13CertificationTest extends TestCase
             'oauth_consumer_key' => 'somekey',
             'oauth_consumer_key_sign' => 'badsignature',
         ];
+        $ltiMessageLaunch = $this->launch($payload, $db);
 
-        $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH);
-        $this->launch($payload);
-    }
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_NO_DEPLOYMENT);
 
-    public function testLti1p1MigrationSuccessfullyMakesDeployment()
-    {
-        $payload = $this->payload;
-        $this->db = $this->migrateDb;
-        $this->db->clearDeployments();
-
-        $this->db->matchingInstall = [
-            Lti1p1Key::new([
-                'key',
-                'secret',
-            ]),
-        ];
-
-        $this->db->createdDeployment = LtiDeployment::new()
-            ->setDeploymentId($payload[LtiConstants::DEPLOYMENT_ID]);
-
-        $payload['exp'] = 1694721589; // To ensure signature match
-        $payload[LtiConstants::LTI1P1] = [
-            'oauth_consumer_key' => 'key',
-            'oauth_consumer_key_sign' => '5Vz/hYbr/GNTyWCQM4l5qrhgkowGjAbamNLNPsYjuwk=',
-        ];
-
-        $launch = $this->launch($payload);
-        $this->assertInstanceOf(LtiMessageLaunch::class, $launch);
+        $ltiMessageLaunch->migrate();
     }
 
     public function testLaunchWithMissingResourceLinkId()
@@ -582,8 +596,10 @@ class Lti13CertificationTest extends TestCase
         $this->assertEquals($casesCount, $testedCases);
     }
 
-    private function launch($payload)
+    private function launch($payload, IDatabase $db = null)
     {
+        $db = $db ?? $this->db;
+
         $jwt = $this->buildJWT($payload, $this->issuer);
         if (isset($payload['nonce'])) {
             $this->cache->cacheNonce($payload['nonce'], static::STATE);
@@ -601,7 +617,7 @@ class Lti13CertificationTest extends TestCase
         $this->serviceConnector->shouldReceive('getResponseBody')
             ->once()->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
 
-        return LtiMessageLaunch::new($this->db, $this->cache, $this->cookie, $this->serviceConnector)
+        return LtiMessageLaunch::new($db, $this->cache, $this->cookie, $this->serviceConnector)
             ->validate($params);
     }
 }

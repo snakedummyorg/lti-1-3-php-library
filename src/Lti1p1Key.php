@@ -13,9 +13,22 @@ class Lti1p1Key
         $this->secret = $key['secret'] ?? null;
     }
 
-    public static function new()
+    public function sign(string $deploymentId, string $iss, string $clientId, string $exp, string $nonce): string
     {
-        return new Lti1p1Key();
+        $signatureComponents = [
+            $this->getKey(),
+            $deploymentId,
+            $iss,
+            $clientId,
+            $exp,
+            $nonce,
+        ];
+
+        $baseString = implode('&', $signatureComponents);
+        $utf8String = mb_convert_encoding($baseString, 'utf8', mb_detect_encoding($baseString));
+        $hash = hash_hmac('sha256', $utf8String, $this->getSecret(), true);
+
+        return base64_encode($hash);
     }
 
     public function getKey()
@@ -41,4 +54,5 @@ class Lti1p1Key
 
         return $this;
     }
+
 }

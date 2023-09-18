@@ -29,8 +29,6 @@ class LtiMessageLaunch
     public const ERR_INVALID_ID_TOKEN = 'Invalid id_token, JWT must contain 3 parts';
     public const ERR_MISSING_NONCE = 'Missing Nonce.';
     public const ERR_INVALID_NONCE = 'Invalid Nonce.';
-    public const ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH = 'Failed to migrate from LTI 1.1 to 1.3. The oauth_consumer_key_sign did not match.';
-    public const ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN = 'Failed to migrate from LTI 1.1 to 1.3. The oauth_consumer_key_sign was not provided.';
 
     /**
      * :issuerUrl and :clientId are used to substitute the queried issuerUrl
@@ -56,8 +54,9 @@ class LtiMessageLaunch
     private $request;
     private $jwt;
     private $registration;
+    private $deployment;
     private $launch_id;
-    private $shouldMigrate;
+    private bool $shouldMigrate;
 
     // See https://www.imsglobal.org/spec/security/v1p1#approved-jwt-signing-algorithms.
     private static $ltiSupportedAlgs = [
@@ -173,8 +172,12 @@ class LtiMessageLaunch
 
     public function migrate()
     {
-        if ($this->shouldMigrate()) {
-            $this->db->migrateFromLti1p1($this->getLaunchData());
+        if ($this->shouldMigrate() && $this->matchingLti1p1KeyExists()) {
+            $this->deployment = $this->db->migrateFromLti1p1($this->getLaunchData());
+        }
+
+        if (!isset($this->deployment)) {
+            throw new LtiException(static::ERR_NO_DEPLOYMENT);
         }
 
         return $this;
@@ -502,9 +505,9 @@ class LtiMessageLaunch
 
         // Find deployment.
         $client_id = $this->getAud();
-        $deployment = $this->db->findDeployment($this->jwt['body']['iss'], $this->jwt['body'][LtiConstants::DEPLOYMENT_ID], $client_id);
+        $this->deployment = $this->db->findDeployment($this->jwt['body']['iss'], $this->jwt['body'][LtiConstants::DEPLOYMENT_ID], $client_id);
 
-        if (empty($deployment) && !$this->shouldMigrate()) {
+        if (empty($this->deployment) && !$this->shouldMigrate()) {
             throw new LtiException(static::ERR_NO_DEPLOYMENT);
         }
 
@@ -556,8 +559,8 @@ class LtiMessageLaunch
         if (!isset($this->shouldMigrate)) {
             // Prevent potential unneeded calls to the database
             $this->shouldMigrate = $this->db instanceof IMigrationDatabase
-                && isset($this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign'])
-                && $this->matchingLti1p1KeyExists();
+                && isset($this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key'])
+                && isset($this->getLaunchData()[LtiConstants::LTI1P1]['oauth_consumer_key_sign']);
         }
 
         return $this->shouldMigrate;
@@ -585,21 +588,13 @@ class LtiMessageLaunch
     {
         $launchData = $this->getLaunchData();
 
-        $signatureComponents = [
-            $key->getKey(),
+        return $key->sign(
             $launchData[LtiConstants::DEPLOYMENT_ID],
             $launchData['iss'],
             $this->getAud(),
             $launchData['exp'],
-            $launchData['nonce'],
-        ];
-
-        // Create signature
-        $baseString = implode('&', $signatureComponents);
-        $utf8String = mb_convert_encoding($baseString, 'utf8', mb_detect_encoding($baseString));
-        $hash = hash_hmac('sha256', $utf8String, $key->getSecret(), true);
-
-        return base64_encode($hash);
+            $launchData['nonce']
+        );
     }
 
     private function getOauthConsumerKeySign(): ?string
