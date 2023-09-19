@@ -553,14 +553,16 @@ class LtiMessageLaunch
 
     private function getAud(): string
     {
-        return is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
+        return $this->jwt['body']['aud'][0] ?? $this->jwt['body']['aud'];
     }
 
     private function canMigrate(): bool
     {
         return $this->db instanceof IMigrationDatabase
-            && isset($this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key'])
-            && isset($this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign']);
+            && isset(
+                $this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key'],
+                $this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign']
+            );
     }
 
     private function shouldMigrate(): bool
@@ -585,7 +587,7 @@ class LtiMessageLaunch
 
     private function oauthConsumerKeySignMatches(Lti1p1Key $key): string
     {
-        return $this->getOauthSignature($key) === $this->getOauthConsumerKeySign();
+        return $this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign'] === $this->getOauthSignature($key);
     }
 
     private function getOauthSignature(Lti1p1Key $key): string
@@ -597,10 +599,5 @@ class LtiMessageLaunch
             $this->jwt['body']['exp'],
             $this->jwt['body']['nonce']
         );
-    }
-
-    private function getOauthConsumerKeySign(): ?string
-    {
-        return $this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign'] ?? null;
     }
 }
