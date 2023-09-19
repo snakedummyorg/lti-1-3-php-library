@@ -52,6 +52,7 @@ class LtiDeepLink
      *
      * @todo Consider wrapping the content inside a well-formed HTML document,
      * and returning it instead of directly writing to standard output
+     * @todo Deprecate this in the next major version
      */
     public function outputResponseForm($resources)
     {

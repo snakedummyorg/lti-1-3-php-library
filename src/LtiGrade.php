@@ -156,6 +156,9 @@ class LtiGrade
 
     // Custom Extension for Canvas.
     // https://documentation.instructure.com/doc/api/score.html
+    /**
+     * @todo: Deprecate this in the next major version
+     */
     public function setCanvasExtension($value)
     {
         $this->canvas_extension = $value;
