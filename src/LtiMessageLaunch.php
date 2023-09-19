@@ -553,7 +553,11 @@ class LtiMessageLaunch
 
     private function getAud(): string
     {
-        return is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
+        if (is_array($this->jwt['body']['aud'])) {
+            return $this->jwt['body']['aud'][0];
+        } else {
+            return $this->jwt['body']['aud'];
+        }
     }
 
     private function canMigrate(): bool
