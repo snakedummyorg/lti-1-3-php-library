@@ -509,7 +509,7 @@ class LtiMessageLaunch
         $client_id = $this->getAud();
         $this->deployment = $this->db->findDeployment($this->jwt['body']['iss'], $this->jwt['body'][LtiConstants::DEPLOYMENT_ID], $client_id);
 
-        if (empty($this->deployment) && !$this->canMigrate()) {
+        if (!isset($this->deployment) && !$this->canMigrate()) {
             throw new LtiException(static::ERR_NO_DEPLOYMENT);
         }
 
