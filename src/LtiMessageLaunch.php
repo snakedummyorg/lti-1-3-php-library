@@ -590,14 +590,12 @@ class LtiMessageLaunch
 
     private function getOauthSignature(Lti1p1Key $key): string
     {
-        $launchData = $this->jwt['body'];
-
         return $key->sign(
-            $launchData[LtiConstants::DEPLOYMENT_ID],
-            $launchData['iss'],
+            $this->jwt['body'][LtiConstants::DEPLOYMENT_ID],
+            $this->jwt['body']['iss'],
             $this->getAud(),
-            $launchData['exp'],
-            $launchData['nonce']
+            $this->jwt['body']['exp'],
+            $this->jwt['body']['nonce']
         );
     }
 
