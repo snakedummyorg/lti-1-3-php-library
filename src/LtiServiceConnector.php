@@ -202,7 +202,7 @@ class LtiServiceConnector implements ILtiServiceConnector
         ])));
     }
 
-    private function getAccessTokenCacheKey(ILtiRegistration $registration, array $scopes)
+    private function getAccessTokenCacheKey(ILtiRegistration $registration, array $scopes): string
     {
         sort($scopes);
         $scopeKey = md5(implode('|', $scopes));
@@ -210,7 +210,7 @@ class LtiServiceConnector implements ILtiServiceConnector
         return $registration->getIssuer().$registration->getClientId().$scopeKey;
     }
 
-    private function getNextUrl(array $headers)
+    private function getNextUrl(array $headers): ?string
     {
         $subject = $headers['Link'] ?? $headers['link'] ?? '';
         preg_match(static::NEXT_PAGE_REGEX, $subject, $matches);

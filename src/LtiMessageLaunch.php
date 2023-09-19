@@ -411,7 +411,7 @@ class LtiMessageLaunch
             static::$ltiSupportedAlgs[$jwtAlg] === $key['kty'];
     }
 
-    protected function validateState()
+    protected function validateState(): self
     {
         // Check State for OIDC.
         if ($this->cookie->getCookie(LtiOidcLogin::COOKIE_PREFIX.$this->request['state']) !== $this->request['state']) {
@@ -422,7 +422,7 @@ class LtiMessageLaunch
         return $this;
     }
 
-    protected function validateJwtFormat()
+    protected function validateJwtFormat(): self
     {
         $jwt = $this->request['id_token'] ?? null;
 
@@ -446,7 +446,7 @@ class LtiMessageLaunch
         return $this;
     }
 
-    protected function validateNonce()
+    protected function validateNonce(): self
     {
         if (!isset($this->jwt['body']['nonce'])) {
             throw new LtiException(static::ERR_MISSING_NONCE);
@@ -458,7 +458,7 @@ class LtiMessageLaunch
         return $this;
     }
 
-    protected function validateRegistration()
+    protected function validateRegistration(): self
     {
         // Find registration.
         $clientId = $this->getAud();
@@ -478,7 +478,7 @@ class LtiMessageLaunch
         return $this;
     }
 
-    protected function validateJwtSignature()
+    protected function validateJwtSignature(): self
     {
         if (!isset($this->jwt['header']['kid'])) {
             throw new LtiException(static::ERR_NO_KID);
@@ -499,7 +499,7 @@ class LtiMessageLaunch
         return $this;
     }
 
-    protected function validateDeployment()
+    protected function validateDeployment(): self
     {
         if (!isset($this->jwt['body'][LtiConstants::DEPLOYMENT_ID])) {
             throw new LtiException(static::ERR_MISSING_DEPLOYEMENT_ID);
@@ -516,7 +516,7 @@ class LtiMessageLaunch
         return $this;
     }
 
-    protected function validateMessage()
+    protected function validateMessage(): self
     {
         if (empty($this->jwt['body'][LtiConstants::MESSAGE_TYPE])) {
             // Unable to identify message type.
