@@ -132,6 +132,7 @@ class LtiMessageLaunch
      */
     public function validate(array $request = null)
     {
+        // @todo remove this in v6.0
         if ($request === null) {
             $request = $_POST;
         }
@@ -144,6 +145,7 @@ class LtiMessageLaunch
             ->validateJwtSignature()
             ->validateDeployment()
             ->validateMessage()
+            // @todo remove this in v6.0
             ->cacheLaunchData();
     }
 
