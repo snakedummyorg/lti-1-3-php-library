@@ -27,7 +27,7 @@ class LtiDeepLink
             'iat' => time(),
             'nonce' => LtiOidcLogin::secureRandomString('nonce-'),
             LtiConstants::DEPLOYMENT_ID => $this->deployment_id,
-            LtiConstants::MESSAGE_TYPE => 'LtiDeepLinkingResponse',
+            LtiConstants::MESSAGE_TYPE => LtiConstants::MESSAGE_TYPE_DEEPLINK_RESPONSE,
             LtiConstants::VERSION => LtiConstants::V1_3,
             LtiConstants::DL_CONTENT_ITEMS => array_map(function ($resource) {
                 return $resource->toArray();
@@ -51,16 +51,14 @@ class LtiDeepLink
         trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
 
         $jwt = $this->getResponseJwt($resources);
-        /*
-         * @todo Fix this
-         */ ?>
-        <form id="auto_submit" action="<?php echo $this->deep_link_settings['deep_link_return_url']; ?>" method="POST">
-            <input type="hidden" name="JWT" value="<?php echo $jwt; ?>" />
-            <input type="submit" name="Go" />
-        </form>
-        <script>
-            document.getElementById('auto_submit').submit();
-        </script>
-        <?php
+        $formActionUrl = $this->deep_link_settings['deep_link_return_url'];
+
+        echo <<<HTML
+<form id="auto_submit" action="{$formActionUrl}" method="POST">
+    <input type="hidden" name="JWT" value="{$jwt}" />
+    <input type="submit" name="Go" />
+</form>
+<script>document.getElementById('auto_submit').submit();</script>
+HTML;
     }
 }
