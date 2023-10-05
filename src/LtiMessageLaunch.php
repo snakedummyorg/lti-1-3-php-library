@@ -29,8 +29,6 @@ class LtiMessageLaunch
     public const ERR_INVALID_ID_TOKEN = 'Invalid id_token, JWT must contain 3 parts';
     public const ERR_MISSING_NONCE = 'Missing Nonce.';
     public const ERR_INVALID_NONCE = 'Invalid Nonce.';
-    public const ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH = 'Failed to migrate from 1.1 -> 1.3, oauth_consumer_key_sign did not match';
-    public const ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN = 'Failed to migrate from 1.1 -> 1.3, oauth_consumer_key_sign was not provided';
 
     /**
      * :issuerUrl and :clientId are used to substitute the queried issuerUrl
@@ -48,13 +46,17 @@ class LtiMessageLaunch
     public const ERR_INVALID_MESSAGE = 'Message validation failed.';
     public const ERR_INVALID_ALG = 'Invalid alg was specified in the JWT header.';
     public const ERR_MISMATCHED_ALG_KEY = 'The alg specified in the JWT header is incompatible with the JWK key type.';
-    private $db;
-    private $cache;
+    public const ERR_OAUTH_KEY_SIGN_NOT_VERIFIED = 'Unable to upgrade from LTI 1.1 to 1.3. A matching OAuth Consumer Key could not be found.';
+    private IDatabase $db;
+    private ICache $cache;
+
+    // @TODO: Type these on the next major version
     private $cookie;
     private $serviceConnector;
     private $request;
     private $jwt;
     private $registration;
+    private $deployment;
     private $launch_id;
 
     // See https://www.imsglobal.org/spec/security/v1p1#approved-jwt-signing-algorithms.
@@ -118,6 +120,7 @@ class LtiMessageLaunch
         ICache $cache = null,
         ILtiServiceConnector $serviceConnector = null
     ) {
+        // @TODO: Fix the null here on the next major version
         $new = new LtiMessageLaunch($database, $cache, null, $serviceConnector);
         $new->launch_id = $launch_id;
         $new->jwt = ['body' => $new->cache->getLaunchData($launch_id)];
@@ -125,45 +128,19 @@ class LtiMessageLaunch
         return $new->validateRegistration();
     }
 
-    public function setRequest(array $request = null)
+    public function setRequest(array $request)
     {
-        if ($request === null) {
-            $request = $_POST;
-        }
-
         $this->request = $request;
 
         return $this;
     }
 
-    private function shouldMigrate(): bool
+    public function initialize(array $request)
     {
-        assert($this->db instanceof IMigrationDatabase);
-
-        $launchData = $this->getLaunchData();
-        $lti1p1Install = $this->db->getMatchingLti1p1Install($launchData);
-        if ($lti1p1Install !== null) {
-            return $this->lti1p1InstallationSignatureMatches($lti1p1Install, $launchData);
-        }
-
-        return false;
-    }
-
-    private function lti1p1InstallationSignatureMatches(Lti1p1Installation $ltiInstall, array $launchData): bool
-    {
-        // Check to see if we have params to calculate oauth_consumer_key_sign
-        if (!isset($launchData[LtiConstants::LTI1P1]) || !isset($launchData[LtiConstants::LTI1P1]['oauth_consumer_key_sign'])) {
-            throw new LtiException(static::ERR_MISSING_OAUTH_CONSUMER_KEY_SIGN);
-        }
-
-        $lti1p1Claim = $launchData[LtiConstants::LTI1P1];
-        $signature = $lti1p1Claim['oauth_consumer_key_sign'];
-
-        if (!$ltiInstall->compareOauthConsumerKeySign($launchData, $signature)) {
-            throw new LtiException(static::ERR_OAUTH_CONSUMER_KEY_SIGN_MISMATCH);
-        }
-
-        return true;
+        return $this->setRequest($request)
+            ->validate()
+            ->migrate()
+            ->cacheLaunchData();
     }
 
     /**
@@ -176,7 +153,14 @@ class LtiMessageLaunch
      */
     public function validate(array $request = null)
     {
-        $this->setRequest($request);
+        // @TODO: Remove this on the next major release.
+        if (!isset($this->request)) {
+            if ($request === null) {
+                $request = $_POST;
+            }
+
+            $this->setRequest($request);
+        }
 
         return $this->validateState()
             ->validateJwtFormat()
@@ -186,6 +170,26 @@ class LtiMessageLaunch
             ->validateDeployment()
             ->validateMessage()
             ->cacheLaunchData();
+    }
+
+    public function migrate()
+    {
+        if ($this->shouldMigrate()) {
+            $this->deployment = $this->db->migrateFromLti1p1($this->jwt['body']);
+        }
+
+        if (!isset($this->deployment)) {
+            throw new LtiException(static::ERR_OAUTH_KEY_SIGN_NOT_VERIFIED);
+        }
+
+        return $this;
+    }
+
+    public function cacheLaunchData()
+    {
+        $this->cache->cacheLaunchData($this->launch_id, $this->jwt['body']);
+
+        return $this;
     }
 
     /**
@@ -407,14 +411,7 @@ class LtiMessageLaunch
             static::$ltiSupportedAlgs[$jwtAlg] === $key['kty'];
     }
 
-    private function cacheLaunchData()
-    {
-        $this->cache->cacheLaunchData($this->launch_id, $this->jwt['body']);
-
-        return $this;
-    }
-
-    protected function validateState()
+    protected function validateState(): self
     {
         // Check State for OIDC.
         if ($this->cookie->getCookie(LtiOidcLogin::COOKIE_PREFIX.$this->request['state']) !== $this->request['state']) {
@@ -425,7 +422,7 @@ class LtiMessageLaunch
         return $this;
     }
 
-    protected function validateJwtFormat()
+    protected function validateJwtFormat(): self
     {
         $jwt = $this->request['id_token'] ?? null;
 
@@ -449,7 +446,7 @@ class LtiMessageLaunch
         return $this;
     }
 
-    protected function validateNonce()
+    protected function validateNonce(): self
     {
         if (!isset($this->jwt['body']['nonce'])) {
             throw new LtiException(static::ERR_MISSING_NONCE);
@@ -461,10 +458,10 @@ class LtiMessageLaunch
         return $this;
     }
 
-    protected function validateRegistration()
+    protected function validateRegistration(): self
     {
         // Find registration.
-        $clientId = is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
+        $clientId = $this->getAud();
         $issuerUrl = $this->jwt['body']['iss'];
         $this->registration = $this->db->findRegistrationByIssuer($issuerUrl, $clientId);
 
@@ -481,7 +478,7 @@ class LtiMessageLaunch
         return $this;
     }
 
-    protected function validateJwtSignature()
+    protected function validateJwtSignature(): self
     {
         if (!isset($this->jwt['header']['kid'])) {
             throw new LtiException(static::ERR_NO_KID);
@@ -502,29 +499,24 @@ class LtiMessageLaunch
         return $this;
     }
 
-    protected function validateDeployment()
+    protected function validateDeployment(): self
     {
         if (!isset($this->jwt['body'][LtiConstants::DEPLOYMENT_ID])) {
             throw new LtiException(static::ERR_MISSING_DEPLOYEMENT_ID);
         }
 
         // Find deployment.
-        $client_id = is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
-        $deployment = $this->db->findDeployment($this->jwt['body']['iss'], $this->jwt['body'][LtiConstants::DEPLOYMENT_ID], $client_id);
+        $client_id = $this->getAud();
+        $this->deployment = $this->db->findDeployment($this->jwt['body']['iss'], $this->jwt['body'][LtiConstants::DEPLOYMENT_ID], $client_id);
 
-        if (empty($deployment) && $this->db instanceof IMigrationDatabase && $this->shouldMigrate()) {
-            // deployment not recognized. Check for migration
-            $deployment = $this->db->migrateFromLti1p1($this->getLaunchData());
-        }
-
-        if (empty($deployment)) {
+        if (!isset($this->deployment) && !$this->canMigrate()) {
             throw new LtiException(static::ERR_NO_DEPLOYMENT);
         }
 
         return $this;
     }
 
-    protected function validateMessage()
+    protected function validateMessage(): self
     {
         if (empty($this->jwt['body'][LtiConstants::MESSAGE_TYPE])) {
             // Unable to identify message type.
@@ -557,5 +549,59 @@ class LtiMessageLaunch
 
         // There should be 0-1 validators. This will either return the validator, or null if none apply.
         return array_shift($applicableValidators);
+    }
+
+    private function getAud(): string
+    {
+        if (is_array($this->jwt['body']['aud'])) {
+            return $this->jwt['body']['aud'][0];
+        } else {
+            return $this->jwt['body']['aud'];
+        }
+    }
+
+    private function canMigrate(): bool
+    {
+        return $this->db instanceof IMigrationDatabase
+            && isset(
+                $this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key'],
+                $this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign']
+            );
+    }
+
+    private function shouldMigrate(): bool
+    {
+        return $this->canMigrate()
+            && !isset($this->deployment)
+            && $this->matchingLti1p1KeyExists();
+    }
+
+    private function matchingLti1p1KeyExists(): bool
+    {
+        $keys = $this->db->findLti1p1Keys($this);
+
+        foreach ($keys as $key) {
+            if ($this->oauthConsumerKeySignMatches($key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function oauthConsumerKeySignMatches(Lti1p1Key $key): string
+    {
+        return $this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign'] === $this->getOauthSignature($key);
+    }
+
+    private function getOauthSignature(Lti1p1Key $key): string
+    {
+        return $key->sign(
+            $this->jwt['body'][LtiConstants::DEPLOYMENT_ID],
+            $this->jwt['body']['iss'],
+            $this->getAud(),
+            $this->jwt['body']['exp'],
+            $this->jwt['body']['nonce']
+        );
     }
 }
