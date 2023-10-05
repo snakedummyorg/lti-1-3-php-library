@@ -386,10 +386,10 @@ class Lti13CertificationTest extends TestCase
     public function testDoesNotMigrate1p1IfMissingOauthKeySign()
     {
         $payload = $this->payload;
-        $this->db = $this->migrateDb;
-        $this->db->clearDeployments();
+        $db = $this->migrateDb;
+        $db->clearDeployments();
 
-        $this->db->matchingKeys = [
+        $db->matchingKeys = [
             new Lti1p1Key([
                 'key' => 'somekey',
                 'secret' => 'somesecret',
@@ -400,9 +400,9 @@ class Lti13CertificationTest extends TestCase
             'oauth_consumer_key' => 'somekey',
         ];
 
-        $this->expectExceptionMessage(LtiMessageLaunch::ERR_NO_DEPLOYMENT);
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_KEY_SIGN_MISSING);
 
-        $this->launch($payload);
+        $this->launch($payload, $db);
     }
 
     public function testDoesNotMigrate1p1IfOauthKeySignDoesntMatch()
@@ -422,11 +422,10 @@ class Lti13CertificationTest extends TestCase
             'oauth_consumer_key' => 'somekey',
             'oauth_consumer_key_sign' => 'badsignature',
         ];
-        $ltiMessageLaunch = $this->launch($payload, $db);
 
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_KEY_SIGN_NOT_VERIFIED);
-
-        $ltiMessageLaunch->migrate();
+        
+        $ltiMessageLaunch = $this->launch($payload, $db);
     }
 
     public function testLaunchWithMissingResourceLinkId()
@@ -595,6 +594,6 @@ class Lti13CertificationTest extends TestCase
             ->once()->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
 
         return LtiMessageLaunch::new($db, $this->cache, $this->cookie, $this->serviceConnector)
-            ->validate($params);
+            ->initialize($params);
     }
 }

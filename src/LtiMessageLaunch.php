@@ -187,7 +187,7 @@ class LtiMessageLaunch
             throw new LtiException(static::ERR_OAUTH_KEY_SIGN_NOT_VERIFIED);
         }
 
-        $this->deployment = $this->db->migrateFromLti1p1($this->jwt['body']);
+        $this->deployment = $this->db->migrateFromLti1p1($this);
 
         return $this;
     }
