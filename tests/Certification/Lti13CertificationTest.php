@@ -424,7 +424,7 @@ class Lti13CertificationTest extends TestCase
         ];
 
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_KEY_SIGN_NOT_VERIFIED);
-        
+
         $ltiMessageLaunch = $this->launch($payload, $db);
     }
 
