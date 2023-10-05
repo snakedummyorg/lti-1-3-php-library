@@ -154,9 +154,15 @@ class LtiGrade
         return $this->canvas_extension;
     }
 
-    // Custom Extension for Canvas.
-    // https://documentation.instructure.com/doc/api/score.html
     /**
+     * Add custom extensions for Canvas.
+     *
+     * Disclaimer: You should only set this if your LMS is Canvas.
+     *             Some LMS (e.g. Schoology) include validation logic that will throw if there
+     *             is unexpected data. And, the type of LMS cannot simply be inferred by their URL.
+     *
+     * @see https://documentation.instructure.com/doc/api/score.html
+     * 
      * @todo: Deprecate this in the next major version
      */
     public function setCanvasExtension($value)
