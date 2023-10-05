@@ -46,7 +46,8 @@ class LtiMessageLaunch
     public const ERR_INVALID_MESSAGE = 'Message validation failed.';
     public const ERR_INVALID_ALG = 'Invalid alg was specified in the JWT header.';
     public const ERR_MISMATCHED_ALG_KEY = 'The alg specified in the JWT header is incompatible with the JWK key type.';
-    public const ERR_OAUTH_KEY_SIGN_NOT_VERIFIED = 'Unable to upgrade from LTI 1.1 to 1.3. A matching OAuth Consumer Key could not be found.';
+    public const ERR_OAUTH_KEY_SIGN_NOT_VERIFIED = 'Unable to upgrade from LTI 1.1 to 1.3. No OAuth Consumer Key matched this signature.';
+    public const ERR_OAUTH_KEY_SIGN_MISSING = 'Unable to upgrade from LTI 1.1 to 1.3. The oauth_consumer_key_sign was not provided.';
     private IDatabase $db;
     private ICache $cache;
 
@@ -174,13 +175,19 @@ class LtiMessageLaunch
 
     public function migrate()
     {
-        if ($this->shouldMigrate()) {
-            $this->deployment = $this->db->migrateFromLti1p1($this->jwt['body']);
+        if (isset($this->deployment) || !$this->canMigrate()) {
+            return $this;
         }
 
-        if (!isset($this->deployment)) {
+        if (!isset($this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign'])) {
+            throw new LtiException(static::ERR_OAUTH_KEY_SIGN_MISSING);
+        }
+
+        if (!$this->matchingLti1p1KeyExists()) {
             throw new LtiException(static::ERR_OAUTH_KEY_SIGN_NOT_VERIFIED);
         }
+
+        $this->deployment = $this->db->migrateFromLti1p1($this->jwt['body']);
 
         return $this;
     }
@@ -563,17 +570,13 @@ class LtiMessageLaunch
     private function canMigrate(): bool
     {
         return $this->db instanceof IMigrationDatabase
-            && isset(
-                $this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key'],
-                $this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign']
-            );
+            && isset($this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key']);
     }
 
     private function shouldMigrate(): bool
     {
         return $this->canMigrate()
-            && !isset($this->deployment)
-            && $this->matchingLti1p1KeyExists();
+            && !isset($this->deployment);
     }
 
     private function matchingLti1p1KeyExists(): bool
