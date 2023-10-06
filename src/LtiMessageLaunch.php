@@ -45,6 +45,8 @@ class LtiMessageLaunch
     public const ERR_INVALID_MESSAGE = 'Message validation failed.';
     public const ERR_INVALID_ALG = 'Invalid alg was specified in the JWT header.';
     public const ERR_MISMATCHED_ALG_KEY = 'The alg specified in the JWT header is incompatible with the JWK key type.';
+
+    // @todo: type these on the next major release
     private $db;
     private $cache;
     private $cookie;
@@ -115,6 +117,7 @@ class LtiMessageLaunch
         ICache $cache = null,
         ILtiServiceConnector $serviceConnector = null
     ) {
+        // @todo: Fix the null here on the next major version
         $new = new LtiMessageLaunch($database, $cache, null, $serviceConnector);
         $new->launch_id = $launch_id;
         $new->jwt = ['body' => $new->cache->getLaunchData($launch_id)];
