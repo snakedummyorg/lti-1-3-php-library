@@ -162,7 +162,7 @@ class LtiGrade
      *             is unexpected data. And, the type of LMS cannot simply be inferred by their URL.
      *
      * @see https://documentation.instructure.com/doc/api/score.html
-     * 
+     *
      * @todo: Deprecate this in the next major version
      */
     public function setCanvasExtension($value)
