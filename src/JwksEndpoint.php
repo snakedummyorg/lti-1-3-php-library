@@ -6,6 +6,9 @@ use Packback\Lti1p3\Interfaces\IDatabase;
 use Packback\Lti1p3\Interfaces\ILtiRegistration;
 use phpseclib3\Crypt\RSA;
 
+/**
+ * @todo Pin versions to v6.6 and php 8
+ */
 class JwksEndpoint
 {
     private $keys;
