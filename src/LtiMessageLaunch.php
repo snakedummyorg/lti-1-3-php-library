@@ -166,10 +166,10 @@ class LtiMessageLaunch
         return $this->validateState()
             ->validateJwtFormat()
             ->validateNonce()
-            ->validateMessage()
             ->validateRegistration()
             ->validateJwtSignature()
             ->validateDeployment()
+            ->validateMessage()
             // @TODO: Remove these in v6.0
             // ->migrate()
             ->cacheLaunchData();
