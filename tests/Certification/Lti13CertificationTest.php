@@ -108,11 +108,17 @@ class TestDb implements IDatabase
 class TestMigrateDb extends TestDb implements IMigrationDatabase
 {
     public array $matchingKeys;
+    public bool $shouldMigrate;
     public LtiDeployment $createdDeployment;
 
     public function findLti1p1Keys(LtiMessageLaunch $launch): array
     {
         return $this->matchingKeys;
+    }
+
+    public function shouldMigrate(LtiMessageLaunch $launch): bool
+    {
+        return $this->shouldMigrate;
     }
 
     public function migrateFromLti1p1(LtiMessageLaunch $launch): LtiDeployment
@@ -364,6 +370,7 @@ class Lti13CertificationTest extends TestCase
         ]);
 
         $db->matchingKeys = [$key];
+        $db->shouldMigrate = true;
         $db->createdDeployment = LtiDeployment::new()
             ->setDeploymentId($payload[LtiConstants::DEPLOYMENT_ID]);
 
@@ -395,6 +402,7 @@ class Lti13CertificationTest extends TestCase
                 'secret' => 'somesecret',
             ]),
         ];
+        $db->shouldMigrate = true;
 
         $payload[LtiConstants::LTI1P1] = [
             'oauth_consumer_key' => 'somekey',
@@ -417,6 +425,7 @@ class Lti13CertificationTest extends TestCase
                 'secret' => 'somesecret',
             ]),
         ];
+        $db->shouldMigrate = true;
 
         $payload[LtiConstants::LTI1P1] = [
             'oauth_consumer_key' => 'somekey',

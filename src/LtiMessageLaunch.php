@@ -170,12 +170,13 @@ class LtiMessageLaunch
             ->validateJwtSignature()
             ->validateDeployment()
             ->validateMessage()
+            // @TODO: Remove this in v6.0
             ->cacheLaunchData();
     }
 
     public function migrate()
     {
-        if (isset($this->deployment) || !$this->canMigrate()) {
+        if (!$this->shouldMigrate()) {
             return $this;
         }
 
@@ -188,6 +189,10 @@ class LtiMessageLaunch
         }
 
         $this->deployment = $this->db->migrateFromLti1p1($this);
+
+        if (!isset($this->deployment)) {
+            throw new LtiException(static::ERR_NO_DEPLOYMENT);
+        }
 
         return $this;
     }
@@ -569,14 +574,13 @@ class LtiMessageLaunch
 
     private function canMigrate(): bool
     {
-        return $this->db instanceof IMigrationDatabase
-            && isset($this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key']);
+        return $this->db instanceof IMigrationDatabase;
     }
 
     private function shouldMigrate(): bool
     {
         return $this->canMigrate()
-            && !isset($this->deployment);
+            && $this->db->shouldMigrate($this);
     }
 
     private function matchingLti1p1KeyExists(): bool

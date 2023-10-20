@@ -29,5 +29,5 @@ interface IMigrationDatabase
      * Previous to this, we validated the oauth_consumer_key_sign to ensure this migration
      * can safely occur.
      */
-    public function migrateFromLti1p1(LtiMessageLaunch $launch): LtiDeployment;
+    public function migrateFromLti1p1(LtiMessageLaunch $launch): ?LtiDeployment;
 }
