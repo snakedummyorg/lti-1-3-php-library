@@ -170,7 +170,8 @@ class LtiMessageLaunch
             ->validateJwtSignature()
             ->validateDeployment()
             ->validateMessage()
-            // @TODO: Remove this in v6.0
+            // @TODO: Remove these in v6.0
+            ->migrate()
             ->cacheLaunchData();
     }
 
