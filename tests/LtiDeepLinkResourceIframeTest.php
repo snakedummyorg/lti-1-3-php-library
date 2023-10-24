@@ -61,10 +61,28 @@ class LtiDeepLinkResourceIframeTest extends TestCase
         $this->assertEquals($expected, $this->ltiDeepLinkResourceIframe->getHeight());
     }
 
+    public function testItGetsSrc()
+    {
+        $result = $this->ltiDeepLinkResourceIframe->getSrc();
+
+        $this->assertNull($result);
+    }
+
+    public function testItSetsSrc()
+    {
+        $expected = 'https://example.com';
+
+        $result = $this->ltiDeepLinkResourceIframe->setSrc($expected);
+
+        $this->assertSame($this->ltiDeepLinkResourceIframe, $result);
+        $this->assertEquals($expected, $this->ltiDeepLinkResourceIframe->getSrc());
+    }
+
     public function testItCreatesArrayWithoutOptionalProperties()
     {
         $this->ltiDeepLinkResourceIframe->setWidth(null);
         $this->ltiDeepLinkResourceIframe->setHeight(null);
+        $this->ltiDeepLinkResourceIframe->setSrc(null);
 
         $result = $this->ltiDeepLinkResourceIframe->toArray();
 
@@ -76,10 +94,12 @@ class LtiDeepLinkResourceIframeTest extends TestCase
         $expected = [
             'width' => 100,
             'height' => 200,
+            'src' => 'https://example.com'
         ];
 
         $this->ltiDeepLinkResourceIframe->setWidth($expected['width']);
         $this->ltiDeepLinkResourceIframe->setHeight($expected['height']);
+        $this->ltiDeepLinkResourceIframe->setSrc($expected['src']);
 
         $result = $this->ltiDeepLinkResourceIframe->toArray();
 
