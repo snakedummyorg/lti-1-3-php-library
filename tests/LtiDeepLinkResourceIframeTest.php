@@ -94,7 +94,7 @@ class LtiDeepLinkResourceIframeTest extends TestCase
         $expected = [
             'width' => 100,
             'height' => 200,
-            'src' => 'https://example.com'
+            'src' => 'https://example.com',
         ];
 
         $this->ltiDeepLinkResourceIframe->setWidth($expected['width']);

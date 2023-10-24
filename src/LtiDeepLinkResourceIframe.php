@@ -50,7 +50,7 @@ class LtiDeepLinkResourceIframe
 
         return $this;
     }
-    
+
     public function getSrc(): ?string
     {
         return $this->src;
