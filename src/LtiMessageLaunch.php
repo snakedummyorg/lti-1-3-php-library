@@ -140,8 +140,9 @@ class LtiMessageLaunch
     {
         return $this->setRequest($request)
             ->validate()
-            ->migrate()
-            ->cacheLaunchData();
+            ->migrate();
+            // @TODO: Add this in v6.0
+            // ->cacheLaunchData();
     }
 
     /**
@@ -170,8 +171,7 @@ class LtiMessageLaunch
             ->validateJwtSignature()
             ->validateDeployment()
             ->validateMessage()
-            // @TODO: Remove these in v6.0
-            // ->migrate()
+            // @TODO: Remove this in v6.0
             ->cacheLaunchData();
     }
 
