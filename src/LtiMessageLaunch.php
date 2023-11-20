@@ -178,7 +178,7 @@ class LtiMessageLaunch
     public function migrate()
     {
         if (!$this->shouldMigrate()) {
-            return $this;
+            return $this->ensureDeploymentExists();
         }
 
         if (!isset($this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign'])) {
@@ -191,11 +191,7 @@ class LtiMessageLaunch
 
         $this->deployment = $this->db->migrateFromLti1p1($this);
 
-        if (!isset($this->deployment)) {
-            throw new LtiException(static::ERR_NO_DEPLOYMENT);
-        }
-
-        return $this;
+        return $this->ensureDeploymentExists();
     }
 
     public function cacheLaunchData()
@@ -522,8 +518,8 @@ class LtiMessageLaunch
         $client_id = $this->getAud();
         $this->deployment = $this->db->findDeployment($this->jwt['body']['iss'], $this->jwt['body'][LtiConstants::DEPLOYMENT_ID], $client_id);
 
-        if (!isset($this->deployment) && !$this->canMigrate()) {
-            throw new LtiException(static::ERR_NO_DEPLOYMENT);
+        if (!$this->canMigrate()) {
+            return $this->ensureDeploymentExists();
         }
 
         return $this;
@@ -571,6 +567,15 @@ class LtiMessageLaunch
         } else {
             return $this->jwt['body']['aud'];
         }
+    }
+
+    private function ensureDeploymentExists(): self
+    {
+        if (!isset($this->deployment)) {
+            throw new LtiException(static::ERR_NO_DEPLOYMENT);
+        }
+
+        return $this;
     }
 
     private function canMigrate(): bool
