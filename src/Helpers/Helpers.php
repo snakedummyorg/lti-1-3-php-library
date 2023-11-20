@@ -9,7 +9,7 @@ class Helpers
         return !is_null($value);
     }
 
-    public static function buildUrlWithQueryParams(string $url, array $params= []): string
+    public static function buildUrlWithQueryParams(string $url, array $params = []): string
     {
         if (empty($params)) {
             return $url;
@@ -21,6 +21,6 @@ class Helpers
             $separator = '?';
         }
 
-        return $url . $separator . http_build_query($params, '');
+        return $url.$separator.http_build_query($params, '');
     }
 }

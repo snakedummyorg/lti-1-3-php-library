@@ -18,7 +18,7 @@ class LtiNamesRolesProvisioningService extends LtiAbstractService
      */
     public function getMembers(array $options = []): array
     {
-        $url =  Helpers::buildUrlWithQueryParams($this->getServiceData()['context_memberships_url'], $options);
+        $url = Helpers::buildUrlWithQueryParams($this->getServiceData()['context_memberships_url'], $options);
 
         $request = new ServiceRequest(
             ServiceRequest::METHOD_GET,
