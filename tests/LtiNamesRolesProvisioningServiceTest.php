@@ -36,4 +36,22 @@ class LtiNamesRolesProvisioningServiceTest extends TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testItGetsMembersForResourceLink()
+    {
+        $expected = ['members'];
+
+        $nrps = new LtiNamesRolesProvisioningService($this->connector, $this->registration, [
+            'context_memberships_url' => 'url',
+        ]);
+        $this->connector->shouldReceive('getAll')
+            ->withArgs(function ($registration, $scope, $request, $key) {
+                return $request->getUrl() === 'url?rlid=resource-link-id' && $key === 'members';
+            })
+            ->once()->andReturn($expected);
+
+        $result = $nrps->getMembers(['rlid' => 'resource-link-id']);
+
+        $this->assertEquals($expected, $result);
+    }
 }
