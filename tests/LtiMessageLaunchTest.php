@@ -12,11 +12,14 @@ use Packback\Lti1p3\Interfaces\ICookie;
 use Packback\Lti1p3\Interfaces\IDatabase;
 use Packback\Lti1p3\Interfaces\ILtiRegistration;
 use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
+use Packback\Lti1p3\Interfaces\IMigrationDatabase;
 use Packback\Lti1p3\JwksEndpoint;
+use Packback\Lti1p3\Lti1p1Key;
 use Packback\Lti1p3\LtiAssignmentsGradesService;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiCourseGroupsService;
 use Packback\Lti1p3\LtiDeepLink;
+use Packback\Lti1p3\LtiDeployment;
 use Packback\Lti1p3\LtiException;
 use Packback\Lti1p3\LtiMessageLaunch;
 use Packback\Lti1p3\LtiNamesRolesProvisioningService;
@@ -43,8 +46,10 @@ class LtiMessageLaunchTest extends TestCase
         $this->cache = Mockery::mock(ICache::class);
         $this->cookie = Mockery::mock(ICookie::class);
         $this->database = Mockery::mock(IDatabase::class);
+        $this->migrationDatabase = Mockery::mock(IDatabase::class, IMigrationDatabase::class);
         $this->serviceConnector = Mockery::mock(ILtiServiceConnector::class);
         $this->registration = Mockery::mock(ILtiRegistration::class);
+        $this->deployment = Mockery::mock(LtiDeployment::class);
 
         $this->messageLaunch = new LtiMessageLaunch(
             $this->database,
@@ -446,6 +451,206 @@ class LtiMessageLaunchTest extends TestCase
         $this->expectException(LtiException::class);
 
         $this->messageLaunch->validate($params);
+    }
+
+    public function testItInitializesALaunch()
+    {
+        $messageLaunch = new LtiMessageLaunch(
+            $this->migrationDatabase,
+            $this->cache,
+            $this->cookie,
+            $this->serviceConnector
+        );
+
+        $payload = $this->payload;
+        $payload[LtiConstants::LTI1P1]['oauth_consumer_key_sign'] = 'foo';
+
+        $params = [
+            'utf8' => '✓',
+            'id_token' => $this->buildJWT($payload, $this->issuer),
+            'state' => static::STATE,
+        ];
+
+        $matchingKey = Mockery::mock(Lti1p1Key::class);
+
+        $this->cookie->shouldReceive('getCookie')
+            ->once()->andReturn($params['state']);
+        $this->cache->shouldReceive('checkNonceIsValid')
+            ->once()->andReturn(true);
+        $this->migrationDatabase->shouldReceive('findRegistrationByIssuer')
+            ->once()->andReturn($this->registration);
+        $this->registration->shouldReceive('getClientId')
+            ->once()->andReturn($this->issuer['client_id']);
+        $this->registration->shouldReceive('getKeySetUrl')
+            ->once()->andReturn($this->issuer['key_set_url']);
+        $this->serviceConnector->shouldReceive('makeRequest')
+            ->once()->andReturn(Mockery::mock(Response::class));
+        $this->serviceConnector->shouldReceive('getResponseBody')
+            ->once()->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
+        $this->migrationDatabase->shouldReceive('findDeployment')
+            ->once()->andReturn(null);
+        $this->migrationDatabase->shouldReceive('shouldMigrate')
+            ->once()->andReturn(true);
+        $this->migrationDatabase->shouldReceive('findLti1p1Keys')
+            ->once()->andReturn([$matchingKey]);
+        $matchingKey->shouldReceive('sign')
+            ->once()->andReturn($payload[LtiConstants::LTI1P1]['oauth_consumer_key_sign']);
+        $this->migrationDatabase->shouldReceive('migrateFromLti1p1')
+            ->once()->andReturn($this->deployment);
+        $this->cache->shouldReceive('cacheLaunchData')
+            ->once()->andReturn(true);
+
+        $actual = $messageLaunch->initialize($params);
+
+        $this->assertInstanceOf(LtiMessageLaunch::class, $actual);
+    }
+
+    public function testItFailsToInitializeIfOauthConsumerKeySignIsMissing()
+    {
+        $messageLaunch = new LtiMessageLaunch(
+            $this->migrationDatabase,
+            $this->cache,
+            $this->cookie,
+            $this->serviceConnector
+        );
+
+        $payload = $this->payload;
+
+        $params = [
+            'utf8' => '✓',
+            'id_token' => $this->buildJWT($payload, $this->issuer),
+            'state' => static::STATE,
+        ];
+
+        $this->cookie->shouldReceive('getCookie')
+            ->once()->andReturn($params['state']);
+        $this->cache->shouldReceive('checkNonceIsValid')
+            ->once()->andReturn(true);
+        $this->migrationDatabase->shouldReceive('findRegistrationByIssuer')
+            ->once()->andReturn($this->registration);
+        $this->registration->shouldReceive('getClientId')
+            ->once()->andReturn($this->issuer['client_id']);
+        $this->registration->shouldReceive('getKeySetUrl')
+            ->once()->andReturn($this->issuer['key_set_url']);
+        $this->serviceConnector->shouldReceive('makeRequest')
+            ->once()->andReturn(Mockery::mock(Response::class));
+        $this->serviceConnector->shouldReceive('getResponseBody')
+            ->once()->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
+        $this->migrationDatabase->shouldReceive('findDeployment')
+            ->once()->andReturn(null);
+        $this->migrationDatabase->shouldReceive('shouldMigrate')
+            ->once()->andReturn(true);
+        $this->cache->shouldReceive('cacheLaunchData')
+            ->once()->andReturn(true);
+
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_KEY_SIGN_MISSING);
+
+        $actual = $messageLaunch->initialize($params);
+    }
+
+    public function testItFailsToInitializeIfNoMatchingKeyIsFound()
+    {
+        $messageLaunch = new LtiMessageLaunch(
+            $this->migrationDatabase,
+            $this->cache,
+            $this->cookie,
+            $this->serviceConnector
+        );
+
+        $payload = $this->payload;
+        $payload[LtiConstants::LTI1P1]['oauth_consumer_key_sign'] = 'foo';
+
+        $params = [
+            'utf8' => '✓',
+            'id_token' => $this->buildJWT($payload, $this->issuer),
+            'state' => static::STATE,
+        ];
+
+        $matchingKey = Mockery::mock(Lti1p1Key::class);
+
+        $this->cookie->shouldReceive('getCookie')
+            ->once()->andReturn($params['state']);
+        $this->cache->shouldReceive('checkNonceIsValid')
+            ->once()->andReturn(true);
+        $this->migrationDatabase->shouldReceive('findRegistrationByIssuer')
+            ->once()->andReturn($this->registration);
+        $this->registration->shouldReceive('getClientId')
+            ->once()->andReturn($this->issuer['client_id']);
+        $this->registration->shouldReceive('getKeySetUrl')
+            ->once()->andReturn($this->issuer['key_set_url']);
+        $this->serviceConnector->shouldReceive('makeRequest')
+            ->once()->andReturn(Mockery::mock(Response::class));
+        $this->serviceConnector->shouldReceive('getResponseBody')
+            ->once()->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
+        $this->migrationDatabase->shouldReceive('findDeployment')
+            ->once()->andReturn(null);
+        $this->migrationDatabase->shouldReceive('shouldMigrate')
+            ->once()->andReturn(true);
+        $this->migrationDatabase->shouldReceive('findLti1p1Keys')
+            ->once()->andReturn([$matchingKey]);
+        $matchingKey->shouldReceive('sign')
+            ->once()->andReturn('bar');
+        $this->cache->shouldReceive('cacheLaunchData')
+            ->once()->andReturn(true);
+
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_KEY_SIGN_NOT_VERIFIED);
+
+        $actual = $messageLaunch->initialize($params);
+    }
+
+    public function testItFailsToInitializeIfDeploymentIsNotReturned()
+    {
+        $messageLaunch = new LtiMessageLaunch(
+            $this->migrationDatabase,
+            $this->cache,
+            $this->cookie,
+            $this->serviceConnector
+        );
+
+        $payload = $this->payload;
+        $payload[LtiConstants::LTI1P1]['oauth_consumer_key_sign'] = 'foo';
+
+        $params = [
+            'utf8' => '✓',
+            'id_token' => $this->buildJWT($payload, $this->issuer),
+            'state' => static::STATE,
+        ];
+
+        $matchingKey = Mockery::mock(Lti1p1Key::class);
+
+        $this->cookie->shouldReceive('getCookie')
+            ->once()->andReturn($params['state']);
+        $this->cache->shouldReceive('checkNonceIsValid')
+            ->once()->andReturn(true);
+        $this->migrationDatabase->shouldReceive('findRegistrationByIssuer')
+            ->once()->andReturn($this->registration);
+        $this->registration->shouldReceive('getClientId')
+            ->once()->andReturn($this->issuer['client_id']);
+        $this->registration->shouldReceive('getKeySetUrl')
+            ->once()->andReturn($this->issuer['key_set_url']);
+        $this->serviceConnector->shouldReceive('makeRequest')
+            ->once()->andReturn(Mockery::mock(Response::class));
+        $this->serviceConnector->shouldReceive('getResponseBody')
+            ->once()->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
+        $this->migrationDatabase->shouldReceive('findDeployment')
+            ->once()->andReturn(null);
+        $this->migrationDatabase->shouldReceive('shouldMigrate')
+            ->once()->andReturn(true);
+        $this->migrationDatabase->shouldReceive('findLti1p1Keys')
+            ->once()->andReturn([$matchingKey]);
+        $matchingKey->shouldReceive('sign')
+            ->once()->andReturn($payload[LtiConstants::LTI1P1]['oauth_consumer_key_sign']);
+        $this->migrationDatabase->shouldReceive('migrateFromLti1p1')
+            ->once()->andReturn(null);
+        $this->cache->shouldReceive('cacheLaunchData')
+            ->once()->andReturn(true);
+
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_NO_DEPLOYMENT);
+
+        $actual = $messageLaunch->initialize($params);
     }
 
     public function testALaunchHasNrps()

@@ -578,7 +578,7 @@ class LtiMessageLaunch
         return $this;
     }
 
-    private function canMigrate(): bool
+    public function canMigrate(): bool
     {
         return $this->db instanceof IMigrationDatabase;
     }
