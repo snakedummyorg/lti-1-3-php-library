@@ -2,6 +2,8 @@
 
 namespace Packback\Lti1p3;
 
+use Packback\Lti1p3\Helpers\Helpers;
+
 class LtiNamesRolesProvisioningService extends LtiAbstractService
 {
     public const CONTENTTYPE_MEMBERSHIPCONTAINER = 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json';
@@ -16,10 +18,8 @@ class LtiNamesRolesProvisioningService extends LtiAbstractService
      */
     public function getMembers(array $options = []): array
     {
-        $url = $this->getServiceData()['context_memberships_url'];
-        if (!empty($options)) {
-            $url .= '?'.http_build_query($options);
-        }
+        $url = Helpers::buildUrlWithQueryParams($this->getServiceData()['context_memberships_url'], $options);
+
         $request = new ServiceRequest(
             ServiceRequest::METHOD_GET,
             $url,
