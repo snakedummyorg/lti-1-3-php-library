@@ -330,6 +330,36 @@ class LtiServiceConnectorTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function testItBuildsLogMessage()
+    {
+        $this->mockMakeRequest();
+        $this->request->shouldReceive('getErrorPrefix')
+            ->once()->andReturn('Logging request data:');
+        $this->request->shouldReceive('getMaskResponseLogs')
+            ->once()->andReturn(false);
+
+        $result = $this->connector::getLogMessage($this->request, ['foo' => 'bar'], ['baz' => 'bat']);
+
+        $expected = "Logging request data: id Array\n(\n    [request_method] => POST\n    [request_url] => https://example.com\n    [response_headers] => Array\n        (\n            [foo] => bar\n        )\n\n    [response_body] => {\"baz\":\"bat\"}\n    [request_body] => {\"userId\":\"id\"}\n)\n";
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testItMasksSensitiveDataInLogMessage()
+    {
+        $this->mockMakeRequest();
+        $this->request->shouldReceive('getErrorPrefix')
+            ->once()->andReturn('Logging request data:');
+        $this->request->shouldReceive('getMaskResponseLogs')
+            ->once()->andReturn(true);
+
+        $result = $this->connector::getLogMessage($this->request, ['foo' => 'bar'], ['baz' => 'bat']);
+
+        $expected = "Logging request data: id Array\n(\n    [request_method] => POST\n    [request_url] => https://example.com\n    [response_headers] => Array\n        (\n            [foo] => ***\n        )\n\n    [response_body] => {\"baz\":\"***\"}\n    [request_body] => {\"userId\":\"id\"}\n)\n";
+
+        $this->assertEquals($expected, $result);
+    }
+
     private function mockMakeRequest()
     {
         // It makes another request

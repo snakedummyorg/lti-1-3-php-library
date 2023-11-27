@@ -70,7 +70,8 @@ class LtiServiceConnector implements ILtiServiceConnector
             $registration->getAuthTokenUrl(),
             ServiceRequest::TYPE_AUTH
         );
-        $request->setPayload(['form_params' => $authRequest]);
+        $request->setPayload(['form_params' => $authRequest])
+            ->setMaskResponseLogs(true);
         $response = $this->makeRequest($request);
 
         $tokenData = $this->getResponseBody($response);
@@ -177,11 +178,16 @@ class LtiServiceConnector implements ILtiServiceConnector
         return $results;
     }
 
-    private function logRequest(
+    public static function getLogMessage(
         IServiceRequest $request,
         array $responseHeaders,
         ?array $responseBody
-    ): void {
+    ): string {
+        if ($request->getMaskResponseLogs()) {
+            $responseHeaders = static::maskValues($responseHeaders);
+            $responseBody = static::maskValues($responseBody);
+        }
+
         $contextArray = [
             'request_method' => $request->getMethod(),
             'request_url' => $request->getUrl(),
@@ -195,11 +201,32 @@ class LtiServiceConnector implements ILtiServiceConnector
             $contextArray['request_body'] = $requestBody;
         }
 
-        error_log(implode(' ', array_filter([
+        return implode(' ', array_filter([
             $request->getErrorPrefix(),
             json_decode($requestBody)->userId ?? null,
             print_r($contextArray, true),
-        ])));
+        ]));
+    }
+
+    private function logRequest(
+        IServiceRequest $request,
+        array $responseHeaders,
+        ?array $responseBody
+    ): void {
+        error_log(static::getLogMessage($request, $responseHeaders, $responseBody));
+    }
+
+    private static function maskValues(?array $payload)
+    {
+        if (!isset($payload) || empty($payload)) {
+            return $payload;
+        }
+
+        foreach ($payload as $key => $value) {
+            $payload[$key] = '***';
+        }
+
+        return $payload;
     }
 
     private function getAccessTokenCacheKey(ILtiRegistration $registration, array $scopes)
