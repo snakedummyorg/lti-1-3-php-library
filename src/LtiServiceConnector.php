@@ -192,7 +192,7 @@ class LtiServiceConnector implements ILtiServiceConnector
             'request_method' => $request->getMethod(),
             'request_url' => $request->getUrl(),
             'response_headers' => $responseHeaders,
-            'response_body' => json_encode($responseBody),
+            'response_body' => $responseBody,
         ];
 
         $requestBody = $request->getPayload()['body'] ?? null;
