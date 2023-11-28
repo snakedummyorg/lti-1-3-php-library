@@ -204,7 +204,7 @@ class LtiServiceConnector implements ILtiServiceConnector
         return implode(' ', array_filter([
             $request->getErrorPrefix(),
             json_decode($requestBody)->userId ?? null,
-            print_r($contextArray, true),
+            json_encode($contextArray),
         ]));
     }
 
