@@ -340,7 +340,7 @@ class LtiServiceConnectorTest extends TestCase
 
         $result = $this->connector::getLogMessage($this->request, ['foo' => 'bar'], ['baz' => 'bat']);
 
-        $expected = "Logging request data: id {\"request_method\":\"POST\",\"request_url\":\"https:\/\/example.com\",\"response_headers\":{\"foo\":\"bar\"},\"response_body\":\"{\\\"baz\\\":\\\"bat\\\"}\",\"request_body\":\"{\\\"userId\\\":\\\"id\\\"}\"}";
+        $expected = "Logging request data: id {\"request_method\":\"POST\",\"request_url\":\"https:\/\/example.com\",\"response_headers\":{\"foo\":\"bar\"},\"response_body\":{\"baz\":\"bat\"},\"request_body\":\"{\\\"userId\\\":\\\"id\\\"}\"}";
 
         $this->assertEquals($expected, $result);
     }
@@ -355,7 +355,7 @@ class LtiServiceConnectorTest extends TestCase
 
         $result = $this->connector::getLogMessage($this->request, ['foo' => 'bar'], ['baz' => 'bat']);
 
-        $expected = "Logging request data: id {\"request_method\":\"POST\",\"request_url\":\"https:\/\/example.com\",\"response_headers\":{\"foo\":\"***\"},\"response_body\":\"{\\\"baz\\\":\\\"***\\\"}\",\"request_body\":\"{\\\"userId\\\":\\\"id\\\"}\"}";
+        $expected = "Logging request data: id {\"request_method\":\"POST\",\"request_url\":\"https:\/\/example.com\",\"response_headers\":{\"foo\":\"***\"},\"response_body\":{\"baz\":\"***\"},\"request_body\":\"{\\\"userId\\\":\\\"id\\\"}\"}";
 
         $this->assertEquals($expected, $result);
     }
