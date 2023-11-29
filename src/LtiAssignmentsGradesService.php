@@ -192,7 +192,7 @@ class LtiAssignmentsGradesService extends LtiAbstractService
 
     private function appendLineItemPath(LtiLineitem $lineItem, string $suffix): string
     {
-        $url = $lineitem->getId();
+        $url = $lineItem->getId();
         $pos = strpos($url, '?');
 
         if ($pos === false) {
