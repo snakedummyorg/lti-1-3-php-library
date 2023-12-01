@@ -106,13 +106,20 @@ function lint_eof_newlines {
 }
 
 function lint_php {
-
   php_files=$(echo "$CHANGED_FILES" | grep '\.php')
   if [[ -z "$php_files" ]]; then
     return 0 # There's nothing to lint.
   fi
 
-  composer lint-fix || return 1
+  phpcsfixer="vendor/bin/php-cs-fixer"
+
+  if ! [ -x "$phpcsfixer" ]; then
+    echo -e "${C_RED}PHP-CS-Fixer is not installed. Install it with \`composer install\`.${NO_FORMAT}" && return 1
+  fi
+
+  echo -e "${C_CYAN}Linting PHP-CS-Fixer...${NO_FORMAT}"
+
+  $phpcsfixer fix -q || return 1
 }
 
 echo -e "${NO_FORMAT}${F_BOLD}Running pre-commit hook...${NO_FORMAT}"
