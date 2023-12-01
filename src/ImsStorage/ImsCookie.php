@@ -5,11 +5,7 @@ namespace Packback\Lti1p3\ImsStorage;
 use Packback\Lti1p3\Interfaces\ICookie;
 
 /**
-<<<<<<< HEAD
  * @deprecated
-=======
- * @todo Deprecate this in the next major version
->>>>>>> mgmt-132-migrations
  */
 class ImsCookie implements ICookie
 {
