@@ -4,7 +4,7 @@ namespace Packback\Lti1p3;
 
 /**
  * Used for migrations from LTI 1.1 to LTI 1.3
- * 
+ *
  * @see IMigrationDatabase
  */
 class Lti1p1Key
@@ -44,7 +44,7 @@ class Lti1p1Key
 
     /**
      * Create a signature using the key and secret
-     * 
+     *
      * @see https://www.imsglobal.org/spec/lti/v1p3/migr#oauth_consumer_key_sign
      */
     public function sign(string $deploymentId, string $iss, string $clientId, string $exp, string $nonce): string

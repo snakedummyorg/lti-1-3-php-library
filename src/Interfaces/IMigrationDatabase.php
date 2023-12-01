@@ -16,7 +16,7 @@ interface IMigrationDatabase extends IDatabase
 {
     /**
      * Using the LtiMessageLaunch return an array of matching LTI 1.1 keys
-     * 
+     *
      * @return array<\Packback\Lti1p3\Lti1p1Key>
      */
     public function findLti1p1Keys(LtiMessageLaunch $launch): array;
