@@ -112,10 +112,6 @@ function lint_php {
     return 0 # There's nothing to lint.
   fi
 
-  if ! [ -x "composer" ]; then
-    echo -e "${C_RED}Composer is not installed. Install it, then run \`composer install\`.${NO_FORMAT}" && return 1
-  fi
-
   composer lint-fix || return 1
 }
 
