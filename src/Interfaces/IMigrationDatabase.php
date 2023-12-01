@@ -12,10 +12,12 @@ use Packback\Lti1p3\LtiMessageLaunch;
  * To use this, just have whatever class you create that implements IDatabase
  * also implement this interface.
  */
-interface IMigrationDatabase
+interface IMigrationDatabase extends IDatabase
 {
     /**
      * Using the LtiMessageLaunch return an array of matching LTI 1.1 keys
+     * 
+     * @return array<\Packback\Lti1p3\Lti1p1Key>
      */
     public function findLti1p1Keys(LtiMessageLaunch $launch): array;
 
