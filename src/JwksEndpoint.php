@@ -52,11 +52,7 @@ class JwksEndpoint
     }
 
     /**
-<<<<<<< HEAD
      * @deprecated
-=======
-     * @todo: Deprecate this in the next major version
->>>>>>> mgmt-132-migrations
      */
     public function outputJwks()
     {
