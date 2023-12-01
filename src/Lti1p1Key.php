@@ -2,7 +2,7 @@
 
 namespace Packback\Lti1p3;
 
-/**  
+/**
  * Used for migrations from LTI 1.1 to LTI 1.3
  *
  * @see IMigrationDatabase

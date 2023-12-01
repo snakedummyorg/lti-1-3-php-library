@@ -117,9 +117,12 @@ function lint_php {
     echo -e "${C_RED}PHP-CS-Fixer is not installed. Install it with \`composer install\`.${NO_FORMAT}" && return 1
   fi
 
-  echo -e "${C_CYAN}Linting PHP-CS-Fixer...${NO_FORMAT}"
+  php_files_arg=$(echo "$php_files" | tr '\n' ' ')
 
+  echo -e "${C_CYAN}Linting PHP-CS-Fixer...${NO_FORMAT}"
   $phpcsfixer fix -q || return 1
+
+  git add $php_files_arg
 }
 
 echo -e "${NO_FORMAT}${F_BOLD}Running pre-commit hook...${NO_FORMAT}"
