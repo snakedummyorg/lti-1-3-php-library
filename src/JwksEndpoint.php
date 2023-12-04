@@ -48,6 +48,9 @@ class JwksEndpoint
         return ['keys' => $jwks];
     }
 
+    /**
+     * @todo: Deprecate this in the next major version
+     */
     public function outputJwks()
     {
         echo json_encode($this->getPublicJwks());

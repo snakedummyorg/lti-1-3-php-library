@@ -1,3 +1,7 @@
+## 5.5 to 5.6
+
+No breaking changes were introduced. However, going forward when processing a `LtiMessageLaunch`, it is recommended to do `$message->initialize($request);` instead of the previous `$message->validate($request);` to support potential migrations.
+
 ## 4.0 to 5.0
 
 ### Changes to `ICache` methods

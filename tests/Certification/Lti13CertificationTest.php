@@ -11,7 +11,9 @@ use Packback\Lti1p3\Interfaces\ICache;
 use Packback\Lti1p3\Interfaces\ICookie;
 use Packback\Lti1p3\Interfaces\IDatabase;
 use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
+use Packback\Lti1p3\Interfaces\IMigrationDatabase;
 use Packback\Lti1p3\JwksEndpoint;
+use Packback\Lti1p3\Lti1p1Key;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiDeployment;
 use Packback\Lti1p3\LtiException;
@@ -89,12 +91,39 @@ class TestDb implements IDatabase
 
     public function findRegistrationByIssuer($iss, $client_id = null)
     {
-        return $this->registrations[$iss];
+        return $this->registrations[$iss] ?? null;
     }
 
     public function findDeployment($iss, $deployment_id, $client_id = null)
     {
-        return $this->deployments[$iss];
+        return $this->deployments[$iss] ?? null;
+    }
+
+    public function clearDeployments()
+    {
+        $this->deployments = [];
+    }
+}
+
+class TestMigrateDb extends TestDb implements IMigrationDatabase
+{
+    public array $matchingKeys;
+    public bool $shouldMigrate;
+    public LtiDeployment $createdDeployment;
+
+    public function findLti1p1Keys(LtiMessageLaunch $launch): array
+    {
+        return $this->matchingKeys;
+    }
+
+    public function shouldMigrate(LtiMessageLaunch $launch): bool
+    {
+        return $this->shouldMigrate;
+    }
+
+    public function migrateFromLti1p1(LtiMessageLaunch $launch): LtiDeployment
+    {
+        return $this->createdDeployment;
     }
 }
 
@@ -105,8 +134,11 @@ class Lti13CertificationTest extends TestCase
     public const CERT_DATA_DIR = __DIR__.'/../data/certification/';
     public const PRIVATE_KEY = __DIR__.'/../data/private.key';
     public const STATE = 'state';
+    public TestDb $db;
+    public TestMigrateDb $migrateDb;
     private $issuer;
     private $key;
+    private array $payload;
 
     public function setUp(): void
     {
@@ -198,6 +230,14 @@ class Lti13CertificationTest extends TestCase
         ];
 
         $this->db = new TestDb(
+            new LtiRegistration([
+                'issuer' => static::ISSUER_URL,
+                'clientId' => $this->issuer['client_id'],
+                'keySetUrl' => static::JWKS_FILE,
+            ]),
+            (new LtiDeployment())->setDeploymentId(static::ISSUER_URL)
+        );
+        $this->migrateDb = new TestMigrateDb(
             new LtiRegistration([
                 'issuer' => static::ISSUER_URL,
                 'clientId' => $this->issuer['client_id'],
@@ -316,6 +356,85 @@ class Lti13CertificationTest extends TestCase
         $this->expectExceptionMessage('No deployment ID was specified');
 
         $this->launch($payload);
+    }
+
+    public function testLti1p1MigrationSuccessfullyMakesDeployment()
+    {
+        $payload = $this->payload;
+        $db = $this->migrateDb;
+        $db->clearDeployments();
+
+        $key = new Lti1p1Key([
+            'key' => 'key',
+            'secret' => 'secret',
+        ]);
+
+        $db->matchingKeys = [$key];
+        $db->shouldMigrate = true;
+        $db->createdDeployment = LtiDeployment::new()
+            ->setDeploymentId($payload[LtiConstants::DEPLOYMENT_ID]);
+
+        $payload['exp'] = 3272987750; // To ensure signature matches
+        $payload[LtiConstants::LTI1P1] = [
+            'oauth_consumer_key' => $key->getKey(),
+            'oauth_consumer_key_sign' => $key->sign(
+                $payload[LtiConstants::DEPLOYMENT_ID],
+                $payload['iss'],
+                $payload['aud'],
+                $payload['exp'],
+                $payload['nonce']
+            ),
+        ];
+
+        $launch = $this->launch($payload, $db);
+        $this->assertInstanceOf(LtiMessageLaunch::class, $launch);
+    }
+
+    public function testDoesNotMigrate1p1IfMissingOauthKeySign()
+    {
+        $payload = $this->payload;
+        $db = $this->migrateDb;
+        $db->clearDeployments();
+
+        $db->matchingKeys = [
+            new Lti1p1Key([
+                'key' => 'somekey',
+                'secret' => 'somesecret',
+            ]),
+        ];
+        $db->shouldMigrate = true;
+
+        $payload[LtiConstants::LTI1P1] = [
+            'oauth_consumer_key' => 'somekey',
+        ];
+
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_KEY_SIGN_MISSING);
+
+        $this->launch($payload, $db);
+    }
+
+    public function testDoesNotMigrate1p1IfOauthKeySignDoesntMatch()
+    {
+        $payload = $this->payload;
+        $db = $this->migrateDb;
+        $db->clearDeployments();
+
+        $db->matchingKeys = [
+            new Lti1p1Key([
+                'key' => 'somekey',
+                'secret' => 'somesecret',
+            ]),
+        ];
+        $db->shouldMigrate = true;
+
+        $payload[LtiConstants::LTI1P1] = [
+            'oauth_consumer_key' => 'somekey',
+            'oauth_consumer_key_sign' => 'badsignature',
+        ];
+
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_KEY_SIGN_NOT_VERIFIED);
+
+        $ltiMessageLaunch = $this->launch($payload, $db);
     }
 
     public function testLaunchWithMissingResourceLinkId()
@@ -462,8 +581,10 @@ class Lti13CertificationTest extends TestCase
         $this->assertEquals($casesCount, $testedCases);
     }
 
-    private function launch($payload)
+    private function launch($payload, IDatabase $db = null)
     {
+        $db = $db ?? $this->db;
+
         $jwt = $this->buildJWT($payload, $this->issuer);
         if (isset($payload['nonce'])) {
             $this->cache->cacheNonce($payload['nonce'], static::STATE);
@@ -481,7 +602,7 @@ class Lti13CertificationTest extends TestCase
         $this->serviceConnector->shouldReceive('getResponseBody')
             ->once()->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
 
-        return LtiMessageLaunch::new($this->db, $this->cache, $this->cookie, $this->serviceConnector)
-            ->validate($params);
+        return LtiMessageLaunch::new($db, $this->cache, $this->cookie, $this->serviceConnector)
+            ->initialize($params);
     }
 }

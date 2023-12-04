@@ -4,6 +4,9 @@ namespace Packback\Lti1p3\ImsStorage;
 
 use Packback\Lti1p3\Interfaces\ICookie;
 
+/**
+ * @todo Deprecate this in the next major version
+ */
 class ImsCookie implements ICookie
 {
     public function getCookie(string $name): ?string
