@@ -10,22 +10,12 @@ unset GIT_DIR
 # Get changed files to be committed, excluding deleted files (since we can't grep them)
 CHANGED_FILES=$(git diff --cached --name-only --diff-filter=d)
 
-STARTING_DIR=$(pwd)
-APP_API_DIR="$GIT_ROOT/backend/app-api"
-FRONTEND_DIR="$GIT_ROOT/frontend"
-E2E_DIR="$GIT_ROOT/e2e-tests"
-
 NO_FORMAT="\e[0m"
 F_BOLD="\e[1m"
 C_RED="\e[31m"
 C_YELLOW="\e[93m"
 C_CYAN="\e[36m"
 C_LIME="\e[92m"
-
-function on_script_finish_cleanup {
-  # Whether it passed or failed, undo any stateful changes.
-  cd "$STARTING_DIR"
-}
 
 # Rather than doing `return 1`, we fail fast.
 function fail {
@@ -126,8 +116,6 @@ function lint_php {
 }
 
 echo -e "${NO_FORMAT}${F_BOLD}Running pre-commit hook...${NO_FORMAT}"
-
-trap on_script_finish_cleanup EXIT
 
 skip_if_merge_in_progress
 skip_if_no_changes
