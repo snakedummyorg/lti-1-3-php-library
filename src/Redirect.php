@@ -22,8 +22,12 @@ class Redirect
         exit;
     }
 
+    /**
+     * @deprecated
+     */
     public function doHybridRedirect(ICookie $cookie)
     {
+        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
         if (!empty($cookie->getCookie(self::$CAN_302_COOKIE))) {
             return $this->doRedirect();
         }
@@ -36,8 +40,13 @@ class Redirect
         return $this->location;
     }
 
+    /**
+     * @deprecated
+     */
     public function doJsRedirect()
     {
+        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
+
         ?>
         <a id="try-again" target="_blank">If you are not automatically redirected, click here to continue</a>
         <script>

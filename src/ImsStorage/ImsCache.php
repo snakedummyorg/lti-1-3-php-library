@@ -5,7 +5,7 @@ namespace Packback\Lti1p3\ImsStorage;
 use Packback\Lti1p3\Interfaces\ICache;
 
 /**
- * @todo Deprecate this in the next major version
+ * @deprecated
  */
 class ImsCache implements ICache
 {

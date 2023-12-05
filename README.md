@@ -44,11 +44,11 @@ A JWKS (JSON Web Key Set) endpoint can be generated for either an individual reg
 use Packback\Lti1p3\JwksEndpoint;
 
 // From issuer
-JwksEndpoint::fromIssuer($database, 'http://example.com')->outputJwks();
+JwksEndpoint::fromIssuer($database, 'http://example.com')->getPublicJwks();
 // From registration
-JwksEndpoint::fromRegistration($registration)->outputJwks();
+JwksEndpoint::fromRegistration($registration)->getPublicJwks();
 // From array
-JwksEndpoint::new(['a_unique_KID' => file_get_contents('/path/to/private/key.pem')])->outputJwks();
+JwksEndpoint::new(['a_unique_KID' => file_get_contents('/path/to/private/key.pem')])->getPublicJwks();
 ```
 
 ## Documentation

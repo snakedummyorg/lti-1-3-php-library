@@ -121,7 +121,7 @@ class LtiMessageLaunch
         ICache $cache = null,
         ILtiServiceConnector $serviceConnector = null
     ) {
-        // @TODO: Fix the null here on the next major version
+        // @todo: Fix the null here on the next major version
         $new = new LtiMessageLaunch($database, $cache, null, $serviceConnector);
         $new->launch_id = $launch_id;
         $new->jwt = ['body' => $new->cache->getLaunchData($launch_id)];
@@ -171,7 +171,7 @@ class LtiMessageLaunch
             ->validateJwtSignature()
             ->validateDeployment()
             ->validateMessage()
-            // @TODO: Remove this in v6.0
+            // @todo remove this in v6.0
             ->cacheLaunchData();
     }
 

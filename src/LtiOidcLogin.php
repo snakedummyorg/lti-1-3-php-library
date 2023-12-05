@@ -48,6 +48,7 @@ class LtiOidcLogin
      */
     public function doOidcLoginRedirect($launchUrl, array $request = null)
     {
+        // @todo remove this in v6.0
         if ($request === null) {
             $request = $_REQUEST;
         }
