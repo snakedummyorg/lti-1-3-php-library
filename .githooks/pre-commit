@@ -64,15 +64,6 @@ function skip_if_merge_in_progress {
   fi
 }
 
-function fail_if_on_master_branch {
-  # Make sure we're not making a commit directly on master
-  branch=$(git rev-parse --abbrev-ref HEAD)
-
-  if [[ "$branch" == "master" ]]; then
-    echo -e "${C_RED}Disallowing commit directly to branch $branch, please commit to a feature branch ${NO_FORMAT}" && fail
-  fi
-}
-
 function fail_if_unresolved_merge_conflict {
   # Check the files to prevent merge markers from being committed.
   if echo "$CHANGED_FILES" | xargs --no-run-if-empty egrep '[><]{7}' -H -I --line-number; then
