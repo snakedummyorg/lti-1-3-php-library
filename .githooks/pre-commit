@@ -2,7 +2,7 @@
 
 set -o pipefail
 
-GIT_ROOT=$(git rev-parse --show-toplevel) # ".../questions"
+GIT_ROOT=$(git rev-parse --show-toplevel) # ".../lti-1-3-php-library"
 
 # So we avoid the "Not a git repository" error when performing git commands in a subdir
 unset GIT_DIR
