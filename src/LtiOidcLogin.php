@@ -16,7 +16,6 @@ class LtiOidcLogin
     private $db;
     private $cache;
     private $cookie;
-    private array $request;
 
     /**
      * Constructor.
@@ -40,11 +39,6 @@ class LtiOidcLogin
         return new LtiOidcLogin($database, $cache, $cookie);
     }
 
-    public function setRequest(array $request)
-    {
-        $this->request = $request;
-    }
-
     /**
      * Calculate the redirect location to return to based on an OIDC third party initiated login request.
      *
@@ -59,22 +53,20 @@ class LtiOidcLogin
             $request = $_REQUEST;
         }
 
-        $this->setRequest($request);
-
-        $authLoginReturnUrl = $this->getOidcLoginUrl($launchUrl);
+        $authLoginReturnUrl = $this->getOidcLoginUrl($launchUrl, $request);
 
         // Return auth redirect.
         return new Redirect($authLoginReturnUrl);
     }
 
-    public function getOidcLoginUrl($launchUrl)
+    public function getOidcLoginUrl($launchUrl, array $request)
     {
         if (empty($launchUrl)) {
             throw new OidcException(static::ERROR_MSG_LAUNCH_URL, 1);
         }
 
         // Validate Request Data.
-        $registration = $this->validateOidcLogin($this->request);
+        $registration = $this->validateOidcLogin($request);
 
         /*
          * Build OIDC Auth Response.
@@ -99,13 +91,13 @@ class LtiOidcLogin
             'redirect_uri' => $launchUrl, // URL to return to after login.
             'state' => $state, // State to identify browser session.
             'nonce' => $nonce, // Prevent replay attacks.
-            'login_hint' => $this->request['login_hint'], // Login hint to identify platform session.
+            'login_hint' => $request['login_hint'], // Login hint to identify platform session.
         ];
 
         // Pass back LTI message hint if we have it.
-        if (isset($this->request['lti_message_hint'])) {
+        if (isset($request['lti_message_hint'])) {
             // LTI message hint to identify LTI context within the platform.
-            $authParams['lti_message_hint'] = $this->request['lti_message_hint'];
+            $authParams['lti_message_hint'] = $request['lti_message_hint'];
         }
 
         return Helpers::buildUrlWithQueryParams($registration->getAuthLoginUrl(), $authParams);
