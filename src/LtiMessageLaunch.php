@@ -80,9 +80,9 @@ class LtiMessageLaunch
      */
     public function __construct(
         IDatabase $database,
-        ICache $cache = null,
-        ICookie $cookie = null,
-        ILtiServiceConnector $serviceConnector = null
+        ?ICache $cache = null,
+        ?ICookie $cookie = null,
+        ?ILtiServiceConnector $serviceConnector = null
     ) {
         $this->db = $database;
 
@@ -98,9 +98,9 @@ class LtiMessageLaunch
      */
     public static function new(
         IDatabase $database,
-        ICache $cache = null,
-        ICookie $cookie = null,
-        ILtiServiceConnector $serviceConnector = null
+        ?ICache $cache = null,
+        ?ICookie $cookie = null,
+        ?ILtiServiceConnector $serviceConnector = null
     ) {
         return new LtiMessageLaunch($database, $cache, $cookie, $serviceConnector);
     }
@@ -118,8 +118,8 @@ class LtiMessageLaunch
     public static function fromCache(
         $launch_id,
         IDatabase $database,
-        ICache $cache = null,
-        ILtiServiceConnector $serviceConnector = null
+        ?ICache $cache = null,
+        ?ILtiServiceConnector $serviceConnector = null
     ) {
         // @todo: Fix the null here on the next major version
         $new = new LtiMessageLaunch($database, $cache, null, $serviceConnector);
@@ -153,7 +153,7 @@ class LtiMessageLaunch
      *
      * @throws LtiException Will throw an LtiException if validation fails
      */
-    public function validate(array $request = null)
+    public function validate(?array $request = null)
     {
         // @TODO: Remove this on the next major release.
         if (!isset($this->request)) {
@@ -337,7 +337,7 @@ class LtiMessageLaunch
         return $this->launch_id;
     }
 
-    public static function getMissingRegistrationErrorMsg(string $issuerUrl, string $clientId = null): string
+    public static function getMissingRegistrationErrorMsg(string $issuerUrl, ?string $clientId = null): string
     {
         // Guard against client ID being null
         if (!isset($clientId)) {

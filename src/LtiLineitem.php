@@ -14,7 +14,7 @@ class LtiLineitem
     private $end_date_time;
     private ?bool $grades_released;
 
-    public function __construct(array $lineitem = null)
+    public function __construct(?array $lineitem = null)
     {
         $this->id = $lineitem['id'] ?? null;
         $this->score_maximum = $lineitem['scoreMaximum'] ?? null;

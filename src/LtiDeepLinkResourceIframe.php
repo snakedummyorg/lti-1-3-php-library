@@ -8,7 +8,7 @@ class LtiDeepLinkResourceIframe
     private ?int $height;
     private ?string $src;
 
-    public function __construct(int $width = null, int $height = null, string $src = null)
+    public function __construct(?int $width = null, ?int $height = null, ?string $src = null)
     {
         $this->width = $width ?? null;
         $this->height = $height ?? null;
