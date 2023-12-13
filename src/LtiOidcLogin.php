@@ -40,31 +40,31 @@ class LtiOidcLogin
     }
 
     /**
-     * Calculate the redirect location to return to based on an OIDC third party initiated login request.
-     *
-     * @param  string  $launchUrl URL to redirect back to after the OIDC login. This URL must match exactly a URL white listed in the platform.
-     * @param  array  $request    An array of request parameters. If not set will default to $_REQUEST.
-     * @return Redirect returns a redirect object containing the fully formed OIDC login URL
+     * @deprecated Use getRedirectUrl() to get the URL and then redirect to it yourself
      */
     public function doOidcLoginRedirect($launchUrl, ?array $request = null)
     {
-        // @todo remove this in v6.0
+        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
+
         if ($request === null) {
             $request = $_REQUEST;
         }
 
-        $authLoginReturnUrl = $this->getOidcLoginUrl($launchUrl, $request);
+        $authLoginReturnUrl = $this->getRedirectUrl($launchUrl, $request);
 
         // Return auth redirect.
         return new Redirect($authLoginReturnUrl);
     }
 
-    public function getOidcLoginUrl($launchUrl, array $request)
+    /**
+     * Calculate the redirect location to return to based on an OIDC third party initiated login request.
+     *
+     * @param  string  $launchUrl URL to redirect back to after the OIDC login. This URL must match exactly a URL white listed in the platform.
+     * @param  array  $request    An array of request parameters.
+     * @return string returns the fully formed OIDC login URL
+     */
+    public function getRedirectUrl(string $launchUrl, array $request): string
     {
-        if (empty($launchUrl)) {
-            throw new OidcException(static::ERROR_MSG_LAUNCH_URL, 1);
-        }
-
         // Validate Request Data.
         $registration = $this->validateOidcLogin($request);
 
