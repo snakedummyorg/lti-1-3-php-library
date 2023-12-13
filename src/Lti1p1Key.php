@@ -12,7 +12,7 @@ class Lti1p1Key
     private $key;
     private $secret;
 
-    public function __construct(array $key = null)
+    public function __construct(?array $key = null)
     {
         $this->key = $key['key'] ?? null;
         $this->secret = $key['secret'] ?? null;

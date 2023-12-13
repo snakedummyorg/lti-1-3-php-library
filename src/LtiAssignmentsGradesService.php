@@ -28,7 +28,7 @@ class LtiAssignmentsGradesService extends LtiAbstractService
         return LtiLineitem::new()->setId($serviceData['lineitem']);
     }
 
-    public function putGrade(LtiGrade $grade, LtiLineitem $lineitem = null)
+    public function putGrade(LtiGrade $grade, ?LtiLineitem $lineitem = null)
     {
         $this->validateScopes([LtiConstants::AGS_SCOPE_SCORE]);
 
@@ -107,7 +107,7 @@ class LtiAssignmentsGradesService extends LtiAbstractService
         return $this->findLineItem($newLineItem) ?? $this->createLineitem($newLineItem);
     }
 
-    public function getGrades(LtiLineitem $lineitem = null)
+    public function getGrades(?LtiLineitem $lineitem = null)
     {
         $lineitem = $this->ensureLineItemExists($lineitem);
         $resultsUrl = $this->appendLineItemPath($lineitem, '/results');
@@ -159,7 +159,7 @@ class LtiAssignmentsGradesService extends LtiAbstractService
         return new LtiLineitem($response);
     }
 
-    private function ensureLineItemExists(LtiLineitem $lineitem = null): LtiLineitem
+    private function ensureLineItemExists(?LtiLineitem $lineitem = null): LtiLineitem
     {
         // If no line item is passed in, attempt to use the one associated with
         // this launch.

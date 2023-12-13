@@ -24,7 +24,7 @@ class LtiOidcLogin
      * @param  ICache  $cache    instance of the Cache interface used to loading and storing launches
      * @param  ICookie  $cookie   instance of the Cookie interface used to set and read cookies
      */
-    public function __construct(IDatabase $database, ICache $cache = null, ICookie $cookie = null)
+    public function __construct(IDatabase $database, ?ICache $cache = null, ?ICookie $cookie = null)
     {
         $this->db = $database;
         $this->cache = $cache;
@@ -34,7 +34,7 @@ class LtiOidcLogin
     /**
      * Static function to allow for method chaining without having to assign to a variable first.
      */
-    public static function new(IDatabase $database, ICache $cache = null, ICookie $cookie = null)
+    public static function new(IDatabase $database, ?ICache $cache = null, ?ICookie $cookie = null)
     {
         return new LtiOidcLogin($database, $cache, $cookie);
     }
@@ -46,7 +46,7 @@ class LtiOidcLogin
      * @param  array  $request    An array of request parameters. If not set will default to $_REQUEST.
      * @return Redirect returns a redirect object containing the fully formed OIDC login URL
      */
-    public function doOidcLoginRedirect($launchUrl, array $request = null)
+    public function doOidcLoginRedirect($launchUrl, ?array $request = null)
     {
         // @todo remove this in v6.0
         if ($request === null) {

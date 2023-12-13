@@ -14,7 +14,7 @@ class LtiGrade
     private $submission_review;
     private $canvas_extension;
 
-    public function __construct(array $grade = null)
+    public function __construct(?array $grade = null)
     {
         $this->score_given = $grade['scoreGiven'] ?? null;
         $this->score_maximum = $grade['scoreMaximum'] ?? null;
