@@ -16,6 +16,7 @@ class LtiOidcLogin
     private $db;
     private $cache;
     private $cookie;
+    private array $request;
 
     /**
      * Constructor.
@@ -24,7 +25,7 @@ class LtiOidcLogin
      * @param  ICache  $cache    instance of the Cache interface used to loading and storing launches
      * @param  ICookie  $cookie   instance of the Cookie interface used to set and read cookies
      */
-    public function __construct(IDatabase $database, ICache $cache = null, ICookie $cookie = null)
+    public function __construct(IDatabase $database, ?ICache $cache = null, ?ICookie $cookie = null)
     {
         $this->db = $database;
         $this->cache = $cache;
@@ -34,9 +35,14 @@ class LtiOidcLogin
     /**
      * Static function to allow for method chaining without having to assign to a variable first.
      */
-    public static function new(IDatabase $database, ICache $cache = null, ICookie $cookie = null)
+    public static function new(IDatabase $database, ?ICache $cache = null, ?ICookie $cookie = null)
     {
         return new LtiOidcLogin($database, $cache, $cookie);
+    }
+
+    public function setRequest(array $request)
+    {
+        $this->request = $request;
     }
 
     /**
@@ -46,19 +52,29 @@ class LtiOidcLogin
      * @param  array  $request    An array of request parameters. If not set will default to $_REQUEST.
      * @return Redirect returns a redirect object containing the fully formed OIDC login URL
      */
-    public function doOidcLoginRedirect($launchUrl, array $request = null)
+    public function doOidcLoginRedirect($launchUrl, ?array $request = null)
     {
         // @todo remove this in v6.0
         if ($request === null) {
             $request = $_REQUEST;
         }
 
+        $this->setRequest($request);
+
+        $authLoginReturnUrl = $this->getOidcLoginUrl($launchUrl);
+
+        // Return auth redirect.
+        return new Redirect($authLoginReturnUrl);
+    }
+
+    public function getOidcLoginUrl($launchUrl)
+    {
         if (empty($launchUrl)) {
             throw new OidcException(static::ERROR_MSG_LAUNCH_URL, 1);
         }
 
         // Validate Request Data.
-        $registration = $this->validateOidcLogin($request);
+        $registration = $this->validateOidcLogin($this->request);
 
         /*
          * Build OIDC Auth Response.
@@ -83,19 +99,16 @@ class LtiOidcLogin
             'redirect_uri' => $launchUrl, // URL to return to after login.
             'state' => $state, // State to identify browser session.
             'nonce' => $nonce, // Prevent replay attacks.
-            'login_hint' => $request['login_hint'], // Login hint to identify platform session.
+            'login_hint' => $this->request['login_hint'], // Login hint to identify platform session.
         ];
 
         // Pass back LTI message hint if we have it.
-        if (isset($request['lti_message_hint'])) {
+        if (isset($this->request['lti_message_hint'])) {
             // LTI message hint to identify LTI context within the platform.
-            $authParams['lti_message_hint'] = $request['lti_message_hint'];
+            $authParams['lti_message_hint'] = $this->request['lti_message_hint'];
         }
 
-        $authLoginReturnUrl = Helpers::buildUrlWithQueryParams($registration->getAuthLoginUrl(), $authParams);
-
-        // Return auth redirect.
-        return new Redirect($authLoginReturnUrl);
+        return Helpers::buildUrlWithQueryParams($registration->getAuthLoginUrl(), $authParams);
     }
 
     public function validateOidcLogin($request)

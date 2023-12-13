@@ -581,7 +581,7 @@ class Lti13CertificationTest extends TestCase
         $this->assertEquals($casesCount, $testedCases);
     }
 
-    private function launch($payload, IDatabase $db = null)
+    private function launch($payload, ?IDatabase $db = null)
     {
         $db = $db ?? $this->db;
 
