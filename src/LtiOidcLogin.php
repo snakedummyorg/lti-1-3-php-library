@@ -13,6 +13,10 @@ class LtiOidcLogin
     public const ERROR_MSG_LAUNCH_URL = 'No launch URL configured';
     public const ERROR_MSG_ISSUER = 'Could not find issuer';
     public const ERROR_MSG_LOGIN_HINT = 'Could not find login hint';
+
+    /**
+     * @todo Type these in v6
+     */
     private $db;
     private $cache;
     private $cookie;
@@ -26,6 +30,9 @@ class LtiOidcLogin
      */
     public function __construct(IDatabase $database, ?ICache $cache = null, ?ICookie $cookie = null)
     {
+        /**
+         * @todo Make these arguments not nullable in v6
+         */
         $this->db = $database;
         $this->cache = $cache;
         $this->cookie = $cookie;
