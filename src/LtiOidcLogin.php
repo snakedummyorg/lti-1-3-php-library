@@ -47,27 +47,6 @@ class LtiOidcLogin
     }
 
     /**
-     * @deprecated Use getRedirectUrl() to get the URL and then redirect to it yourself. Will be removed in v6.0
-     */
-    public function doOidcLoginRedirect($launchUrl, ?array $request = null)
-    {
-        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
-
-        if ($request === null) {
-            $request = $_REQUEST;
-        }
-
-        if (empty($launchUrl)) {
-            throw new OidcException(static::ERROR_MSG_LAUNCH_URL, 1);
-        }
-
-        $authLoginReturnUrl = $this->getRedirectUrl($launchUrl, $request);
-
-        // Return auth redirect.
-        return new Redirect($authLoginReturnUrl);
-    }
-
-    /**
      * Calculate the redirect location to return to based on an OIDC third party initiated login request.
      *
      * @param  string  $launchUrl URL to redirect back to after the OIDC login. This URL must match exactly a URL white listed in the platform.
