@@ -46,7 +46,7 @@
         "test": "phpunit",
         "lint": [
             "php-cs-fixer fix -v --dry-run",
-            "phpstan analyse --level 5 src tests"
+            "phpstan analyse"
         ],
         "lint-fix": "php-cs-fixer fix -v"
     }
