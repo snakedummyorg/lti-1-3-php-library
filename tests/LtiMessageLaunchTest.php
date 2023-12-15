@@ -850,7 +850,7 @@ class LtiMessageLaunchTest extends TestCase
 
     public function tesGetLaunchDataForALaunch()
     {
-        $launch = $this->getLaunchData($this->payload);
+        $launch = $this->fakeLaunch($this->payload);
 
         $actual = $launch->getLaunchData();
 
@@ -889,6 +889,6 @@ class LtiMessageLaunchTest extends TestCase
             return \implode('.', $segments);
         }
 
-        return JWT::encode($data, $this->issuer['tool_private_key'], $alg, $this->issuer['kid']);
+        return JWT::encode($data, $this->issuer['tool_private_key'], $this->issuer['alg'], $this->issuer['kid']);
     }
 }

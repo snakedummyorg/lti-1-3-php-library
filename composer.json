@@ -43,7 +43,10 @@
     },
     "scripts": {
         "test": "phpunit",
-        "lint": "php-cs-fixer fix -v --dry-run",
+        "lint": [
+            "php-cs-fixer fix -v --dry-run",
+            "phpstan analyse --level 5 src tests"
+        ],
         "lint-fix": "php-cs-fixer fix -v"
     }
 }
