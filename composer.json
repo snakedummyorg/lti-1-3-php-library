@@ -29,6 +29,7 @@
         "jubeki/laravel-code-style": "^2.0",
         "mockery/mockery": "^1.4",
         "nesbot/carbon": "^2.43",
+        "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.5"
     },
     "autoload": {
