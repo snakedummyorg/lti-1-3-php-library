@@ -4,7 +4,7 @@ No breaking changes were introduced. However, going forward when processing a `L
 
 ```php
 // Do this:
-$redirect = $oidcLogin->getRedirectUrl($request);
+$redirect = $oidcLogin->getRedirectUrl($launchUrl, $request);
 // Then do the redirect yourself (Laravel):
 return redirect($redirect);
 // Or some other method
@@ -12,7 +12,7 @@ header('Location: '.$this->location, true, 302);
 exit;
 
 // Instead of the old method:
-$redirect = $oidcLogin->doOidcLoginRedirect($request);
+$redirect = $oidcLogin->doOidcLoginRedirect($launchUrl, $request);
 $redirect->doRedirect();
 ```
 
