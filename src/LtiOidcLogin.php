@@ -13,6 +13,10 @@ class LtiOidcLogin
     public const ERROR_MSG_LAUNCH_URL = 'No launch URL configured';
     public const ERROR_MSG_ISSUER = 'Could not find issuer';
     public const ERROR_MSG_LOGIN_HINT = 'Could not find login hint';
+
+    /**
+     * @todo Type these in v6
+     */
     private $db;
     private $cache;
     private $cookie;
@@ -26,6 +30,9 @@ class LtiOidcLogin
      */
     public function __construct(IDatabase $database, ?ICache $cache = null, ?ICookie $cookie = null)
     {
+        /**
+         * @todo Make these arguments not nullable in v6
+         */
         $this->db = $database;
         $this->cache = $cache;
         $this->cookie = $cookie;
@@ -40,15 +47,12 @@ class LtiOidcLogin
     }
 
     /**
-     * Calculate the redirect location to return to based on an OIDC third party initiated login request.
-     *
-     * @param  string  $launchUrl URL to redirect back to after the OIDC login. This URL must match exactly a URL white listed in the platform.
-     * @param  array  $request    An array of request parameters. If not set will default to $_REQUEST.
-     * @return Redirect returns a redirect object containing the fully formed OIDC login URL
+     * @deprecated Use getRedirectUrl() to get the URL and then redirect to it yourself. Will be removed in v6.0
      */
     public function doOidcLoginRedirect($launchUrl, ?array $request = null)
     {
-        // @todo remove this in v6.0
+        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
+
         if ($request === null) {
             $request = $_REQUEST;
         }
@@ -57,6 +61,21 @@ class LtiOidcLogin
             throw new OidcException(static::ERROR_MSG_LAUNCH_URL, 1);
         }
 
+        $authLoginReturnUrl = $this->getRedirectUrl($launchUrl, $request);
+
+        // Return auth redirect.
+        return new Redirect($authLoginReturnUrl);
+    }
+
+    /**
+     * Calculate the redirect location to return to based on an OIDC third party initiated login request.
+     *
+     * @param  string  $launchUrl URL to redirect back to after the OIDC login. This URL must match exactly a URL white listed in the platform.
+     * @param  array  $request    An array of request parameters.
+     * @return string returns the fully formed OIDC login URL
+     */
+    public function getRedirectUrl(string $launchUrl, array $request): string
+    {
         // Validate Request Data.
         $registration = $this->validateOidcLogin($request);
 
@@ -92,10 +111,7 @@ class LtiOidcLogin
             $authParams['lti_message_hint'] = $request['lti_message_hint'];
         }
 
-        $authLoginReturnUrl = Helpers::buildUrlWithQueryParams($registration->getAuthLoginUrl(), $authParams);
-
-        // Return auth redirect.
-        return new Redirect($authLoginReturnUrl);
+        return Helpers::buildUrlWithQueryParams($registration->getAuthLoginUrl(), $authParams);
     }
 
     public function validateOidcLogin($request)

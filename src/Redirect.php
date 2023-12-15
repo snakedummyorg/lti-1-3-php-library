@@ -4,6 +4,9 @@ namespace Packback\Lti1p3;
 
 use Packback\Lti1p3\Interfaces\ICookie;
 
+/**
+ * @deprecated Use LtiOidcLogin::getRedirectUrl() to get the URL and then redirect to it yourself
+ */
 class Redirect
 {
     private $location;
@@ -16,8 +19,12 @@ class Redirect
         $this->referer_query = $referer_query;
     }
 
+    /**
+     * @deprecated
+     */
     public function doRedirect()
     {
+        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
         header('Location: '.$this->location, true, 302);
         exit;
     }
@@ -35,8 +42,13 @@ class Redirect
         $this->doJsRedirect();
     }
 
+    /**
+     * @deprecated
+     */
     public function getRedirectUrl()
     {
+        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
+
         return $this->location;
     }
 
