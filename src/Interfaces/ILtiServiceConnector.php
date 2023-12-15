@@ -4,6 +4,7 @@ namespace Packback\Lti1p3\Interfaces;
 
 use GuzzleHttp\Psr7\Response;
 
+/** @internal */
 interface ILtiServiceConnector
 {
     public function getAccessToken(ILtiRegistration $registration, array $scopes);
@@ -26,5 +27,5 @@ interface ILtiServiceConnector
         string $key
     ): array;
 
-    public function setDebuggingMode(bool $enable): void;
+    public function setDebuggingMode(bool $enable): ILtiServiceConnector;
 }

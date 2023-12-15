@@ -15,24 +15,22 @@ use Packback\Lti1p3\Interfaces\IServiceRequest;
 class LtiServiceConnector implements ILtiServiceConnector
 {
     public const NEXT_PAGE_REGEX = '/<([^>]*)>; ?rel="next"/i';
-    private $cache;
-    private $client;
-    private $debuggingMode = false;
+    private bool $debuggingMode = false;
 
     public function __construct(
-        ICache $cache,
-        Client $client
+        private ICache $cache,
+        private Client $client
     ) {
-        $this->cache = $cache;
-        $this->client = $client;
     }
 
-    public function setDebuggingMode(bool $enable): void
+    public function setDebuggingMode(bool $enable): self
     {
         $this->debuggingMode = $enable;
+
+        return $this;
     }
 
-    public function getAccessToken(ILtiRegistration $registration, array $scopes)
+    public function getAccessToken(ILtiRegistration $registration, array $scopes): string
     {
         // Get a unique cache key for the access token
         $accessTokenKey = $this->getAccessTokenCacheKey($registration, $scopes);
@@ -82,7 +80,7 @@ class LtiServiceConnector implements ILtiServiceConnector
         return $tokenData['access_token'];
     }
 
-    public function makeRequest(IServiceRequest $request)
+    public function makeRequest(IServiceRequest $request): Response
     {
         $response = $this->client->request(
             $request->getMethod(),
@@ -216,7 +214,7 @@ class LtiServiceConnector implements ILtiServiceConnector
         error_log(static::getLogMessage($request, $responseHeaders, $responseBody));
     }
 
-    private static function maskValues(?array $payload)
+    private static function maskValues(?array $payload): ?array
     {
         if (!isset($payload) || empty($payload)) {
             return $payload;
