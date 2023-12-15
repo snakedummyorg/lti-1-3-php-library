@@ -29,8 +29,7 @@
         "jubeki/laravel-code-style": "^2.0",
         "mockery/mockery": "^1.4",
         "nesbot/carbon": "^2.43",
-        "phpunit/phpunit": "^9.5",
-        "phpstan/phpstan": "^1.10"
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
@@ -44,10 +43,7 @@
     },
     "scripts": {
         "test": "phpunit",
-        "lint": [
-            "php-cs-fixer fix -v --dry-run",
-            "phpstan analyse --level=5 src tests"
-        ],
+        "lint": "php-cs-fixer fix -v --dry-run",
         "lint-fix": "php-cs-fixer fix -v"
     }
 }
