@@ -50,14 +50,4 @@ class JwksEndpoint
 
         return ['keys' => $jwks];
     }
-
-    /**
-     * @deprecated
-     */
-    public function outputJwks()
-    {
-        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
-
-        echo json_encode($this->getPublicJwks());
-    }
 }
