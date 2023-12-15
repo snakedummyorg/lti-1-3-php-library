@@ -156,7 +156,8 @@ class LtiMessageLaunchTest extends TestCase
         $messageLaunch = LtiMessageLaunch::new(
             $this->database,
             $this->cache,
-            $this->cookie
+            $this->cookie,
+            $this->serviceConnector
         );
 
         $this->assertInstanceOf(LtiMessageLaunch::class, $messageLaunch);
@@ -171,7 +172,9 @@ class LtiMessageLaunchTest extends TestCase
         $this->registration->shouldReceive('getClientId')
             ->once()->andReturn($this->issuer['client_id']);
 
-        $actual = $this->messageLaunch::fromCache('id_token', $this->database, $this->cache);
+        $actual = $this->messageLaunch::fromCache('id_token', $this->database, $this->cache,
+            $this->cookie,
+            $this->serviceConnector);
 
         $this->assertInstanceOf(LtiMessageLaunch::class, $actual);
     }
@@ -199,11 +202,11 @@ class LtiMessageLaunchTest extends TestCase
         $this->serviceConnector->shouldReceive('getResponseBody')
             ->once()->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
         $this->database->shouldReceive('findDeployment')
-            ->once()->andReturn(['a deployment']);
-        $this->cache->shouldReceive('cacheLaunchData')
-            ->once()->andReturn(true);
+            ->once()->andReturn(new LtiDeployment('a deployment'));
 
-        $actual = $this->messageLaunch->validate($params);
+        $this->messageLaunch->setRequest($params);
+
+        $actual = $this->messageLaunch->validate();
 
         $this->assertInstanceOf(LtiMessageLaunch::class, $actual);
     }
@@ -221,7 +224,9 @@ class LtiMessageLaunchTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_STATE_NOT_FOUND);
 
-        $actual = $this->messageLaunch->validate($payload);
+        $this->messageLaunch->setRequest($payload);
+
+        $actual = $this->messageLaunch->validate();
     }
 
     public function testALaunchFailsIfIdTokenIsMissing()
@@ -236,7 +241,9 @@ class LtiMessageLaunchTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_MISSING_ID_TOKEN);
 
-        $actual = $this->messageLaunch->validate($payload);
+        $this->messageLaunch->setRequest($payload);
+
+        $actual = $this->messageLaunch->validate();
     }
 
     public function testALaunchFailsIfJwtIsInvalid()
@@ -252,7 +259,9 @@ class LtiMessageLaunchTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_INVALID_ID_TOKEN);
 
-        $actual = $this->messageLaunch->validate($payload);
+        $this->messageLaunch->setRequest($payload);
+
+        $actual = $this->messageLaunch->validate();
     }
 
     public function testALaunchFailsIfNonceIsMissing()
@@ -270,7 +279,9 @@ class LtiMessageLaunchTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_MISSING_NONCE);
 
-        $actual = $this->messageLaunch->validate($payload);
+        $this->messageLaunch->setRequest($payload);
+
+        $actual = $this->messageLaunch->validate();
     }
 
     public function testALaunchFailsIfNonceIsInvalid()
@@ -290,7 +301,9 @@ class LtiMessageLaunchTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_INVALID_NONCE);
 
-        $actual = $this->messageLaunch->validate($payload);
+        $this->messageLaunch->setRequest($payload);
+
+        $actual = $this->messageLaunch->validate();
     }
 
     public function testALaunchFailsIfMissingRegistration()
@@ -311,7 +324,9 @@ class LtiMessageLaunchTest extends TestCase
         $expectedMsg = $this->messageLaunch->getMissingRegistrationErrorMsg($this->issuer['issuer'], $this->issuer['client_id']);
         $this->expectExceptionMessage($expectedMsg);
 
-        $actual = $this->messageLaunch->validate($payload);
+        $this->messageLaunch->setRequest($payload);
+
+        $actual = $this->messageLaunch->validate();
     }
 
     public function testALaunchFailsIfRegistrationClientIdIsWrong()
@@ -333,7 +348,9 @@ class LtiMessageLaunchTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_CLIENT_NOT_REGISTERED);
 
-        $actual = $this->messageLaunch->validate($payload);
+        $this->messageLaunch->setRequest($payload);
+
+        $actual = $this->messageLaunch->validate();
     }
 
     public function testALaunchFailsIfKIDIsMissing()
@@ -357,7 +374,9 @@ class LtiMessageLaunchTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_NO_KID);
 
-        $actual = $this->messageLaunch->validate($payload);
+        $this->messageLaunch->setRequest($payload);
+
+        $actual = $this->messageLaunch->validate();
     }
 
     public function testALaunchFailsIfDeploymentIdIsMissing()
@@ -387,7 +406,9 @@ class LtiMessageLaunchTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_MISSING_DEPLOYEMENT_ID);
 
-        $actual = $this->messageLaunch->validate($payload);
+        $this->messageLaunch->setRequest($payload);
+
+        $actual = $this->messageLaunch->validate();
     }
 
     public function testALaunchFailsIfNoDeployment()
@@ -418,7 +439,9 @@ class LtiMessageLaunchTest extends TestCase
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_NO_DEPLOYMENT);
 
-        $actual = $this->messageLaunch->validate($payload);
+        $this->messageLaunch->setRequest($payload);
+
+        $actual = $this->messageLaunch->validate();
     }
 
     public function testALaunchFailsIfThePayloadIsInvalid()
@@ -446,11 +469,12 @@ class LtiMessageLaunchTest extends TestCase
         $this->serviceConnector->shouldReceive('getResponseBody')
             ->once()->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
         $this->database->shouldReceive('findDeployment')
-            ->once()->andReturn(['a deployment']);
+            ->once()->andReturn(new LtiDeployment('a deployment'));
+        $this->messageLaunch->setRequest($params);
 
         $this->expectException(LtiException::class);
 
-        $this->messageLaunch->validate($params);
+        $this->messageLaunch->validate();
     }
 
     public function testItInitializesALaunch()
@@ -540,8 +564,6 @@ class LtiMessageLaunchTest extends TestCase
             ->once()->andReturn(null);
         $this->migrationDatabase->shouldReceive('shouldMigrate')
             ->once()->andReturn(true);
-        $this->cache->shouldReceive('cacheLaunchData')
-            ->once()->andReturn(true);
 
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_KEY_SIGN_MISSING);
@@ -591,8 +613,6 @@ class LtiMessageLaunchTest extends TestCase
             ->once()->andReturn([$matchingKey]);
         $matchingKey->shouldReceive('sign')
             ->once()->andReturn('bar');
-        $this->cache->shouldReceive('cacheLaunchData')
-            ->once()->andReturn(true);
 
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_OAUTH_KEY_SIGN_NOT_VERIFIED);
@@ -644,8 +664,6 @@ class LtiMessageLaunchTest extends TestCase
             ->once()->andReturn($payload[LtiConstants::LTI1P1]['oauth_consumer_key_sign']);
         $this->migrationDatabase->shouldReceive('migrateFromLti1p1')
             ->once()->andReturn(null);
-        $this->cache->shouldReceive('cacheLaunchData')
-            ->once()->andReturn(true);
 
         $this->expectException(LtiException::class);
         $this->expectExceptionMessage(LtiMessageLaunch::ERR_NO_DEPLOYMENT);
@@ -848,7 +866,7 @@ class LtiMessageLaunchTest extends TestCase
         $this->registration->shouldReceive('getClientId')
             ->once()->andReturn($this->issuer['client_id']);
 
-        return $this->messageLaunch::fromCache($launchId, $this->database, $this->cache, $this->serviceConnector);
+        return $this->messageLaunch::fromCache($launchId, $this->database, $this->cache, $this->cookie, $this->serviceConnector);
     }
 
     private function buildJWT($data, $header)

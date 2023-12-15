@@ -10,6 +10,8 @@ use Mockery;
 use Packback\Lti1p3\Interfaces\ICache;
 use Packback\Lti1p3\Interfaces\ICookie;
 use Packback\Lti1p3\Interfaces\IDatabase;
+use Packback\Lti1p3\Interfaces\ILtiDeployment;
+use Packback\Lti1p3\Interfaces\ILtiRegistration;
 use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
 use Packback\Lti1p3\Interfaces\IMigrationDatabase;
 use Packback\Lti1p3\JwksEndpoint;
@@ -89,12 +91,12 @@ class TestDb implements IDatabase
         $this->deployments[$deployment->getDeploymentId()] = $deployment;
     }
 
-    public function findRegistrationByIssuer($iss, $client_id = null)
+    public function findRegistrationByIssuer(string $iss, ?string $client_id = null): ?ILtiRegistration
     {
         return $this->registrations[$iss] ?? null;
     }
 
-    public function findDeployment($iss, $deployment_id, $client_id = null)
+    public function findDeployment(string $iss, string $deployment_id, ?string $client_id = null): ?ILtiDeployment
     {
         return $this->deployments[$iss] ?? null;
     }
@@ -235,7 +237,7 @@ class Lti13CertificationTest extends TestCase
                 'clientId' => $this->issuer['client_id'],
                 'keySetUrl' => static::JWKS_FILE,
             ]),
-            (new LtiDeployment())->setDeploymentId(static::ISSUER_URL)
+            new LtiDeployment(static::ISSUER_URL)
         );
         $this->migrateDb = new TestMigrateDb(
             new LtiRegistration([
@@ -243,7 +245,7 @@ class Lti13CertificationTest extends TestCase
                 'clientId' => $this->issuer['client_id'],
                 'keySetUrl' => static::JWKS_FILE,
             ]),
-            (new LtiDeployment())->setDeploymentId(static::ISSUER_URL)
+            new LtiDeployment(static::ISSUER_URL)
         );
         $this->cache = new TestCache();
         $this->cookie = new TestCookie();
@@ -313,8 +315,8 @@ class Lti13CertificationTest extends TestCase
 
         $this->expectExceptionMessage('Invalid id_token, JWT must contain 3 parts');
 
-        LtiMessageLaunch::new($this->db, $this->cache, $this->cookie)
-            ->validate($params);
+        LtiMessageLaunch::new($this->db, $this->cache, $this->cookie, $this->serviceConnector)
+            ->initialize($params);
     }
 
     public function testExpAndIatFieldsInvalid()
@@ -371,8 +373,7 @@ class Lti13CertificationTest extends TestCase
 
         $db->matchingKeys = [$key];
         $db->shouldMigrate = true;
-        $db->createdDeployment = LtiDeployment::new()
-            ->setDeploymentId($payload[LtiConstants::DEPLOYMENT_ID]);
+        $db->createdDeployment = new LtiDeployment($payload[LtiConstants::DEPLOYMENT_ID]);
 
         $payload['exp'] = 3272987750; // To ensure signature matches
         $payload[LtiConstants::LTI1P1] = [
@@ -515,7 +516,7 @@ class Lti13CertificationTest extends TestCase
 
             try {
                 LtiMessageLaunch::new($this->db, $this->cache, $this->cookie, $this->serviceConnector)
-                    ->validate($params);
+                    ->initialize($params);
             } catch (Exception $e) {
                 $this->assertInstanceOf(LtiException::class, $e);
             }
@@ -570,7 +571,7 @@ class Lti13CertificationTest extends TestCase
                 ->once()->andReturn(json_decode(file_get_contents(static::JWKS_FILE), true));
 
             $result = LtiMessageLaunch::new($this->db, $this->cache, $this->cookie, $this->serviceConnector)
-                ->validate($params);
+                ->initialize($params);
 
             // Assertions
             $this->assertInstanceOf(LtiMessageLaunch::class, $result);
