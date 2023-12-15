@@ -19,6 +19,9 @@ class Redirect
         $this->referer_query = $referer_query;
     }
 
+    /**
+     * @deprecated
+     */
     public function doRedirect()
     {
         trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
@@ -39,8 +42,13 @@ class Redirect
         $this->doJsRedirect();
     }
 
+    /**
+     * @deprecated
+     */
     public function getRedirectUrl()
     {
+        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
+
         return $this->location;
     }
 

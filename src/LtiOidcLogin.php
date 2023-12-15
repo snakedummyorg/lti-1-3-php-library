@@ -47,7 +47,7 @@ class LtiOidcLogin
     }
 
     /**
-     * @deprecated Use getRedirectUrl() to get the URL and then redirect to it yourself
+     * @deprecated Use getRedirectUrl() to get the URL and then redirect to it yourself. Will be removed in v6.0
      */
     public function doOidcLoginRedirect($launchUrl, ?array $request = null)
     {
@@ -55,6 +55,10 @@ class LtiOidcLogin
 
         if ($request === null) {
             $request = $_REQUEST;
+        }
+
+        if (empty($launchUrl)) {
+            throw new OidcException(static::ERROR_MSG_LAUNCH_URL, 1);
         }
 
         $authLoginReturnUrl = $this->getRedirectUrl($launchUrl, $request);
