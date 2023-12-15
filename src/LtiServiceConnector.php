@@ -182,8 +182,8 @@ class LtiServiceConnector implements ILtiServiceConnector
         ?array $responseBody
     ): string {
         if ($request->getMaskResponseLogs()) {
-            $responseHeaders = static::maskValues($responseHeaders);
-            $responseBody = static::maskValues($responseBody);
+            $responseHeaders = self::maskValues($responseHeaders);
+            $responseBody = self::maskValues($responseBody);
         }
 
         $contextArray = [
@@ -211,7 +211,7 @@ class LtiServiceConnector implements ILtiServiceConnector
         array $responseHeaders,
         ?array $responseBody
     ): void {
-        error_log(static::getLogMessage($request, $responseHeaders, $responseBody));
+        error_log(self::getLogMessage($request, $responseHeaders, $responseBody));
     }
 
     private static function maskValues(?array $payload): ?array
