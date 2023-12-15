@@ -28,7 +28,7 @@
     "require-dev": {
         "mockery/mockery": "^1.4",
         "nesbot/carbon": "^2.43",
-        "laravel/pint": "^1.13",
+        "laravel/pint": "^1.0",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.5"
     },
