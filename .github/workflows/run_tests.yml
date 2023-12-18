@@ -35,6 +35,8 @@ jobs:
       - uses: paambaati/codeclimate-action@v5.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+          XDEBUG_MODE: coverage
+          XDEBUG_COVERAGE: true
         with:
           coverageCommand: composer test
           debug: true
