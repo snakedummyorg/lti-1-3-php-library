@@ -29,10 +29,17 @@ return redirect($oidLogin->getRedirectUrl($launchUrl, $request));
 
 All arguments and returns are now strictly typed. This includes interfaces that require custom implementations. Notable changes:
 
-- `ICookie::setCookie(string $name, string $value, int $exp = 3600, array $options = []): void`
-- `IDatabase::findRegistrationByIssuer(string $iss, ?string $clientId = null): ?ILtiRegistration`
-- `IDatabase::findDeployment(string $iss, string $deploymentId, ?string $clientId = null): ?ILtiDeployment`
-- `IMigrationDatabase::migrateFromLti1p1(LtiMessageLaunch $launch): ?ILtiDeployment`
+```php
+Packback\Lti1p3\Interfaces\ICookie
+    setCookie(string $name, string $value, int $exp = 3600, array $options = []): void;
+
+Packback\Lti1p3\Interfaces\IDatabase
+    findRegistrationByIssuer(string $iss, ?string $clientId = null): ?ILtiRegistration;
+    findDeployment(string $iss, string $deploymentId, ?string $clientId = null): ?ILtiDeployment;
+
+Packback\Lti1p3\Interfaces\IMigrationDatabase
+    migrateFromLti1p1(LtiMessageLaunch $launch): ?ILtiDeployment;
+```
 
 ### Dropped support for PHP 7 and PHP-JWT 5
 
