@@ -2,42 +2,22 @@
 
 namespace Packback\Lti1p3;
 
+use Packback\Lti1p3\Helpers\HasDimensions;
+
 class LtiDeepLinkResourceIframe
 {
+    use HasDimensions;
+
     public function __construct(
+        private ?string $src = null,
         private ?int $width = null,
-        private ?int $height = null,
-        private ?string $src = null
+        private ?int $height = null
     ) {
     }
 
     public static function new(): self
     {
         return new LtiDeepLinkResourceIframe();
-    }
-
-    public function setWidth(?int $width): self
-    {
-        $this->width = $width;
-
-        return $this;
-    }
-
-    public function getWidth(): ?int
-    {
-        return $this->width;
-    }
-
-    public function setHeight(?int $height): self
-    {
-        $this->height = $height;
-
-        return $this;
-    }
-
-    public function getHeight(): ?int
-    {
-        return $this->height;
     }
 
     public function setSrc(?string $src): self

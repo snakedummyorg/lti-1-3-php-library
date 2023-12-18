@@ -2,8 +2,12 @@
 
 namespace Packback\Lti1p3;
 
+use Packback\Lti1p3\Helpers\HasDimensions;
+
 class LtiDeepLinkResourceWindow
 {
+    use HasDimensions;
+
     public function __construct(
         private ?string $target_name = null,
         private ?int $width = null,
@@ -27,30 +31,6 @@ class LtiDeepLinkResourceWindow
     public function getTargetName(): ?string
     {
         return $this->target_name;
-    }
-
-    public function setWidth(?int $width): self
-    {
-        $this->width = $width;
-
-        return $this;
-    }
-
-    public function getWidth(): ?int
-    {
-        return $this->width;
-    }
-
-    public function setHeight(?int $height): self
-    {
-        $this->height = $height;
-
-        return $this;
-    }
-
-    public function getHeight(): ?int
-    {
-        return $this->height;
     }
 
     public function setWindowFeatures(?string $windowFeatures): self

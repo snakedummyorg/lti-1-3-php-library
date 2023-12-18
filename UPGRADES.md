@@ -33,6 +33,22 @@ All arguments and returns are now strictly typed. This includes changes to the `
 
 This library now requires PHP 8 and firebase/php-jwt 6.
 
+### `LtiDeepLinkResourceIframe` constructor arguments changed order
+
+To make the interface consistent with other deep link resources, `src` is now the first argument in the constructor:
+
+```php
+class LtiDeepLinkResourceIframe
+{
+    public function __construct(
+        private ?string $src = null,
+        private ?int $width = null,
+        private ?int $height = null
+    ) {
+    }
+}
+```
+
 ### Removed `ImsStorage` classes
 
 Everything in the `Packback\Lti1p3\ImsStorage` namespace has been removed, specifically the `Packback\Lti1p3\ImsStorage\ImsCache` and `Packback\Lti1p3\ImsStorage\ImsCookie`. If you were using these classes, you will need to implement your own custom storage services. See the [Laravel Implementation Guide](https://github.com/packbackbooks/lti-1-3-php-library/wiki/Laravel-Implementation-Guide#sample-data-store-implementations) for an example.

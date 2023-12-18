@@ -6,13 +6,14 @@ use DateTime;
 
 class LtiDeepLinkDateTimeInterval
 {
+    public const ERROR_NO_START_OR_END = 'Either a start or end time must be specified.';
+    public const ERROR_START_GT_END = 'The start time cannot be greater than end time.';
+
     public function __construct(
         private ?DateTime $start = null,
         private ?DateTime $end = null
     ) {
-        if (isset($start) && isset($end) && $end < $start) {
-            throw new LtiException('Interval start time cannot be greater than end time');
-        }
+        $this->validateStartAndEnd();
     }
 
     public static function new(): self
@@ -47,12 +48,10 @@ class LtiDeepLinkDateTimeInterval
     public function toArray(): array
     {
         if (!isset($this->start) && !isset($this->end)) {
-            throw new LtiException('At least one of the interval bounds must be specified on the object instance');
+            throw new LtiException(self::ERROR_NO_START_OR_END);
         }
 
-        if ($this->start !== null && $this->end !== null && $this->end < $this->start) {
-            throw new LtiException('Interval start time cannot be greater than end time');
-        }
+        $this->validateStartAndEnd();
 
         $dateTimeInterval = [];
 
@@ -64,5 +63,12 @@ class LtiDeepLinkDateTimeInterval
         }
 
         return $dateTimeInterval;
+    }
+
+    private function validateStartAndEnd(): void
+    {
+        if (isset($this->start) && isset($this->end) && $this->start > $this->end) {
+            throw new LtiException(self::ERROR_START_GT_END);
+        }
     }
 }

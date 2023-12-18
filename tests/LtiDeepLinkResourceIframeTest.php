@@ -6,13 +6,18 @@ use Packback\Lti1p3\LtiDeepLinkResourceIframe;
 
 class LtiDeepLinkResourceIframeTest extends TestCase
 {
+    public const INITIAL_SRC = 'https://example.com';
     public const INITIAL_WIDTH = 1;
     public const INITIAL_HEIGHT = 2;
     private LtiDeepLinkResourceIframe $ltiDeepLinkResourceIframe;
 
     public function setUp(): void
     {
-        $this->ltiDeepLinkResourceIframe = new LtiDeepLinkResourceIframe(self::INITIAL_WIDTH, self::INITIAL_HEIGHT);
+        $this->ltiDeepLinkResourceIframe = new LtiDeepLinkResourceIframe(
+            self::INITIAL_SRC,
+            self::INITIAL_WIDTH,
+            self::INITIAL_HEIGHT
+        );
     }
 
     public function testItInstantiates()
@@ -65,12 +70,12 @@ class LtiDeepLinkResourceIframeTest extends TestCase
     {
         $result = $this->ltiDeepLinkResourceIframe->getSrc();
 
-        $this->assertNull($result);
+        $this->assertEquals(self::INITIAL_SRC, $result);
     }
 
     public function testItSetsSrc()
     {
-        $expected = 'https://example.com';
+        $expected = 'https://example.com/foo/bar';
 
         $result = $this->ltiDeepLinkResourceIframe->setSrc($expected);
 
@@ -94,7 +99,7 @@ class LtiDeepLinkResourceIframeTest extends TestCase
         $expected = [
             'width' => 100,
             'height' => 200,
-            'src' => 'https://example.com',
+            'src' => 'https://example.com/foo/bar',
         ];
 
         $this->ltiDeepLinkResourceIframe->setWidth($expected['width']);
