@@ -18,7 +18,7 @@ class LtiDeepLinkResource
     private ?LtiDeepLinkDateTimeInterval $availability_interval = null;
     private ?LtiDeepLinkDateTimeInterval $submission_interval = null;
 
-    public static function new(): LtiDeepLinkResource
+    public static function new(): self
     {
         return new LtiDeepLinkResource();
     }
@@ -28,7 +28,7 @@ class LtiDeepLinkResource
         return $this->type;
     }
 
-    public function setType(string $value): LtiDeepLinkResource
+    public function setType(string $value): self
     {
         $this->type = $value;
 
@@ -40,7 +40,7 @@ class LtiDeepLinkResource
         return $this->title;
     }
 
-    public function setTitle(?string $value): LtiDeepLinkResource
+    public function setTitle(?string $value): self
     {
         $this->title = $value;
 
@@ -52,7 +52,7 @@ class LtiDeepLinkResource
         return $this->text;
     }
 
-    public function setText(?string $value): LtiDeepLinkResource
+    public function setText(?string $value): self
     {
         $this->text = $value;
 
@@ -64,7 +64,7 @@ class LtiDeepLinkResource
         return $this->url;
     }
 
-    public function setUrl(?string $value): LtiDeepLinkResource
+    public function setUrl(?string $value): self
     {
         $this->url = $value;
 
@@ -76,14 +76,14 @@ class LtiDeepLinkResource
         return $this->line_item;
     }
 
-    public function setLineItem(?LtiLineitem $value): LtiDeepLinkResource
+    public function setLineItem(?LtiLineitem $value): self
     {
         $this->line_item = $value;
 
         return $this;
     }
 
-    public function setIcon(?LtiDeepLinkResourceIcon $icon): LtiDeepLinkResource
+    public function setIcon(?LtiDeepLinkResourceIcon $icon): self
     {
         $this->icon = $icon;
 
@@ -95,7 +95,7 @@ class LtiDeepLinkResource
         return $this->icon;
     }
 
-    public function setThumbnail(?LtiDeepLinkResourceIcon $thumbnail): LtiDeepLinkResource
+    public function setThumbnail(?LtiDeepLinkResourceIcon $thumbnail): self
     {
         $this->thumbnail = $thumbnail;
 
@@ -112,7 +112,7 @@ class LtiDeepLinkResource
         return $this->custom_params;
     }
 
-    public function setCustomParams(array $value): LtiDeepLinkResource
+    public function setCustomParams(array $value): self
     {
         $this->custom_params = $value;
 
@@ -124,7 +124,7 @@ class LtiDeepLinkResource
         return $this->iframe;
     }
 
-    public function setIframe(?LtiDeepLinkResourceIframe $iframe): LtiDeepLinkResource
+    public function setIframe(?LtiDeepLinkResourceIframe $iframe): self
     {
         $this->iframe = $iframe;
 
@@ -136,7 +136,7 @@ class LtiDeepLinkResource
         return $this->window;
     }
 
-    public function setWindow(?LtiDeepLinkResourceWindow $window): LtiDeepLinkResource
+    public function setWindow(?LtiDeepLinkResourceWindow $window): self
     {
         $this->window = $window;
 
@@ -148,7 +148,7 @@ class LtiDeepLinkResource
         return $this->availability_interval;
     }
 
-    public function setAvailabilityInterval(?LtiDeepLinkDateTimeInterval $availabilityInterval): LtiDeepLinkResource
+    public function setAvailabilityInterval(?LtiDeepLinkDateTimeInterval $availabilityInterval): self
     {
         $this->availability_interval = $availabilityInterval;
 
@@ -160,7 +160,7 @@ class LtiDeepLinkResource
         return $this->submission_interval;
     }
 
-    public function setSubmissionInterval(?LtiDeepLinkDateTimeInterval $submissionInterval): LtiDeepLinkResource
+    public function setSubmissionInterval(?LtiDeepLinkDateTimeInterval $submissionInterval): self
     {
         $this->submission_interval = $submissionInterval;
 

@@ -80,12 +80,12 @@ class LtiOidcLogin
     public function validateOidcLogin(array $request): ILtiRegistration
     {
         // Validate Issuer.
-        if (empty($request['iss'])) {
+        if (!isset($request['iss'])) {
             throw new OidcException(static::ERROR_MSG_ISSUER);
         }
 
         // Validate Login Hint.
-        if (empty($request['login_hint'])) {
+        if (!isset($request['login_hint'])) {
             throw new OidcException(static::ERROR_MSG_LOGIN_HINT);
         }
 
@@ -94,7 +94,7 @@ class LtiOidcLogin
         $registration = $this->db->findRegistrationByIssuer($request['iss'], $clientId);
 
         // Check we got something.
-        if (empty($registration)) {
+        if (!isset($registration)) {
             $errorMsg = LtiMessageLaunch::getMissingRegistrationErrorMsg($request['iss'], $clientId);
 
             throw new OidcException($errorMsg);
