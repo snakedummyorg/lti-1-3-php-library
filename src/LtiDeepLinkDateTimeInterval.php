@@ -15,12 +15,12 @@ class LtiDeepLinkDateTimeInterval
         }
     }
 
-    public static function new(): LtiDeepLinkDateTimeInterval
+    public static function new(): self
     {
         return new LtiDeepLinkDateTimeInterval();
     }
 
-    public function setStart(?DateTime $start): LtiDeepLinkDateTimeInterval
+    public function setStart(?DateTime $start): self
     {
         $this->start = $start;
 
@@ -32,7 +32,7 @@ class LtiDeepLinkDateTimeInterval
         return $this->start;
     }
 
-    public function setEnd(?DateTime $end): LtiDeepLinkDateTimeInterval
+    public function setEnd(?DateTime $end): self
     {
         $this->end = $end;
 

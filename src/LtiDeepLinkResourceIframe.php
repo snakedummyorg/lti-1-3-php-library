@@ -11,12 +11,12 @@ class LtiDeepLinkResourceIframe
     ) {
     }
 
-    public static function new(): LtiDeepLinkResourceIframe
+    public static function new(): self
     {
         return new LtiDeepLinkResourceIframe();
     }
 
-    public function setWidth(?int $width): LtiDeepLinkResourceIframe
+    public function setWidth(?int $width): self
     {
         $this->width = $width;
 
@@ -28,7 +28,7 @@ class LtiDeepLinkResourceIframe
         return $this->width;
     }
 
-    public function setHeight(?int $height): LtiDeepLinkResourceIframe
+    public function setHeight(?int $height): self
     {
         $this->height = $height;
 
@@ -40,7 +40,7 @@ class LtiDeepLinkResourceIframe
         return $this->height;
     }
 
-    public function setSrc(?string $src): LtiDeepLinkResourceIframe
+    public function setSrc(?string $src): self
     {
         $this->src = $src;
 

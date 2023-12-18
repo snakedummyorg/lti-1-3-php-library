@@ -12,12 +12,12 @@ class LtiDeepLinkResourceWindow
     ) {
     }
 
-    public static function new(): LtiDeepLinkResourceWindow
+    public static function new(): self
     {
         return new LtiDeepLinkResourceWindow();
     }
 
-    public function setTargetName(?string $targetName): LtiDeepLinkResourceWindow
+    public function setTargetName(?string $targetName): self
     {
         $this->target_name = $targetName;
 
@@ -29,7 +29,7 @@ class LtiDeepLinkResourceWindow
         return $this->target_name;
     }
 
-    public function setWidth(?int $width): LtiDeepLinkResourceWindow
+    public function setWidth(?int $width): self
     {
         $this->width = $width;
 
@@ -41,7 +41,7 @@ class LtiDeepLinkResourceWindow
         return $this->width;
     }
 
-    public function setHeight(?int $height): LtiDeepLinkResourceWindow
+    public function setHeight(?int $height): self
     {
         $this->height = $height;
 
@@ -53,7 +53,7 @@ class LtiDeepLinkResourceWindow
         return $this->height;
     }
 
-    public function setWindowFeatures(?string $windowFeatures): LtiDeepLinkResourceWindow
+    public function setWindowFeatures(?string $windowFeatures): self
     {
         $this->window_features = $windowFeatures;
 
