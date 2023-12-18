@@ -36,26 +36,18 @@ jobs:
         run: composer test
 
   coverage:
-    name: Test
+    name: Code coverage
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php:
-          - "latest"
     steps:
       - uses: "actions/checkout@v3"
       - uses: "shivammathur/setup-php@v2"
         with:
-          php-version: "${{ matrix.php }}"
+          php-version: lastest
+          coverage: xdebug
       - uses: "ramsey/composer-install@v2"
-        with:
-          dependency-versions: "${{ matrix.dependencies }}"
-          composer-options: "${{ matrix.composer-options }}"
       - uses: paambaati/codeclimate-action@v5.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          XDEBUG_MODE: coverage
-          XDEBUG_COVERAGE: true
         with:
           coverageCommand: composer test
           debug: true
