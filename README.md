@@ -2,6 +2,10 @@
 
 ![Test status](https://github.com/packbackbooks/lti-1-3-php-library/actions/workflows/run_tests.yml/badge.svg?branch=master)
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/16055e83ea04ad95a2f9/maintainability)](https://codeclimate.com/github/packbackbooks/lti-1-3-php-library/maintainability)
+
+[![Test Coverage](https://api.codeclimate.com/v1/badges/16055e83ea04ad95a2f9/test_coverage)](https://codeclimate.com/github/packbackbooks/lti-1-3-php-library/test_coverage)
+
 A library used for building IMS-certified LTI 1.3 tool providers in PHP.
 
 This library allows a tool provider (your app) to receive LTI launches from a tool consumer (i.e. LMS). It validates LTI launches and lets an application interact with services like the Names Roles Provisioning Service (to fetch a roster for an LMS course) and Assignment Grades Service (to update grades for students in a course in the LMS).
