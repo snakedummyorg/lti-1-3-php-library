@@ -14,7 +14,7 @@ $message->inilialize($request);
 
 ### HIGH LIKELIHOOD OF IMPACT: Changed how the OIDC Login URL is retrieved, deprecated the `Redirect` object
 
-When redirecting to the OIDC Login URL, the `Packback\Lti1p3\LtiOidcLogin::getOidcLoginUrl()` method should be used to retrieve the URL. Your application should use this to build the redirect response in whatever way is appropriate for your framework. This replaces, `Packback\Lti1p3\LtiOidcLogin::doOidcLoginRedirect()` which returned a `Redirect` object. See: https://github.com/packbackbooks/lti-1-3-php-library/pull/116
+When redirecting to the OIDC Login URL, the `Packback\Lti1p3\LtiOidcLogin::getOidcLoginUrl()` method should be used to retrieve the URL. Your application should use this to build the redirect response in whatever way is appropriate for your framework. This replaces `Packback\Lti1p3\LtiOidcLogin::doOidcLoginRedirect()`, which returned a `Redirect` object. See: https://github.com/packbackbooks/lti-1-3-php-library/pull/116
 
 ```php
 // instead of doing this:
