@@ -8,8 +8,8 @@ class LtiDeepLinkDateTimeInterval
 {
     public function __construct(
         private ?DateTime $start = null,
-        private ?DateTime $end = null)
-    {
+        private ?DateTime $end = null
+    ) {
         if ($start !== null && $end !== null && $end < $start) {
             throw new LtiException('Interval start time cannot be greater than end time');
         }

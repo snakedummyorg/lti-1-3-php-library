@@ -8,8 +8,8 @@ class LtiDeepLinkResourceWindow
         private ?string $target_name = null,
         private ?int $width = null,
         private ?int $height = null,
-        private ?string $window_features = null)
-    {
+        private ?string $window_features = null
+    ) {
     }
 
     public static function new(): LtiDeepLinkResourceWindow

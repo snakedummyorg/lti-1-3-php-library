@@ -18,8 +18,8 @@ class LtiOidcLogin
     public function __construct(
         public IDatabase $db,
         public ICache $cache,
-        public ICookie $cookie)
-    {
+        public ICookie $cookie
+    ) {
     }
 
     /**
@@ -81,12 +81,12 @@ class LtiOidcLogin
     {
         // Validate Issuer.
         if (empty($request['iss'])) {
-            throw new OidcException(static::ERROR_MSG_ISSUER, 1);
+            throw new OidcException(static::ERROR_MSG_ISSUER);
         }
 
         // Validate Login Hint.
         if (empty($request['login_hint'])) {
-            throw new OidcException(static::ERROR_MSG_LOGIN_HINT, 1);
+            throw new OidcException(static::ERROR_MSG_LOGIN_HINT);
         }
 
         // Fetch Registration Details.
@@ -97,7 +97,7 @@ class LtiOidcLogin
         if (empty($registration)) {
             $errorMsg = LtiMessageLaunch::getMissingRegistrationErrorMsg($request['iss'], $clientId);
 
-            throw new OidcException($errorMsg, 1);
+            throw new OidcException($errorMsg);
         }
 
         // Return Registration.

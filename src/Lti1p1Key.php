@@ -23,7 +23,7 @@ class Lti1p1Key
         return $this->key;
     }
 
-    public function setKey(string $key)
+    public function setKey(string $key): self
     {
         $this->key = $key;
 
@@ -35,7 +35,7 @@ class Lti1p1Key
         return $this->secret;
     }
 
-    public function setSecret(string $secret)
+    public function setSecret(string $secret): self
     {
         $this->secret = $secret;
 
