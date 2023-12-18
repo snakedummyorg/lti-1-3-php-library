@@ -25,7 +25,7 @@ class LtiOidcLogin
     /**
      * Static function to allow for method chaining without having to assign to a variable first.
      */
-    public static function new(IDatabase $db, ?ICache $cache = null, ?ICookie $cookie = null): self
+    public static function new(IDatabase $db, ICache $cache, ICookie $cookie): self
     {
         return new LtiOidcLogin($db, $cache, $cookie);
     }

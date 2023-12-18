@@ -37,7 +37,7 @@ class LtiRegistration implements ILtiRegistration
         return $this->issuer;
     }
 
-    public function setIssuer($issuer): self
+    public function setIssuer(string $issuer): self
     {
         $this->issuer = $issuer;
 
@@ -49,7 +49,7 @@ class LtiRegistration implements ILtiRegistration
         return $this->clientId;
     }
 
-    public function setClientId($clientId): self
+    public function setClientId(string $clientId): self
     {
         $this->clientId = $clientId;
 
@@ -61,7 +61,7 @@ class LtiRegistration implements ILtiRegistration
         return $this->keySetUrl;
     }
 
-    public function setKeySetUrl($keySetUrl): self
+    public function setKeySetUrl(string $keySetUrl): self
     {
         $this->keySetUrl = $keySetUrl;
 
@@ -73,7 +73,7 @@ class LtiRegistration implements ILtiRegistration
         return $this->authTokenUrl;
     }
 
-    public function setAuthTokenUrl($authTokenUrl): self
+    public function setAuthTokenUrl(string $authTokenUrl): self
     {
         $this->authTokenUrl = $authTokenUrl;
 
@@ -85,7 +85,7 @@ class LtiRegistration implements ILtiRegistration
         return $this->authLoginUrl;
     }
 
-    public function setAuthLoginUrl($authLoginUrl): self
+    public function setAuthLoginUrl(string $authLoginUrl): self
     {
         $this->authLoginUrl = $authLoginUrl;
 
@@ -97,7 +97,7 @@ class LtiRegistration implements ILtiRegistration
         return $this->authServer ?? $this->authTokenUrl;
     }
 
-    public function setAuthServer($authServer): self
+    public function setAuthServer(string $authServer): self
     {
         $this->authServer = $authServer;
 
@@ -121,7 +121,7 @@ class LtiRegistration implements ILtiRegistration
         return $this->kid ?? hash('sha256', trim($this->issuer.$this->clientId));
     }
 
-    public function setKid($kid): self
+    public function setKid(string $kid): self
     {
         $this->kid = $kid;
 
