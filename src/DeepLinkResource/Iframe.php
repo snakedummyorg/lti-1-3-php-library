@@ -1,10 +1,10 @@
 <?php
 
-namespace Packback\Lti1p3;
+namespace Packback\Lti1p3\DeepLinkResource;
 
 use Packback\Lti1p3\Helpers\HasDimensions;
 
-class LtiDeepLinkResourceIframe
+class Iframe
 {
     use HasDimensions;
 
@@ -17,7 +17,7 @@ class LtiDeepLinkResourceIframe
 
     public static function new(): self
     {
-        return new LtiDeepLinkResourceIframe();
+        return new Iframe();
     }
 
     public function setSrc(?string $src): self

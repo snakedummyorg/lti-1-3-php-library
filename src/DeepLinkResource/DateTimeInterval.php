@@ -1,10 +1,11 @@
 <?php
 
-namespace Packback\Lti1p3;
+namespace Packback\Lti1p3\DeepLinkResource;
 
 use DateTime;
+use Packback\Lti1p3\LtiException;
 
-class LtiDeepLinkDateTimeInterval
+class DateTimeInterval
 {
     public const ERROR_NO_START_OR_END = 'Either a start or end time must be specified.';
     public const ERROR_START_GT_END = 'The start time cannot be greater than end time.';
@@ -18,7 +19,7 @@ class LtiDeepLinkDateTimeInterval
 
     public static function new(): self
     {
-        return new LtiDeepLinkDateTimeInterval();
+        return new DateTimeInterval();
     }
 
     public function setStart(?DateTime $start): self

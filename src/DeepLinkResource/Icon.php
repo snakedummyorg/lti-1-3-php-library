@@ -1,10 +1,10 @@
 <?php
 
-namespace Packback\Lti1p3;
+namespace Packback\Lti1p3\DeepLinkResource;
 
 use Packback\Lti1p3\Helpers\HasDimensions;
 
-class LtiDeepLinkResourceIcon
+class Icon
 {
     use HasDimensions;
 
@@ -17,7 +17,7 @@ class LtiDeepLinkResourceIcon
 
     public static function new(string $url, int $width, int $height): self
     {
-        return new LtiDeepLinkResourceIcon($url, $width, $height);
+        return new Icon($url, $width, $height);
     }
 
     public function setUrl(string $url): self

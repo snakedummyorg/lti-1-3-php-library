@@ -5,10 +5,10 @@ namespace Tests;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Mockery;
+use Packback\Lti1p3\DeepLinkResource\Resource;
 use Packback\Lti1p3\Interfaces\ILtiRegistration;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiDeepLink;
-use Packback\Lti1p3\LtiDeepLinkResource;
 
 class LtiDeepLinkTest extends TestCase
 {
@@ -22,7 +22,7 @@ class LtiDeepLinkTest extends TestCase
     protected function setUp(): void
     {
         $this->registrationMock = Mockery::mock(ILtiRegistration::class);
-        $this->ltiResourceMock = Mockery::mock(LtiDeepLinkResource::class);
+        $this->ltiResourceMock = Mockery::mock(Resource::class);
     }
 
     public function testItInstantiates()

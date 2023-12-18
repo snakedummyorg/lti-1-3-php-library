@@ -1,10 +1,10 @@
 <?php
 
-namespace Packback\Lti1p3;
+namespace Packback\Lti1p3\DeepLinkResource;
 
 use Packback\Lti1p3\Helpers\HasDimensions;
 
-class LtiDeepLinkResourceWindow
+class Window
 {
     use HasDimensions;
 
@@ -18,7 +18,7 @@ class LtiDeepLinkResourceWindow
 
     public static function new(): self
     {
-        return new LtiDeepLinkResourceWindow();
+        return new Window();
     }
 
     public function setTargetName(?string $targetName): self
