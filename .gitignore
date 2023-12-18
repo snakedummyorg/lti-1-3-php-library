@@ -14,4 +14,5 @@ tests/_support/_generated/*
 vendor
 
 # ignore the coverage folders
+**/.phpunit.cache
 **/coverage
