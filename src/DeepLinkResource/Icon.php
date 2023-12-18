@@ -2,8 +2,6 @@
 
 namespace Packback\Lti1p3\DeepLinkResource;
 
-use Packback\Lti1p3\Helpers\HasDimensions;
-
 class Icon
 {
     use HasDimensions;

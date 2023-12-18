@@ -1,6 +1,6 @@
 <?php
 
-namespace Packback\Lti1p3\Helpers;
+namespace Packback\Lti1p3\DeepLinkResource;
 
 trait HasDimensions
 {
