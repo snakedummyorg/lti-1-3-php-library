@@ -1,39 +1,40 @@
 <?php
 
-namespace Tests;
+namespace Tests\DeepLinkResources;
 
 use DateTime;
-use Packback\Lti1p3\LtiDeepLinkDateTimeInterval;
+use Packback\Lti1p3\DeepLinkResources\DateTimeInterval;
 use Packback\Lti1p3\LtiException;
+use Tests\TestCase;
 
-class LtiDeepLinkDateTimeIntervalTest extends TestCase
+class DateTimeIntervalTest extends TestCase
 {
     private DateTime $initialStart;
     private DateTime $initialEnd;
-    private LtiDeepLinkDateTimeInterval $ltiDeepLinkDateTimeInterval;
+    private DateTimeInterval $dateTimeInterval;
 
     public function setUp(): void
     {
         $this->initialStart = date_create();
         $this->initialEnd = date_create();
-        $this->ltiDeepLinkDateTimeInterval = new LtiDeepLinkDateTimeInterval($this->initialStart, $this->initialEnd);
+        $this->dateTimeInterval = new DateTimeInterval($this->initialStart, $this->initialEnd);
     }
 
     public function testItInstantiates()
     {
-        $this->assertInstanceOf(LtiDeepLinkDateTimeInterval::class, $this->ltiDeepLinkDateTimeInterval);
+        $this->assertInstanceOf(DateTimeInterval::class, $this->dateTimeInterval);
     }
 
     public function testItCreatesANewInstance()
     {
-        $deepLinkResource = LtiDeepLinkDateTimeInterval::new();
+        $DeepLinkResources = DateTimeInterval::new();
 
-        $this->assertInstanceOf(LtiDeepLinkDateTimeInterval::class, $deepLinkResource);
+        $this->assertInstanceOf(DateTimeInterval::class, $DeepLinkResources);
     }
 
     public function testItGetsStart()
     {
-        $result = $this->ltiDeepLinkDateTimeInterval->getStart();
+        $result = $this->dateTimeInterval->getStart();
 
         $this->assertEquals($this->initialStart, $result);
     }
@@ -42,15 +43,15 @@ class LtiDeepLinkDateTimeIntervalTest extends TestCase
     {
         $expected = date_create('+1 day');
 
-        $result = $this->ltiDeepLinkDateTimeInterval->setStart($expected);
+        $result = $this->dateTimeInterval->setStart($expected);
 
-        $this->assertSame($this->ltiDeepLinkDateTimeInterval, $result);
-        $this->assertEquals($expected, $this->ltiDeepLinkDateTimeInterval->getStart());
+        $this->assertSame($this->dateTimeInterval, $result);
+        $this->assertEquals($expected, $this->dateTimeInterval->getStart());
     }
 
     public function testItGetsEnd()
     {
-        $result = $this->ltiDeepLinkDateTimeInterval->getEnd();
+        $result = $this->dateTimeInterval->getEnd();
 
         $this->assertEquals($this->initialEnd, $result);
     }
@@ -59,32 +60,32 @@ class LtiDeepLinkDateTimeIntervalTest extends TestCase
     {
         $expected = date_create('+1 day');
 
-        $result = $this->ltiDeepLinkDateTimeInterval->setEnd($expected);
+        $result = $this->dateTimeInterval->setEnd($expected);
 
-        $this->assertSame($this->ltiDeepLinkDateTimeInterval, $result);
-        $this->assertEquals($expected, $this->ltiDeepLinkDateTimeInterval->getEnd());
+        $this->assertSame($this->dateTimeInterval, $result);
+        $this->assertEquals($expected, $this->dateTimeInterval->getEnd());
     }
 
     public function testItThrowsExceptionWhenCreatingArrayWithBothPropertiesNull()
     {
-        $this->ltiDeepLinkDateTimeInterval->setStart(null);
-        $this->ltiDeepLinkDateTimeInterval->setEnd(null);
+        $this->dateTimeInterval->setStart(null);
+        $this->dateTimeInterval->setEnd(null);
 
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('At least one of the interval bounds must be specified on the object instance');
+        $this->expectExceptionMessage(DateTimeInterval::ERROR_NO_START_OR_END);
 
-        $this->ltiDeepLinkDateTimeInterval->toArray();
+        $this->dateTimeInterval->toArray();
     }
 
     public function testItThrowsExceptionWhenCreatingArrayWithInvalidTimeInterval()
     {
-        $this->ltiDeepLinkDateTimeInterval->setStart(date_create());
-        $this->ltiDeepLinkDateTimeInterval->setEnd(date_create('-1 day'));
+        $this->dateTimeInterval->setStart(date_create());
+        $this->dateTimeInterval->setEnd(date_create('-1 day'));
 
         $this->expectException(LtiException::class);
-        $this->expectExceptionMessage('Interval start time cannot be greater than end time');
+        $this->expectExceptionMessage(DateTimeInterval::ERROR_START_GT_END);
 
-        $this->ltiDeepLinkDateTimeInterval->toArray();
+        $this->dateTimeInterval->toArray();
     }
 
     public function testItCreatesArrayWithDefinedOptionalProperties()
@@ -96,10 +97,10 @@ class LtiDeepLinkDateTimeIntervalTest extends TestCase
             'endDateTime' => $expectedEnd->format(DateTime::ATOM),
         ];
 
-        $this->ltiDeepLinkDateTimeInterval->setStart($expectedStart);
-        $this->ltiDeepLinkDateTimeInterval->setEnd($expectedEnd);
+        $this->dateTimeInterval->setStart($expectedStart);
+        $this->dateTimeInterval->setEnd($expectedEnd);
 
-        $result = $this->ltiDeepLinkDateTimeInterval->toArray();
+        $result = $this->dateTimeInterval->toArray();
 
         $this->assertEquals($expected, $result);
     }

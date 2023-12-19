@@ -1,35 +1,41 @@
 <?php
 
-namespace Tests;
+namespace Tests\DeepLinkResources;
 
-use Packback\Lti1p3\LtiDeepLinkResourceIframe;
+use Packback\Lti1p3\DeepLinkResources\Iframe;
+use Tests\TestCase;
 
-class LtiDeepLinkResourceIframeTest extends TestCase
+class IframeTest extends TestCase
 {
+    public const INITIAL_SRC = 'https://example.com';
     public const INITIAL_WIDTH = 1;
     public const INITIAL_HEIGHT = 2;
-    private LtiDeepLinkResourceIframe $ltiDeepLinkResourceIframe;
+    private Iframe $iframe;
 
     public function setUp(): void
     {
-        $this->ltiDeepLinkResourceIframe = new LtiDeepLinkResourceIframe(self::INITIAL_WIDTH, self::INITIAL_HEIGHT);
+        $this->iframe = new Iframe(
+            self::INITIAL_SRC,
+            self::INITIAL_WIDTH,
+            self::INITIAL_HEIGHT
+        );
     }
 
     public function testItInstantiates()
     {
-        $this->assertInstanceOf(LtiDeepLinkResourceIframe::class, $this->ltiDeepLinkResourceIframe);
+        $this->assertInstanceOf(Iframe::class, $this->iframe);
     }
 
     public function testItCreatesANewInstance()
     {
-        $deepLinkResource = LtiDeepLinkResourceIframe::new();
+        $DeepLinkResources = Iframe::new();
 
-        $this->assertInstanceOf(LtiDeepLinkResourceIframe::class, $deepLinkResource);
+        $this->assertInstanceOf(Iframe::class, $DeepLinkResources);
     }
 
     public function testItGetsWidth()
     {
-        $result = $this->ltiDeepLinkResourceIframe->getWidth();
+        $result = $this->iframe->getWidth();
 
         $this->assertEquals(self::INITIAL_WIDTH, $result);
     }
@@ -38,15 +44,15 @@ class LtiDeepLinkResourceIframeTest extends TestCase
     {
         $expected = 300;
 
-        $result = $this->ltiDeepLinkResourceIframe->setWidth($expected);
+        $result = $this->iframe->setWidth($expected);
 
-        $this->assertSame($this->ltiDeepLinkResourceIframe, $result);
-        $this->assertEquals($expected, $this->ltiDeepLinkResourceIframe->getWidth());
+        $this->assertSame($this->iframe, $result);
+        $this->assertEquals($expected, $this->iframe->getWidth());
     }
 
     public function testItGetsHeight()
     {
-        $result = $this->ltiDeepLinkResourceIframe->getHeight();
+        $result = $this->iframe->getHeight();
 
         $this->assertEquals(self::INITIAL_HEIGHT, $result);
     }
@@ -55,36 +61,36 @@ class LtiDeepLinkResourceIframeTest extends TestCase
     {
         $expected = 400;
 
-        $result = $this->ltiDeepLinkResourceIframe->setHeight($expected);
+        $result = $this->iframe->setHeight($expected);
 
-        $this->assertSame($this->ltiDeepLinkResourceIframe, $result);
-        $this->assertEquals($expected, $this->ltiDeepLinkResourceIframe->getHeight());
+        $this->assertSame($this->iframe, $result);
+        $this->assertEquals($expected, $this->iframe->getHeight());
     }
 
     public function testItGetsSrc()
     {
-        $result = $this->ltiDeepLinkResourceIframe->getSrc();
+        $result = $this->iframe->getSrc();
 
-        $this->assertNull($result);
+        $this->assertEquals(self::INITIAL_SRC, $result);
     }
 
     public function testItSetsSrc()
     {
-        $expected = 'https://example.com';
+        $expected = 'https://example.com/foo/bar';
 
-        $result = $this->ltiDeepLinkResourceIframe->setSrc($expected);
+        $result = $this->iframe->setSrc($expected);
 
-        $this->assertSame($this->ltiDeepLinkResourceIframe, $result);
-        $this->assertEquals($expected, $this->ltiDeepLinkResourceIframe->getSrc());
+        $this->assertSame($this->iframe, $result);
+        $this->assertEquals($expected, $this->iframe->getSrc());
     }
 
     public function testItCreatesArrayWithoutOptionalProperties()
     {
-        $this->ltiDeepLinkResourceIframe->setWidth(null);
-        $this->ltiDeepLinkResourceIframe->setHeight(null);
-        $this->ltiDeepLinkResourceIframe->setSrc(null);
+        $this->iframe->setWidth(null);
+        $this->iframe->setHeight(null);
+        $this->iframe->setSrc(null);
 
-        $result = $this->ltiDeepLinkResourceIframe->toArray();
+        $result = $this->iframe->toArray();
 
         $this->assertEquals([], $result);
     }
@@ -94,14 +100,14 @@ class LtiDeepLinkResourceIframeTest extends TestCase
         $expected = [
             'width' => 100,
             'height' => 200,
-            'src' => 'https://example.com',
+            'src' => 'https://example.com/foo/bar',
         ];
 
-        $this->ltiDeepLinkResourceIframe->setWidth($expected['width']);
-        $this->ltiDeepLinkResourceIframe->setHeight($expected['height']);
-        $this->ltiDeepLinkResourceIframe->setSrc($expected['src']);
+        $this->iframe->setWidth($expected['width']);
+        $this->iframe->setHeight($expected['height']);
+        $this->iframe->setSrc($expected['src']);
 
-        $result = $this->ltiDeepLinkResourceIframe->toArray();
+        $result = $this->iframe->toArray();
 
         $this->assertEquals($expected, $result);
     }

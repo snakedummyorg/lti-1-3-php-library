@@ -1,32 +1,33 @@
 <?php
 
-namespace Tests;
+namespace Tests\DeepLinkResources;
 
-use Packback\Lti1p3\LtiDeepLinkResourceIcon;
+use Packback\Lti1p3\DeepLinkResources\Icon;
+use Tests\TestCase;
 
-class LtiDeepLinkResourceIconTest extends TestCase
+class IconTest extends TestCase
 {
     public function setUp(): void
     {
         $this->imageUrl = 'https://example.com/image.png';
-        $this->deepLinkResourceIcon = new LtiDeepLinkResourceIcon($this->imageUrl, 1, 2);
+        $this->icon = new Icon($this->imageUrl, 1, 2);
     }
 
     public function testItInstantiates()
     {
-        $this->assertInstanceOf(LtiDeepLinkResourceIcon::class, $this->deepLinkResourceIcon);
+        $this->assertInstanceOf(Icon::class, $this->icon);
     }
 
     public function testItCreatesANewInstance()
     {
-        $deepLinkResource = LtiDeepLinkResourceIcon::new($this->imageUrl, 100, 200);
+        $DeepLinkResources = Icon::new($this->imageUrl, 100, 200);
 
-        $this->assertInstanceOf(LtiDeepLinkResourceIcon::class, $deepLinkResource);
+        $this->assertInstanceOf(Icon::class, $DeepLinkResources);
     }
 
     public function testItGetsUrl()
     {
-        $result = $this->deepLinkResourceIcon->getUrl();
+        $result = $this->icon->getUrl();
 
         $this->assertEquals($this->imageUrl, $result);
     }
@@ -35,14 +36,14 @@ class LtiDeepLinkResourceIconTest extends TestCase
     {
         $expected = 'expected';
 
-        $this->deepLinkResourceIcon->setUrl($expected);
+        $this->icon->setUrl($expected);
 
-        $this->assertEquals($expected, $this->deepLinkResourceIcon->getUrl());
+        $this->assertEquals($expected, $this->icon->getUrl());
     }
 
     public function testItGetsWidth()
     {
-        $result = $this->deepLinkResourceIcon->getWidth();
+        $result = $this->icon->getWidth();
 
         $this->assertEquals(1, $result);
     }
@@ -51,14 +52,14 @@ class LtiDeepLinkResourceIconTest extends TestCase
     {
         $expected = 300;
 
-        $this->deepLinkResourceIcon->setWidth($expected);
+        $this->icon->setWidth($expected);
 
-        $this->assertEquals($expected, $this->deepLinkResourceIcon->getWidth());
+        $this->assertEquals($expected, $this->icon->getWidth());
     }
 
     public function testItGetsHeight()
     {
-        $result = $this->deepLinkResourceIcon->getHeight();
+        $result = $this->icon->getHeight();
 
         $this->assertEquals(2, $result);
     }
@@ -67,9 +68,9 @@ class LtiDeepLinkResourceIconTest extends TestCase
     {
         $expected = 400;
 
-        $this->deepLinkResourceIcon->setHeight($expected);
+        $this->icon->setHeight($expected);
 
-        $this->assertEquals($expected, $this->deepLinkResourceIcon->getHeight());
+        $this->assertEquals($expected, $this->icon->getHeight());
     }
 
     public function testItCreatesArray()
@@ -80,11 +81,11 @@ class LtiDeepLinkResourceIconTest extends TestCase
             'height' => 200,
         ];
 
-        $this->deepLinkResourceIcon->setUrl($expected['url']);
-        $this->deepLinkResourceIcon->setWidth($expected['width']);
-        $this->deepLinkResourceIcon->setHeight($expected['height']);
+        $this->icon->setUrl($expected['url']);
+        $this->icon->setWidth($expected['width']);
+        $this->icon->setHeight($expected['height']);
 
-        $result = $this->deepLinkResourceIcon->toArray();
+        $result = $this->icon->toArray();
 
         $this->assertEquals($expected, $result);
     }

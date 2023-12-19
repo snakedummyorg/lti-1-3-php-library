@@ -1,26 +1,28 @@
 <?php
 
-namespace Packback\Lti1p3;
+namespace Packback\Lti1p3\DeepLinkResources;
 
 use DateTime;
+use Packback\Lti1p3\LtiException;
 
-class LtiDeepLinkDateTimeInterval
+class DateTimeInterval
 {
+    public const ERROR_NO_START_OR_END = 'Either a start or end time must be specified.';
+    public const ERROR_START_GT_END = 'The start time cannot be greater than end time.';
+
     public function __construct(
         private ?DateTime $start = null,
-        private ?DateTime $end = null)
-    {
-        if ($start !== null && $end !== null && $end < $start) {
-            throw new LtiException('Interval start time cannot be greater than end time');
-        }
+        private ?DateTime $end = null
+    ) {
+        $this->validateStartAndEnd();
     }
 
-    public static function new(): LtiDeepLinkDateTimeInterval
+    public static function new(): self
     {
-        return new LtiDeepLinkDateTimeInterval();
+        return new DateTimeInterval();
     }
 
-    public function setStart(?DateTime $start): LtiDeepLinkDateTimeInterval
+    public function setStart(?DateTime $start): self
     {
         $this->start = $start;
 
@@ -32,7 +34,7 @@ class LtiDeepLinkDateTimeInterval
         return $this->start;
     }
 
-    public function setEnd(?DateTime $end): LtiDeepLinkDateTimeInterval
+    public function setEnd(?DateTime $end): self
     {
         $this->end = $end;
 
@@ -47,12 +49,10 @@ class LtiDeepLinkDateTimeInterval
     public function toArray(): array
     {
         if (!isset($this->start) && !isset($this->end)) {
-            throw new LtiException('At least one of the interval bounds must be specified on the object instance');
+            throw new LtiException(self::ERROR_NO_START_OR_END);
         }
 
-        if ($this->start !== null && $this->end !== null && $this->end < $this->start) {
-            throw new LtiException('Interval start time cannot be greater than end time');
-        }
+        $this->validateStartAndEnd();
 
         $dateTimeInterval = [];
 
@@ -64,5 +64,12 @@ class LtiDeepLinkDateTimeInterval
         }
 
         return $dateTimeInterval;
+    }
+
+    private function validateStartAndEnd(): void
+    {
+        if (isset($this->start) && isset($this->end) && $this->start > $this->end) {
+            throw new LtiException(self::ERROR_START_GT_END);
+        }
     }
 }

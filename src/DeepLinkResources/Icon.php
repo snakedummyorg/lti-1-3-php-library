@@ -1,22 +1,24 @@
 <?php
 
-namespace Packback\Lti1p3;
+namespace Packback\Lti1p3\DeepLinkResources;
 
-class LtiDeepLinkResourceIcon
+class Icon
 {
+    use HasDimensions;
+
     public function __construct(
         private string $url,
         private int $width,
-        private int $height)
-    {
+        private int $height
+    ) {
     }
 
-    public static function new(string $url, int $width, int $height): LtiDeepLinkResourceIcon
+    public static function new(string $url, int $width, int $height): self
     {
-        return new LtiDeepLinkResourceIcon($url, $width, $height);
+        return new Icon($url, $width, $height);
     }
 
-    public function setUrl(string $url): LtiDeepLinkResourceIcon
+    public function setUrl(string $url): self
     {
         $this->url = $url;
 
@@ -26,30 +28,6 @@ class LtiDeepLinkResourceIcon
     public function getUrl(): string
     {
         return $this->url;
-    }
-
-    public function setWidth(int $width): LtiDeepLinkResourceIcon
-    {
-        $this->width = $width;
-
-        return $this;
-    }
-
-    public function getWidth(): int
-    {
-        return $this->width;
-    }
-
-    public function setHeight(int $height): LtiDeepLinkResourceIcon
-    {
-        $this->height = $height;
-
-        return $this;
-    }
-
-    public function getHeight(): int
-    {
-        return $this->height;
     }
 
     public function toArray(): array

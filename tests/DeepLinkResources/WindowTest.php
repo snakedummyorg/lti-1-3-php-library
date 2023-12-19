@@ -1,38 +1,39 @@
 <?php
 
-namespace Tests;
+namespace Tests\DeepLinkResources;
 
-use Packback\Lti1p3\LtiDeepLinkResourceWindow;
+use Packback\Lti1p3\DeepLinkResources\Window;
+use Tests\TestCase;
 
-class LtiDeepLinkResourceWindowTest extends TestCase
+class WindowTest extends TestCase
 {
     public const INITIAL_TARGET_NAME = 'example-name';
     public const INITIAL_WIDTH = 1;
     public const INITIAL_HEIGHT = 2;
     public const INITIAL_WINDOW_FEATURES = 'example-feature=value';
-    private LtiDeepLinkResourceWindow $ltiDeepLinkResourceWindow;
+    private Window $window;
 
     public function setUp(): void
     {
-        $this->ltiDeepLinkResourceWindow = new LtiDeepLinkResourceWindow(self::INITIAL_TARGET_NAME,
+        $this->window = new Window(self::INITIAL_TARGET_NAME,
             self::INITIAL_WIDTH, self::INITIAL_HEIGHT, self::INITIAL_WINDOW_FEATURES);
     }
 
     public function testItInstantiates()
     {
-        $this->assertInstanceOf(LtiDeepLinkResourceWindow::class, $this->ltiDeepLinkResourceWindow);
+        $this->assertInstanceOf(Window::class, $this->window);
     }
 
     public function testItCreatesANewInstance()
     {
-        $deepLinkResource = LtiDeepLinkResourceWindow::new();
+        $DeepLinkResources = Window::new();
 
-        $this->assertInstanceOf(LtiDeepLinkResourceWindow::class, $deepLinkResource);
+        $this->assertInstanceOf(Window::class, $DeepLinkResources);
     }
 
     public function testItGetsTargetName()
     {
-        $result = $this->ltiDeepLinkResourceWindow->getTargetName();
+        $result = $this->window->getTargetName();
 
         $this->assertEquals(self::INITIAL_TARGET_NAME, $result);
     }
@@ -41,15 +42,15 @@ class LtiDeepLinkResourceWindowTest extends TestCase
     {
         $expected = 'expected';
 
-        $result = $this->ltiDeepLinkResourceWindow->setTargetName($expected);
+        $result = $this->window->setTargetName($expected);
 
-        $this->assertSame($this->ltiDeepLinkResourceWindow, $result);
-        $this->assertEquals($expected, $this->ltiDeepLinkResourceWindow->getTargetName());
+        $this->assertSame($this->window, $result);
+        $this->assertEquals($expected, $this->window->getTargetName());
     }
 
     public function testItGetsWidth()
     {
-        $result = $this->ltiDeepLinkResourceWindow->getWidth();
+        $result = $this->window->getWidth();
 
         $this->assertEquals(self::INITIAL_WIDTH, $result);
     }
@@ -58,15 +59,15 @@ class LtiDeepLinkResourceWindowTest extends TestCase
     {
         $expected = 300;
 
-        $result = $this->ltiDeepLinkResourceWindow->setWidth($expected);
+        $result = $this->window->setWidth($expected);
 
-        $this->assertSame($this->ltiDeepLinkResourceWindow, $result);
-        $this->assertEquals($expected, $this->ltiDeepLinkResourceWindow->getWidth());
+        $this->assertSame($this->window, $result);
+        $this->assertEquals($expected, $this->window->getWidth());
     }
 
     public function testItGetsHeight()
     {
-        $result = $this->ltiDeepLinkResourceWindow->getHeight();
+        $result = $this->window->getHeight();
 
         $this->assertEquals(self::INITIAL_HEIGHT, $result);
     }
@@ -75,15 +76,15 @@ class LtiDeepLinkResourceWindowTest extends TestCase
     {
         $expected = 400;
 
-        $result = $this->ltiDeepLinkResourceWindow->setHeight($expected);
+        $result = $this->window->setHeight($expected);
 
-        $this->assertSame($this->ltiDeepLinkResourceWindow, $result);
-        $this->assertEquals($expected, $this->ltiDeepLinkResourceWindow->getHeight());
+        $this->assertSame($this->window, $result);
+        $this->assertEquals($expected, $this->window->getHeight());
     }
 
     public function testItGetsWindowFeatures()
     {
-        $result = $this->ltiDeepLinkResourceWindow->getWindowFeatures();
+        $result = $this->window->getWindowFeatures();
 
         $this->assertEquals(self::INITIAL_WINDOW_FEATURES, $result);
     }
@@ -92,10 +93,10 @@ class LtiDeepLinkResourceWindowTest extends TestCase
     {
         $expected = 'first-feature=value,second-feature';
 
-        $result = $this->ltiDeepLinkResourceWindow->setWindowFeatures($expected);
+        $result = $this->window->setWindowFeatures($expected);
 
-        $this->assertSame($this->ltiDeepLinkResourceWindow, $result);
-        $this->assertEquals($expected, $this->ltiDeepLinkResourceWindow->getWindowFeatures());
+        $this->assertSame($this->window, $result);
+        $this->assertEquals($expected, $this->window->getWindowFeatures());
     }
 
     public function testItCreatesArray()
@@ -107,12 +108,12 @@ class LtiDeepLinkResourceWindowTest extends TestCase
             'windowFeatures' => 'first-feature=value,second-feature',
         ];
 
-        $this->ltiDeepLinkResourceWindow->setTargetName($expected['targetName']);
-        $this->ltiDeepLinkResourceWindow->setWidth($expected['width']);
-        $this->ltiDeepLinkResourceWindow->setHeight($expected['height']);
-        $this->ltiDeepLinkResourceWindow->setWindowFeatures($expected['windowFeatures']);
+        $this->window->setTargetName($expected['targetName']);
+        $this->window->setWidth($expected['width']);
+        $this->window->setHeight($expected['height']);
+        $this->window->setWindowFeatures($expected['windowFeatures']);
 
-        $result = $this->ltiDeepLinkResourceWindow->toArray();
+        $result = $this->window->toArray();
 
         $this->assertEquals($expected, $result);
     }
