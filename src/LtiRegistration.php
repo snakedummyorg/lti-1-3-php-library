@@ -12,7 +12,7 @@ class LtiRegistration implements ILtiRegistration
     private ?string $authTokenUrl;
     private ?string $authLoginUrl;
     private ?string $authServer;
-    private $toolPrivateKey;
+    private ?string $toolPrivateKey;
     private ?string $kid;
 
     public function __construct(?array $registration = null)
@@ -109,7 +109,7 @@ class LtiRegistration implements ILtiRegistration
         return $this->toolPrivateKey;
     }
 
-    public function setToolPrivateKey($toolPrivateKey): self
+    public function setToolPrivateKey(string $toolPrivateKey): self
     {
         $this->toolPrivateKey = $toolPrivateKey;
 
