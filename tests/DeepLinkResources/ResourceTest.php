@@ -1,15 +1,16 @@
 <?php
 
-namespace Tests;
+namespace Tests\DeepLinkResources;
 
 use Mockery;
-use Packback\Lti1p3\DeepLinkResource\DateTimeInterval;
-use Packback\Lti1p3\DeepLinkResource\Icon;
-use Packback\Lti1p3\DeepLinkResource\Iframe;
-use Packback\Lti1p3\DeepLinkResource\Resource;
-use Packback\Lti1p3\DeepLinkResource\Window;
+use Packback\Lti1p3\DeepLinkResources\DateTimeInterval;
+use Packback\Lti1p3\DeepLinkResources\Icon;
+use Packback\Lti1p3\DeepLinkResources\Iframe;
+use Packback\Lti1p3\DeepLinkResources\Resource;
+use Packback\Lti1p3\DeepLinkResources\Window;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiLineitem;
+use Tests\TestCase;
 
 class ResourceTest extends TestCase
 {

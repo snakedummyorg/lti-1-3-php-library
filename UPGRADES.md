@@ -45,12 +45,22 @@ Packback\Lti1p3\Interfaces\IMigrationDatabase
 
 This library now requires PHP 8 and firebase/php-jwt 6.
 
-### `LtiDeepLinkResourceIframe` constructor arguments changed order
+### `Packback\Lti1p3\DeepLinkResource*` objects moved to their own namespace
+
+Objects named `DeepLinkResource*` have been moved to their own namespace: `Packback\Lti1p3\DeepLinkResources`.  The following classes have been moved:
+
+- `Packback\Lti1p3\DeepLinkResourceDateTimeInterval` is now `Packback\Lti1p3\DeepLinkResources\DateTimeInterval`
+- `Packback\Lti1p3\DeepLinkResourceIcon` is now `Packback\Lti1p3\DeepLinkResources\Icon`
+- `Packback\Lti1p3\DeepLinkResourceIframe` is now `Packback\Lti1p3\DeepLinkResources\Iframe`
+- `Packback\Lti1p3\DeepLinkResource` is now `Packback\Lti1p3\DeepLinkResources\Resource`
+- `Packback\Lti1p3\DeepLinkResourceWindow` is now `Packback\Lti1p3\DeepLinkResources\Window`
+
+### `Packback\Lti1p3\DeepLinkResources\Iframe` constructor arguments changed order
 
 To make the interface consistent with other deep link resources, `src` is now the first argument in the constructor:
 
 ```php
-class LtiDeepLinkResourceIframe
+class Iframe
 {
     public function __construct(
         private ?string $src = null,
@@ -77,8 +87,8 @@ The following methods have been removed:
 
 * `Packback\Lti1p3\JwksEndpoint::outputJwks()` - use `getPublicJwks()` to build your own output
 * `Packback\Lti1p3\LtiDeepLink::outputResponseForm()` - use `getResponseJwt()` to build your own output
-* `Packback\Lti1p3\LtiDeepLinkResource::getTarget()` - consider using `getIframe()` or `getWindow()` instead
-* `Packback\Lti1p3\LtiDeepLinkResource::setTarget()` - consider using `setIframe()` or `setWindow()` instead
+* `Packback\Lti1p3\LtiDeepLinkResources\Resource::getTarget()` - consider using `getIframe()` or `getWindow()` instead
+* `Packback\Lti1p3\LtiDeepLinkResources\Resource::setTarget()` - consider using `setIframe()` or `setWindow()` instead
 * `Packback\Lti1p3\Redirect::doHybridRedirect()`
 * `Packback\Lti1p3\Redirect::getRedirectUrl()`
 

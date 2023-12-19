@@ -1,6 +1,6 @@
 <?php
 
-namespace Packback\Lti1p3\DeepLinkResource;
+namespace Packback\Lti1p3\DeepLinkResources;
 
 class Window
 {

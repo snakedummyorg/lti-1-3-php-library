@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests;
+namespace Tests\DeepLinkResources;
 
-use Packback\Lti1p3\DeepLinkResource\Window;
+use Packback\Lti1p3\DeepLinkResources\Window;
+use Tests\TestCase;
 
 class WindowTest extends TestCase
 {
@@ -25,9 +26,9 @@ class WindowTest extends TestCase
 
     public function testItCreatesANewInstance()
     {
-        $deepLinkResource = Window::new();
+        $DeepLinkResources = Window::new();
 
-        $this->assertInstanceOf(Window::class, $deepLinkResource);
+        $this->assertInstanceOf(Window::class, $DeepLinkResources);
     }
 
     public function testItGetsTargetName()

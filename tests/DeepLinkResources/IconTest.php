@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests;
+namespace Tests\DeepLinkResources;
 
-use Packback\Lti1p3\DeepLinkResource\Icon;
+use Packback\Lti1p3\DeepLinkResources\Icon;
+use Tests\TestCase;
 
 class IconTest extends TestCase
 {
@@ -19,9 +20,9 @@ class IconTest extends TestCase
 
     public function testItCreatesANewInstance()
     {
-        $deepLinkResource = Icon::new($this->imageUrl, 100, 200);
+        $DeepLinkResources = Icon::new($this->imageUrl, 100, 200);
 
-        $this->assertInstanceOf(Icon::class, $deepLinkResource);
+        $this->assertInstanceOf(Icon::class, $DeepLinkResources);
     }
 
     public function testItGetsUrl()

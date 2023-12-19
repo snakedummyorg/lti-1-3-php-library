@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests;
+namespace Tests\DeepLinkResources;
 
-use Packback\Lti1p3\DeepLinkResource\Iframe;
+use Packback\Lti1p3\DeepLinkResources\Iframe;
+use Tests\TestCase;
 
 class IframeTest extends TestCase
 {
@@ -27,9 +28,9 @@ class IframeTest extends TestCase
 
     public function testItCreatesANewInstance()
     {
-        $deepLinkResource = Iframe::new();
+        $DeepLinkResources = Iframe::new();
 
-        $this->assertInstanceOf(Iframe::class, $deepLinkResource);
+        $this->assertInstanceOf(Iframe::class, $DeepLinkResources);
     }
 
     public function testItGetsWidth()

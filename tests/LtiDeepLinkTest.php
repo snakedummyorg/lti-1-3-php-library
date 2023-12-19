@@ -5,7 +5,7 @@ namespace Tests;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Mockery;
-use Packback\Lti1p3\DeepLinkResource\Resource;
+use Packback\Lti1p3\DeepLinkResources\Resource;
 use Packback\Lti1p3\Interfaces\ILtiRegistration;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiDeepLink;

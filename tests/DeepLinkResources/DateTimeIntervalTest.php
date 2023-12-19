@@ -1,10 +1,11 @@
 <?php
 
-namespace Tests;
+namespace Tests\DeepLinkResources;
 
 use DateTime;
-use Packback\Lti1p3\DeepLinkResource\DateTimeInterval;
+use Packback\Lti1p3\DeepLinkResources\DateTimeInterval;
 use Packback\Lti1p3\LtiException;
+use Tests\TestCase;
 
 class DateTimeIntervalTest extends TestCase
 {
@@ -26,9 +27,9 @@ class DateTimeIntervalTest extends TestCase
 
     public function testItCreatesANewInstance()
     {
-        $deepLinkResource = DateTimeInterval::new();
+        $DeepLinkResources = DateTimeInterval::new();
 
-        $this->assertInstanceOf(DateTimeInterval::class, $deepLinkResource);
+        $this->assertInstanceOf(DateTimeInterval::class, $DeepLinkResources);
     }
 
     public function testItGetsStart()
