@@ -2,12 +2,13 @@
 
 namespace Packback\Lti1p3\DeepLinkResources;
 
-use Packback\Lti1p3\Helpers\Helpers;
+use Packback\Lti1p3\Concerns\Arrayable;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiLineitem;
 
 class Resource
 {
+    use Arrayable;
     private string $type = LtiConstants::DL_RESOURCE_LINK_TYPE;
     private ?string $title = null;
     private ?string $text = null;
@@ -171,7 +172,7 @@ class Resource
         return $this;
     }
 
-    public function toArray(): array
+    public function getArray(): array
     {
         $resource = [
             'type' => $this->type,
@@ -204,6 +205,6 @@ class Resource
             ];
         }
 
-        return Helpers::filterOutNulls($resource);
+        return $resource;
     }
 }

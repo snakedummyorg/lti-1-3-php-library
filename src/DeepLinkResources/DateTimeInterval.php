@@ -3,11 +3,12 @@
 namespace Packback\Lti1p3\DeepLinkResources;
 
 use DateTime;
-use Packback\Lti1p3\Helpers\Helpers;
+use Packback\Lti1p3\Concerns\Arrayable;
 use Packback\Lti1p3\LtiException;
 
 class DateTimeInterval
 {
+    use Arrayable;
     public const ERROR_NO_START_OR_END = 'Either a start or end time must be specified.';
     public const ERROR_START_GT_END = 'The start time cannot be greater than end time.';
 
@@ -47,7 +48,7 @@ class DateTimeInterval
         return $this->end;
     }
 
-    public function toArray(): array
+    public function getArray(): array
     {
         if (!isset($this->start) && !isset($this->end)) {
             throw new LtiException(self::ERROR_NO_START_OR_END);
@@ -55,12 +56,10 @@ class DateTimeInterval
 
         $this->validateStartAndEnd();
 
-        $dateTimeInterval = [
+        return [
             'startDateTime' => $this->start?->format(DateTime::ATOM),
             'endDateTime' => $this->end?->format(DateTime::ATOM),
         ];
-
-        return Helpers::filterOutNulls($dateTimeInterval);
     }
 
     /**

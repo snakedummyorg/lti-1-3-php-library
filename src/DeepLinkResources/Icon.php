@@ -2,9 +2,11 @@
 
 namespace Packback\Lti1p3\DeepLinkResources;
 
+use Packback\Lti1p3\Concerns\Arrayable;
+
 class Icon
 {
-    use HasDimensions;
+    use Arrayable, HasDimensions;
 
     public function __construct(
         private string $url,
@@ -30,7 +32,7 @@ class Icon
         return $this->url;
     }
 
-    public function toArray(): array
+    public function getArray(): array
     {
         return [
             'url' => $this->url,

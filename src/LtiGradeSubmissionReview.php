@@ -2,10 +2,11 @@
 
 namespace Packback\Lti1p3;
 
-use Packback\Lti1p3\Helpers\Helpers;
+use Packback\Lti1p3\Concerns\JsonStringable;
 
 class LtiGradeSubmissionReview
 {
+    use JsonStringable;
     private $reviewable_status;
     private $label;
     private $url;
@@ -19,15 +20,14 @@ class LtiGradeSubmissionReview
         $this->custom = $gradeSubmission['custom'] ?? null;
     }
 
-    public function __toString(): string
+    public function getArray(): array
     {
-        // Additionally, includes the call back to filter out only NULL values
-        return json_encode(Helpers::filterOutNulls([
+        return [
             'reviewableStatus' => $this->reviewable_status,
             'label' => $this->label,
             'url' => $this->url,
             'custom' => $this->custom,
-        ]));
+        ];
     }
 
     /**

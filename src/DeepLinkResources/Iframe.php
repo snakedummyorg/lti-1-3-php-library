@@ -2,11 +2,11 @@
 
 namespace Packback\Lti1p3\DeepLinkResources;
 
-use Packback\Lti1p3\Helpers\Helpers;
+use Packback\Lti1p3\Concerns\Arrayable;
 
 class Iframe
 {
-    use HasDimensions;
+    use Arrayable, HasDimensions;
 
     public function __construct(
         private ?string $src = null,
@@ -32,14 +32,12 @@ class Iframe
         return $this->src;
     }
 
-    public function toArray(): array
+    public function getArray(): array
     {
-        $iframe = [
+        return [
             'width' => $this->width,
             'height' => $this->height,
             'src' => $this->src,
         ];
-
-        return Helpers::filterOutNulls($iframe);
     }
 }

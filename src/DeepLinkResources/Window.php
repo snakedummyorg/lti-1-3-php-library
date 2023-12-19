@@ -2,11 +2,11 @@
 
 namespace Packback\Lti1p3\DeepLinkResources;
 
-use Packback\Lti1p3\Helpers\Helpers;
+use Packback\Lti1p3\Concerns\Arrayable;
 
 class Window
 {
-    use HasDimensions;
+    use Arrayable, HasDimensions;
 
     public function __construct(
         private ?string $target_name = null,
@@ -45,15 +45,13 @@ class Window
         return $this->window_features;
     }
 
-    public function toArray(): array
+    public function getArray(): array
     {
-        $window = [
+        return [
             'targetName' => $this->target_name,
             'width' => $this->width,
             'height' => $this->height,
             'windowFeatures' => $this->window_features,
         ];
-
-        return Helpers::filterOutNulls($window);
     }
 }

@@ -2,10 +2,11 @@
 
 namespace Packback\Lti1p3;
 
-use Packback\Lti1p3\Helpers\Helpers;
+use Packback\Lti1p3\Concerns\JsonStringable;
 
 class LtiGrade
 {
+    use JsonStringable;
     private $score_given;
     private $score_maximum;
     private $comment;
@@ -29,10 +30,9 @@ class LtiGrade
         $this->canvas_extension = $grade['https://canvas.instructure.com/lti/submission'] ?? null;
     }
 
-    public function __toString(): string
+    public function getArray(): array
     {
-        // Additionally, includes the call back to filter out only NULL values
-        $request = Helpers::filterOutNulls([
+        return [
             'scoreGiven' => $this->score_given,
             'scoreMaximum' => $this->score_maximum,
             'comment' => $this->comment,
@@ -42,9 +42,7 @@ class LtiGrade
             'userId' => $this->user_id,
             'submissionReview' => $this->submission_review,
             'https://canvas.instructure.com/lti/submission' => $this->canvas_extension,
-        ]);
-
-        return json_encode($request);
+        ];
     }
 
     /**
