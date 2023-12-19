@@ -26,9 +26,9 @@
         "phpseclib/phpseclib": "^3.0"
     },
     "require-dev": {
-        "jubeki/laravel-code-style": "^2.0",
         "mockery/mockery": "^1.4",
         "nesbot/carbon": "^2.43",
+        "laravel/pint": "^1.0",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.0|^10.0"
     },
@@ -43,13 +43,11 @@
         }
     },
     "scripts": {
-        "test": [
-            "phpunit"
-        ],
+        "test": "phpunit",
         "lint": [
-            "php-cs-fixer fix -v --dry-run",
+            "pint -v --test",
             "phpstan analyse"
         ],
-        "lint-fix": "php-cs-fixer fix -v"
+        "lint-fix": "pint -v"
     }
 }
