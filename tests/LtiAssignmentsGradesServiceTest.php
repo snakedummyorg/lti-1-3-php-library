@@ -7,6 +7,7 @@ use Packback\Lti1p3\Interfaces\ILtiRegistration;
 use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
 use Packback\Lti1p3\LtiAssignmentsGradesService;
 use Packback\Lti1p3\LtiConstants;
+use Packback\Lti1p3\LtiException;
 use Packback\Lti1p3\LtiLineitem;
 
 class LtiAssignmentsGradesServiceTest extends TestCase
@@ -96,5 +97,36 @@ class LtiAssignmentsGradesServiceTest extends TestCase
         $result = $service->deleteLineitem();
 
         $this->assertEquals($response, $result);
+    }
+
+    public function testItThrowsWithMissingScope()
+    {
+        $ltiLineitemData = [
+            'id' => 'testId',
+        ];
+
+        $serviceData = [
+            'scope' => [],
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $expected = new LtiLineitem($ltiLineitemData);
+
+        $this->expectException(LtiException::class);
+
+        $service->getLineItem('someUrl');
+    }
+
+    public function testItSetsServiceData()
+    {
+        $expected = ['foo' => 'bar'];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, []);
+        $service->setServiceData($expected);
+
+        $actual = $service->getServiceData();
+
+        $this->assertEquals($expected, $actual);
     }
 }
