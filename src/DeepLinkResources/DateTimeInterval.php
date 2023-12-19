@@ -56,8 +56,8 @@ class DateTimeInterval
         $this->validateStartAndEnd();
 
         $dateTimeInterval = [
-            'startDateTime' => $this->start?->format(DateTime::ATOM) ?? null,
-            'endDateTime' => $this->end?->format(DateTime::ATOM) ?? null,
+            'startDateTime' => $this->start?->format(DateTime::ATOM),
+            'endDateTime' => $this->end?->format(DateTime::ATOM),
         ];
 
         return Helpers::filterOutNulls($dateTimeInterval);

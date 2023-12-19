@@ -2,6 +2,8 @@
 
 namespace Packback\Lti1p3;
 
+use Packback\Lti1p3\Helpers\Helpers;
+
 class LtiGradeSubmissionReview
 {
     private $reviewable_status;
@@ -20,12 +22,12 @@ class LtiGradeSubmissionReview
     public function __toString(): string
     {
         // Additionally, includes the call back to filter out only NULL values
-        return json_encode(array_filter([
+        return json_encode(Helpers::filterOutNulls([
             'reviewableStatus' => $this->reviewable_status,
             'label' => $this->label,
             'url' => $this->url,
             'custom' => $this->custom,
-        ], '\Packback\Lti1p3\Helpers\Helpers::checkIfNullValue'));
+        ]));
     }
 
     /**

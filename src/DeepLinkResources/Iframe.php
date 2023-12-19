@@ -35,9 +35,9 @@ class Iframe
     public function toArray(): array
     {
         $iframe = [
-            'width' => $this->width ?? null,
-            'height' => $this->height ?? null,
-            'src' => $this->src ?? null,
+            'width' => $this->width,
+            'height' => $this->height,
+            'src' => $this->src,
         ];
 
         return Helpers::filterOutNulls($iframe);

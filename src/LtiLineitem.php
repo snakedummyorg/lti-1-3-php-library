@@ -2,6 +2,8 @@
 
 namespace Packback\Lti1p3;
 
+use Packback\Lti1p3\Helpers\Helpers;
+
 class LtiLineitem
 {
     private $id;
@@ -30,7 +32,7 @@ class LtiLineitem
     public function __toString(): string
     {
         // Additionally, includes the call back to filter out only NULL values
-        return json_encode(array_filter([
+        return json_encode(Helpers::filterOutNulls([
             'id' => $this->id,
             'scoreMaximum' => $this->score_maximum,
             'label' => $this->label,
@@ -40,7 +42,7 @@ class LtiLineitem
             'startDateTime' => $this->start_date_time,
             'endDateTime' => $this->end_date_time,
             'gradesReleased' => $this->grades_released,
-        ], '\Packback\Lti1p3\Helpers\Helpers::checkIfNullValue'));
+        ]));
     }
 
     /**

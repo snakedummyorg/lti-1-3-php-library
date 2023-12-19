@@ -2,6 +2,8 @@
 
 namespace Packback\Lti1p3\DeepLinkResources;
 
+use Packback\Lti1p3\Helpers\Helpers;
+
 class Window
 {
     use HasDimensions;
@@ -45,21 +47,13 @@ class Window
 
     public function toArray(): array
     {
-        $window = [];
+        $window = [
+            'targetName' => $this->target_name,
+            'width' => $this->width,
+            'height' => $this->height,
+            'windowFeatures' => $this->window_features,
+        ];
 
-        if (isset($this->target_name)) {
-            $window['targetName'] = $this->target_name;
-        }
-        if (isset($this->width)) {
-            $window['width'] = $this->width;
-        }
-        if (isset($this->height)) {
-            $window['height'] = $this->height;
-        }
-        if (isset($this->window_features)) {
-            $window['windowFeatures'] = $this->window_features;
-        }
-
-        return $window;
+        return Helpers::filterOutNulls($window);
     }
 }

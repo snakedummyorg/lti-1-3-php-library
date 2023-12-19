@@ -175,15 +175,15 @@ class Resource
     {
         $resource = [
             'type' => $this->type,
-            'title' => $this->title ?? null,
-            'text' => $this->text ?? null,
-            'url' => $this->url ?? null,
-            'icon' => $this->icon?->toArray() ?? null,
-            'thumbnail' => $this->thumbnail?->toArray() ?? null,
-            'iframe' => $this->iframe?->toArray() ?? null,
-            'window' => $this->window?->toArray() ?? null,
-            'available' => $this->availability_interval?->toArray() ?? null,
-            'submission' => $this->submission_interval?->toArray() ?? null,
+            'title' => $this->title,
+            'text' => $this->text,
+            'url' => $this->url,
+            'icon' => $this->icon?->toArray(),
+            'thumbnail' => $this->thumbnail?->toArray(),
+            'iframe' => $this->iframe?->toArray(),
+            'window' => $this->window?->toArray(),
+            'available' => $this->availability_interval?->toArray(),
+            'submission' => $this->submission_interval?->toArray(),
         ];
 
         if (!empty($this->custom_params)) {

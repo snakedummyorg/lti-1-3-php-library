@@ -2,6 +2,8 @@
 
 namespace Packback\Lti1p3;
 
+use Packback\Lti1p3\Helpers\Helpers;
+
 class LtiGrade
 {
     private $score_given;
@@ -30,7 +32,7 @@ class LtiGrade
     public function __toString(): string
     {
         // Additionally, includes the call back to filter out only NULL values
-        $request = array_filter([
+        $request = Helpers::filterOutNulls([
             'scoreGiven' => $this->score_given,
             'scoreMaximum' => $this->score_maximum,
             'comment' => $this->comment,
@@ -40,7 +42,7 @@ class LtiGrade
             'userId' => $this->user_id,
             'submissionReview' => $this->submission_review,
             'https://canvas.instructure.com/lti/submission' => $this->canvas_extension,
-        ], '\Packback\Lti1p3\Helpers\Helpers::checkIfNullValue');
+        ]);
 
         return json_encode($request);
     }
