@@ -4,15 +4,11 @@ namespace Packback\Lti1p3;
 
 class LtiDeepLinkResourceIcon
 {
-    private $url;
-    private $width;
-    private $height;
-
-    public function __construct(string $url, int $width, int $height)
+    public function __construct(
+        private string $url,
+        private int $width,
+        private int $height)
     {
-        $this->url = $url;
-        $this->width = $width;
-        $this->height = $height;
     }
 
     public static function new(string $url, int $width, int $height): LtiDeepLinkResourceIcon
