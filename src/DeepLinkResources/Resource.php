@@ -2,6 +2,7 @@
 
 namespace Packback\Lti1p3\DeepLinkResources;
 
+use Packback\Lti1p3\Helpers\Helpers;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiLineitem;
 
@@ -174,27 +175,22 @@ class Resource
     {
         $resource = [
             'type' => $this->type,
+            'title' => $this->title ?? null,
+            'text' => $this->text ?? null,
+            'url' => $this->url ?? null,
+            'icon' => $this->icon?->toArray() ?? null,
+            'thumbnail' => $this->thumbnail?->toArray() ?? null,
+            'iframe' => $this->iframe?->toArray() ?? null,
+            'window' => $this->window?->toArray() ?? null,
+            'available' => $this->availability_interval?->toArray() ?? null,
+            'submission' => $this->submission_interval?->toArray() ?? null,
         ];
 
-        if (isset($this->title)) {
-            $resource['title'] = $this->title;
-        }
-        if (isset($this->text)) {
-            $resource['text'] = $this->text;
-        }
-        if (isset($this->url)) {
-            $resource['url'] = $this->url;
-        }
         if (!empty($this->custom_params)) {
             $resource['custom'] = $this->custom_params;
         }
-        if (isset($this->icon)) {
-            $resource['icon'] = $this->icon->toArray();
-        }
-        if (isset($this->thumbnail)) {
-            $resource['thumbnail'] = $this->thumbnail->toArray();
-        }
-        if ($this->line_item !== null) {
+
+        if (isset($this->line_item)) {
             $resource['lineItem'] = [
                 'scoreMaximum' => $this->line_item->getScoreMaximum(),
                 'label' => $this->line_item->getLabel(),
@@ -208,19 +204,6 @@ class Resource
             ];
         }
 
-        if (isset($this->iframe)) {
-            $resource['iframe'] = $this->iframe->toArray();
-        }
-        if (isset($this->window)) {
-            $resource['window'] = $this->window->toArray();
-        }
-        if (isset($this->availability_interval)) {
-            $resource['available'] = $this->availability_interval->toArray();
-        }
-        if (isset($this->submission_interval)) {
-            $resource['submission'] = $this->submission_interval->toArray();
-        }
-
-        return $resource;
+        return Helpers::filterOutNulls($resource);
     }
 }

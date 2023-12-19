@@ -3,6 +3,7 @@
 namespace Packback\Lti1p3\DeepLinkResources;
 
 use DateTime;
+use Packback\Lti1p3\Helpers\Helpers;
 use Packback\Lti1p3\LtiException;
 
 class DateTimeInterval
@@ -54,18 +55,17 @@ class DateTimeInterval
 
         $this->validateStartAndEnd();
 
-        $dateTimeInterval = [];
+        $dateTimeInterval = [
+            'startDateTime' => $this->start?->format(DateTime::ATOM) ?? null,
+            'endDateTime' => $this->end?->format(DateTime::ATOM) ?? null,
+        ];
 
-        if (isset($this->start)) {
-            $dateTimeInterval['startDateTime'] = $this->start->format(DateTime::ATOM);
-        }
-        if (isset($this->end)) {
-            $dateTimeInterval['endDateTime'] = $this->end->format(DateTime::ATOM);
-        }
-
-        return $dateTimeInterval;
+        return Helpers::filterOutNulls($dateTimeInterval);
     }
 
+    /**
+     * @throws LtiException
+     */
     private function validateStartAndEnd(): void
     {
         if (isset($this->start) && isset($this->end) && $this->start > $this->end) {

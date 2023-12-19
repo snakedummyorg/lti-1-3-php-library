@@ -2,6 +2,8 @@
 
 namespace Packback\Lti1p3\DeepLinkResources;
 
+use Packback\Lti1p3\Helpers\Helpers;
+
 class Iframe
 {
     use HasDimensions;
@@ -32,18 +34,12 @@ class Iframe
 
     public function toArray(): array
     {
-        $iframe = [];
+        $iframe = [
+            'width' => $this->width ?? null,
+            'height' => $this->height ?? null,
+            'src' => $this->src ?? null,
+        ];
 
-        if (isset($this->width)) {
-            $iframe['width'] = $this->width;
-        }
-        if (isset($this->height)) {
-            $iframe['height'] = $this->height;
-        }
-        if (isset($this->src)) {
-            $iframe['src'] = $this->src;
-        }
-
-        return $iframe;
+        return Helpers::filterOutNulls($iframe);
     }
 }

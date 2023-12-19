@@ -9,6 +9,11 @@ class Helpers
         return !is_null($value);
     }
 
+    public static function filterOutNulls(array $array): array
+    {
+        return array_filter($array, '\Packback\Lti1p3\Helpers\Helpers::checkIfNullValue');
+    }
+
     public static function buildUrlWithQueryParams(string $url, array $params = []): string
     {
         if (empty($params)) {
