@@ -11,7 +11,7 @@ interface ILtiServiceConnector
 
     public function makeRequest(IServiceRequest $request): ResponseInterface;
 
-    public function getResponseBody(ResponseInterface $request): ?array;
+    public function getResponseBody(ResponseInterface $response): ?array;
 
     public function getResponseHeaders(ResponseInterface $response): ?array;
 
