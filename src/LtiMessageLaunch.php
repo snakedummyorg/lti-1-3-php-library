@@ -358,8 +358,8 @@ class LtiMessageLaunch
     {
         $jwtAlg = $this->jwt['header']['alg'];
 
-        return isset(static::$ltiSupportedAlgs[$jwtAlg]) &&
-            static::$ltiSupportedAlgs[$jwtAlg] === $key['kty'];
+        return isset(self::$ltiSupportedAlgs[$jwtAlg]) &&
+            self::$ltiSupportedAlgs[$jwtAlg] === $key['kty'];
     }
 
     protected function validateState(): self
@@ -547,7 +547,7 @@ class LtiMessageLaunch
         return false;
     }
 
-    private function oauthConsumerKeySignMatches(Lti1p1Key $key): string
+    private function oauthConsumerKeySignMatches(Lti1p1Key $key): bool
     {
         return $this->jwt['body'][LtiConstants::LTI1P1]['oauth_consumer_key_sign'] === $this->getOauthSignature($key);
     }
