@@ -36,7 +36,8 @@ class LtiServiceConnector implements ILtiServiceConnector
         $accessTokenKey = $this->getAccessTokenCacheKey($registration, $scopes);
         // Get access token from cache if it exists
         $accessToken = $this->cache->getAccessToken($accessTokenKey);
-        if ($accessToken) {
+
+        if (isset($accessToken)) {
             return $accessToken;
         }
 
@@ -195,7 +196,7 @@ class LtiServiceConnector implements ILtiServiceConnector
 
         $requestBody = $request->getPayload()['body'] ?? null;
 
-        if (!empty($requestBody)) {
+        if (isset($requestBody)) {
             $contextArray['request_body'] = $requestBody;
         }
 

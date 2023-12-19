@@ -414,7 +414,7 @@ class LtiMessageLaunch
         $issuerUrl = $this->jwt['body']['iss'];
         $this->registration = $this->db->findRegistrationByIssuer($issuerUrl, $clientId);
 
-        if (empty($this->registration)) {
+        if (!isset($this->registration)) {
             throw new LtiException($this->getMissingRegistrationErrorMsg($issuerUrl, $clientId));
         }
 
