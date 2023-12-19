@@ -20,6 +20,15 @@ class Iframe
         return new Iframe();
     }
 
+    public function getArray(): array
+    {
+        return [
+            'width' => $this->width,
+            'height' => $this->height,
+            'src' => $this->src,
+        ];
+    }
+
     public function setSrc(?string $src): self
     {
         $this->src = $src;
@@ -30,14 +39,5 @@ class Iframe
     public function getSrc(): ?string
     {
         return $this->src;
-    }
-
-    public function getArray(): array
-    {
-        return [
-            'width' => $this->width,
-            'height' => $this->height,
-            'src' => $this->src,
-        ];
     }
 }

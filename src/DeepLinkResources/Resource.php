@@ -28,6 +28,42 @@ class Resource
         return new Resource();
     }
 
+    public function getArray(): array
+    {
+        $resource = [
+            'type' => $this->type,
+            'title' => $this->title,
+            'text' => $this->text,
+            'url' => $this->url,
+            'icon' => $this->icon?->toArray(),
+            'thumbnail' => $this->thumbnail?->toArray(),
+            'iframe' => $this->iframe?->toArray(),
+            'window' => $this->window?->toArray(),
+            'available' => $this->availability_interval?->toArray(),
+            'submission' => $this->submission_interval?->toArray(),
+        ];
+
+        if (!empty($this->custom_params)) {
+            $resource['custom'] = $this->custom_params;
+        }
+
+        if (isset($this->line_item)) {
+            $resource['lineItem'] = [
+                'scoreMaximum' => $this->line_item->getScoreMaximum(),
+                'label' => $this->line_item->getLabel(),
+            ];
+        }
+
+        // Kept for backwards compatibility
+        if (!isset($this->iframe) && !isset($this->window)) {
+            $resource['presentation'] = [
+                'documentTarget' => $this->target,
+            ];
+        }
+
+        return $resource;
+    }
+
     public function getType(): string
     {
         return $this->type;
@@ -170,41 +206,5 @@ class Resource
         $this->submission_interval = $submissionInterval;
 
         return $this;
-    }
-
-    public function getArray(): array
-    {
-        $resource = [
-            'type' => $this->type,
-            'title' => $this->title,
-            'text' => $this->text,
-            'url' => $this->url,
-            'icon' => $this->icon?->toArray(),
-            'thumbnail' => $this->thumbnail?->toArray(),
-            'iframe' => $this->iframe?->toArray(),
-            'window' => $this->window?->toArray(),
-            'available' => $this->availability_interval?->toArray(),
-            'submission' => $this->submission_interval?->toArray(),
-        ];
-
-        if (!empty($this->custom_params)) {
-            $resource['custom'] = $this->custom_params;
-        }
-
-        if (isset($this->line_item)) {
-            $resource['lineItem'] = [
-                'scoreMaximum' => $this->line_item->getScoreMaximum(),
-                'label' => $this->line_item->getLabel(),
-            ];
-        }
-
-        // Kept for backwards compatibility
-        if (!isset($this->iframe) && !isset($this->window)) {
-            $resource['presentation'] = [
-                'documentTarget' => $this->target,
-            ];
-        }
-
-        return $resource;
     }
 }

@@ -20,6 +20,15 @@ class Icon
         return new Icon($url, $width, $height);
     }
 
+    public function getArray(): array
+    {
+        return [
+            'url' => $this->url,
+            'width' => $this->width,
+            'height' => $this->height,
+        ];
+    }
+
     public function setUrl(string $url): self
     {
         $this->url = $url;
@@ -30,14 +39,5 @@ class Icon
     public function getUrl(): string
     {
         return $this->url;
-    }
-
-    public function getArray(): array
-    {
-        return [
-            'url' => $this->url,
-            'width' => $this->width,
-            'height' => $this->height,
-        ];
     }
 }

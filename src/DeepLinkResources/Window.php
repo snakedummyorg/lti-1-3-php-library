@@ -21,6 +21,16 @@ class Window
         return new Window();
     }
 
+    public function getArray(): array
+    {
+        return [
+            'targetName' => $this->target_name,
+            'width' => $this->width,
+            'height' => $this->height,
+            'windowFeatures' => $this->window_features,
+        ];
+    }
+
     public function setTargetName(?string $targetName): self
     {
         $this->target_name = $targetName;
@@ -43,15 +53,5 @@ class Window
     public function getWindowFeatures(): ?string
     {
         return $this->window_features;
-    }
-
-    public function getArray(): array
-    {
-        return [
-            'targetName' => $this->target_name,
-            'width' => $this->width,
-            'height' => $this->height,
-            'windowFeatures' => $this->window_features,
-        ];
     }
 }
