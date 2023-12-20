@@ -24,7 +24,7 @@ interface ILtiServiceConnector
         ILtiRegistration $registration,
         array $scopes,
         IServiceRequest $request,
-        string $key
+        ?string $key
     ): array;
 
     public function setDebuggingMode(bool $enable): ILtiServiceConnector;

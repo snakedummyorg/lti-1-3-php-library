@@ -25,6 +25,47 @@ class LtiAssignmentsGradesServiceTest extends TestCase
         $this->assertInstanceOf(LtiAssignmentsGradesService::class, $service);
     }
 
+    public function testItGetsScope()
+    {
+        $serviceData = [
+            'scope' => ['asdf'],
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $result = $service->getScope();
+
+        $this->assertEquals($serviceData['scope'], $result);
+    }
+
+    public function testItGetsResourceLaunchLineItem()
+    {
+        $ltiLineitemData = [
+            'id' => 'testId',
+        ];
+
+        $serviceData = [
+            'lineitem' => $ltiLineitemData['id'],
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $expected = new LtiLineitem($ltiLineitemData);
+
+        $result = $service->getResourceLaunchLineItem();
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testItGetsNullResourceLaunchLineItem()
+    {
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, []);
+
+        $result = $service->getResourceLaunchLineItem();
+
+        $this->assertNull($result);
+    }
+
     public function testItGetsSingleLineItem()
     {
         $ltiLineitemData = [
@@ -77,6 +118,106 @@ class LtiAssignmentsGradesServiceTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function testItFindsALineItem()
+    {
+        $ltiLineitemData = [
+            'id' => 'testId',
+        ];
+
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
+            'lineitems' => 'https://canvas.localhost/api/lti/courses/8/line_items',
+        ];
+
+        $lineItem = new LtiLineitem($ltiLineitemData);
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $response = [$ltiLineitemData];
+
+        $this->connector->shouldReceive('getAll')
+            ->once()->andReturn($response);
+
+        $result = $service->findLineItem($lineItem);
+
+        $this->assertEquals($lineItem, $result);
+    }
+
+    public function testItFindsNoLineItem()
+    {
+        $ltiLineitemData = [
+            'id' => 'testId',
+        ];
+
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
+            'lineitems' => 'https://canvas.localhost/api/lti/courses/8/line_items',
+        ];
+
+        $lineItem = new LtiLineitem($ltiLineitemData);
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $this->connector->shouldReceive('getAll')
+            ->once()->andReturn([]);
+
+        $result = $service->findLineItem($lineItem);
+
+        $this->assertNull($result);
+    }
+
+    public function testItUpdatesALineItem()
+    {
+        $ltiLineitemData = [
+            'id' => 'testId',
+        ];
+
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
+            'lineitem' => 'https://canvas.localhost/api/lti/courses/8/line_items/27',
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $response = [
+            'body' => $ltiLineitemData,
+        ];
+
+        $this->connector->shouldReceive('makeServiceRequest')
+            ->once()->andReturn($response);
+
+        $expected = new LtiLineitem($ltiLineitemData);
+
+        $result = $service->updateLineItem(new LtiLineItem());
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testItCreatesALineItem()
+    {
+        $ltiLineitemData = [
+            'id' => 'testId',
+        ];
+
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
+            'lineitems' => 'https://canvas.localhost/api/lti/courses/8/line_items',
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $response = [
+            'body' => $ltiLineitemData,
+        ];
+
+        $this->connector->shouldReceive('makeServiceRequest')
+            ->once()->andReturn($response);
+
+        $expected = new LtiLineitem($ltiLineitemData);
+
+        $result = $service->createLineItem(new LtiLineItem());
+
+        $this->assertEquals($expected, $result);
+    }
+
     public function testItDeletesALineItem()
     {
         $serviceData = [
@@ -97,6 +238,37 @@ class LtiAssignmentsGradesServiceTest extends TestCase
         $result = $service->deleteLineitem();
 
         $this->assertEquals($response, $result);
+    }
+
+    public function testItFindsOrCreatesALineItem()
+    {
+        $ltiLineitemData = [
+            'id' => 'testId',
+        ];
+
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
+            'lineitems' => 'https://canvas.localhost/api/lti/courses/8/line_items',
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $response = [
+            'body' => $ltiLineitemData,
+        ];
+
+        // Find Line Item
+        $this->connector->shouldReceive('getAll')
+            ->once()->andReturn([]);
+        // Create Line Item
+        $this->connector->shouldReceive('makeServiceRequest')
+            ->once()->andReturn($response);
+
+        $expected = new LtiLineitem($ltiLineitemData);
+
+        $result = $service->findOrCreateLineitem($expected);
+
+        $this->assertEquals($expected, $result);
     }
 
     public function testItThrowsWithMissingScope()
@@ -128,5 +300,54 @@ class LtiAssignmentsGradesServiceTest extends TestCase
         $actual = $service->getServiceData();
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testItGetsLineItems()
+    {
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
+            'lineitems' => 'https://canvas.localhost/api/lti/courses/8/line_items',
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $response = [
+            'status' => 204,
+            'body' => [],
+        ];
+
+        $this->connector->shouldReceive('getAll')
+            ->once()->andReturn($response);
+
+        $result = $service->getLineItems();
+
+        $this->assertEquals($response, $result);
+    }
+
+    public function testItGetsALineItems()
+    {
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
+            'lineitems' => 'https://canvas.localhost/api/lti/courses/8/line_items',
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $response = [
+            'status' => 204,
+            'body' => ['id' => 'testId'],
+        ];
+
+        $expected = [
+            'status' => 204,
+            'body' => [['id' => 'testId']],
+        ];
+
+        $this->connector->shouldReceive('getAll')
+            ->once()->andReturn($response);
+
+        $result = $service->getLineItems();
+
+        $this->assertEquals($expected, $result);
     }
 }
