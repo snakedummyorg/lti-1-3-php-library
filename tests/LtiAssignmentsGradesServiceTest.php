@@ -8,6 +8,7 @@ use Packback\Lti1p3\Interfaces\ILtiServiceConnector;
 use Packback\Lti1p3\LtiAssignmentsGradesService;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiException;
+use Packback\Lti1p3\LtiGrade;
 use Packback\Lti1p3\LtiLineitem;
 
 class LtiAssignmentsGradesServiceTest extends TestCase
@@ -114,6 +115,31 @@ class LtiAssignmentsGradesServiceTest extends TestCase
         $expected = new LtiLineitem($ltiLineitemData);
 
         $result = $service->getLineItem('someUrl');
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testItPutsAGrade()
+    {
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_SCORE],
+            'lineitems' => 'https://canvas.localhost/api/lti/courses/8/line_items',
+        ];
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $lineItem = new LtiLineitem([
+            'id' => 'testId',
+        ]);
+
+        $expected = [
+            'scoreGiven' => 10,
+            'scoreMaximum' => 15,
+        ];
+        $grade = new LtiGrade($expected);
+        $this->connector->shouldReceive('makeServiceRequest')
+            ->once()->andReturn($expected);
+
+        $result = $service->putGrade($grade, $lineItem);
 
         $this->assertEquals($expected, $result);
     }
@@ -300,6 +326,30 @@ class LtiAssignmentsGradesServiceTest extends TestCase
         $actual = $service->getServiceData();
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testItGetsGrades()
+    {
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
+            'lineitems' => 'https://canvas.localhost/api/lti/courses/8/line_items',
+        ];
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $lineItem = new LtiLineitem([
+            'id' => 'testId',
+        ]);
+
+        $expected = [[
+            'scoreGiven' => 10,
+            'scoreMaximum' => 15,
+        ]];
+        $this->connector->shouldReceive('getAll')
+            ->once()->andReturn($expected);
+
+        $result = $service->getGrades($lineItem);
+
+        $this->assertEquals($expected, $result);
     }
 
     public function testItGetsLineItems()
