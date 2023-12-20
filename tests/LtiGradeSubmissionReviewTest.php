@@ -16,6 +16,13 @@ class LtiGradeSubmissionReviewTest extends TestCase
         $this->assertInstanceOf(LtiGradeSubmissionReview::class, $this->gradeReview);
     }
 
+    public function testCreatesANewInstance()
+    {
+        $review = LtiGradeSubmissionReview::new();
+
+        $this->assertInstanceOf(LtiGradeSubmissionReview::class, $review);
+    }
+
     public function testItGetsReviewableStatus()
     {
         $expected = 'ReviewableStatus';

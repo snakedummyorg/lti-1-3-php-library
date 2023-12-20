@@ -848,6 +848,30 @@ class LtiMessageLaunchTest extends TestCase
         $this->assertFalse($actual);
     }
 
+    public function testGetLaunchData()
+    {
+        $payload = $this->payload;
+        $payload[LtiConstants::MESSAGE_TYPE] = LtiMessageLaunch::TYPE_DEEPLINK;
+        $launch = $this->fakeLaunch($payload);
+
+        $actual = $launch->getLaunchData();
+
+        $this->assertEquals($payload, $actual);
+    }
+
+    public function testGetLaunchId()
+    {
+        $expected = 'launch_id';
+
+        $payload = $this->payload;
+        $payload[LtiConstants::MESSAGE_TYPE] = LtiMessageLaunch::TYPE_DEEPLINK;
+        $launch = $this->fakeLaunch($payload, $expected);
+
+        $actual = $launch->getLaunchId();
+
+        $this->assertEquals($expected, $actual);
+    }
+
     public function tesGetLaunchDataForALaunch()
     {
         $launch = $this->fakeLaunch($this->payload);
