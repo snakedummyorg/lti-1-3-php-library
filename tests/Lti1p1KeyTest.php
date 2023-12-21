@@ -47,4 +47,16 @@ class Lti1p1KeyTest extends TestCase
 
         $this->assertEquals($expected, $this->key->getSecret());
     }
+
+    public function testItSigns()
+    {
+        $key = new Lti1p1Key([
+            'key' => 'foo',
+            'secret' => 'bar',
+        ]);
+
+        $actual = $key->sign('deploymentId', 'iss', 'clientId', 'exp', 'nonce');
+
+        $this->assertEquals('1Ze6akG0koOVeizCVBIyQHJ78Eo3vGUXyqOM0iDqS0k=', $actual);
+    }
 }
