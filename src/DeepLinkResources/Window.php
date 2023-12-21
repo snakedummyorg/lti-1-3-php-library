@@ -1,23 +1,25 @@
 <?php
 
-namespace Packback\Lti1p3;
+namespace Packback\Lti1p3\DeepLinkResources;
 
-class LtiDeepLinkResourceWindow
+class Window
 {
+    use HasDimensions;
+
     public function __construct(
         private ?string $target_name = null,
         private ?int $width = null,
         private ?int $height = null,
-        private ?string $window_features = null)
-    {
+        private ?string $window_features = null
+    ) {
     }
 
-    public static function new(): LtiDeepLinkResourceWindow
+    public static function new(): self
     {
-        return new LtiDeepLinkResourceWindow();
+        return new Window();
     }
 
-    public function setTargetName(?string $targetName): LtiDeepLinkResourceWindow
+    public function setTargetName(?string $targetName): self
     {
         $this->target_name = $targetName;
 
@@ -29,31 +31,7 @@ class LtiDeepLinkResourceWindow
         return $this->target_name;
     }
 
-    public function setWidth(?int $width): LtiDeepLinkResourceWindow
-    {
-        $this->width = $width;
-
-        return $this;
-    }
-
-    public function getWidth(): ?int
-    {
-        return $this->width;
-    }
-
-    public function setHeight(?int $height): LtiDeepLinkResourceWindow
-    {
-        $this->height = $height;
-
-        return $this;
-    }
-
-    public function getHeight(): ?int
-    {
-        return $this->height;
-    }
-
-    public function setWindowFeatures(?string $windowFeatures): LtiDeepLinkResourceWindow
+    public function setWindowFeatures(?string $windowFeatures): self
     {
         $this->window_features = $windowFeatures;
 
