@@ -2,11 +2,13 @@
 
 namespace Packback\Lti1p3\DeepLinkResources;
 
+use Packback\Lti1p3\Concerns\Arrayable;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiLineitem;
 
 class Resource
 {
+    use Arrayable;
     private string $type = LtiConstants::DL_RESOURCE_LINK_TYPE;
     private ?string $title = null;
     private ?string $text = null;
@@ -24,6 +26,42 @@ class Resource
     public static function new(): self
     {
         return new Resource();
+    }
+
+    public function getArray(): array
+    {
+        $resource = [
+            'type' => $this->type,
+            'title' => $this->title,
+            'text' => $this->text,
+            'url' => $this->url,
+            'icon' => $this->icon?->toArray(),
+            'thumbnail' => $this->thumbnail?->toArray(),
+            'iframe' => $this->iframe?->toArray(),
+            'window' => $this->window?->toArray(),
+            'available' => $this->availability_interval?->toArray(),
+            'submission' => $this->submission_interval?->toArray(),
+        ];
+
+        if (!empty($this->custom_params)) {
+            $resource['custom'] = $this->custom_params;
+        }
+
+        if (isset($this->line_item)) {
+            $resource['lineItem'] = [
+                'scoreMaximum' => $this->line_item->getScoreMaximum(),
+                'label' => $this->line_item->getLabel(),
+            ];
+        }
+
+        // Kept for backwards compatibility
+        if (!isset($this->iframe) && !isset($this->window)) {
+            $resource['presentation'] = [
+                'documentTarget' => $this->target,
+            ];
+        }
+
+        return $resource;
     }
 
     public function getType(): string
@@ -168,59 +206,5 @@ class Resource
         $this->submission_interval = $submissionInterval;
 
         return $this;
-    }
-
-    public function toArray(): array
-    {
-        $resource = [
-            'type' => $this->type,
-        ];
-
-        if (isset($this->title)) {
-            $resource['title'] = $this->title;
-        }
-        if (isset($this->text)) {
-            $resource['text'] = $this->text;
-        }
-        if (isset($this->url)) {
-            $resource['url'] = $this->url;
-        }
-        if (!empty($this->custom_params)) {
-            $resource['custom'] = $this->custom_params;
-        }
-        if (isset($this->icon)) {
-            $resource['icon'] = $this->icon->toArray();
-        }
-        if (isset($this->thumbnail)) {
-            $resource['thumbnail'] = $this->thumbnail->toArray();
-        }
-        if ($this->line_item !== null) {
-            $resource['lineItem'] = [
-                'scoreMaximum' => $this->line_item->getScoreMaximum(),
-                'label' => $this->line_item->getLabel(),
-            ];
-        }
-
-        // Kept for backwards compatibility
-        if (!isset($this->iframe) && !isset($this->window)) {
-            $resource['presentation'] = [
-                'documentTarget' => $this->target,
-            ];
-        }
-
-        if (isset($this->iframe)) {
-            $resource['iframe'] = $this->iframe->toArray();
-        }
-        if (isset($this->window)) {
-            $resource['window'] = $this->window->toArray();
-        }
-        if (isset($this->availability_interval)) {
-            $resource['available'] = $this->availability_interval->toArray();
-        }
-        if (isset($this->submission_interval)) {
-            $resource['submission'] = $this->submission_interval->toArray();
-        }
-
-        return $resource;
     }
 }

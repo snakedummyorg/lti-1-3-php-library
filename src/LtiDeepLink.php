@@ -10,8 +10,8 @@ class LtiDeepLink
     public function __construct(
         private ILtiRegistration $registration,
         private string $deployment_id,
-        private array $deep_link_settings)
-    {
+        private array $deep_link_settings
+    ) {
     }
 
     public function getResponseJwt(array $resources): string

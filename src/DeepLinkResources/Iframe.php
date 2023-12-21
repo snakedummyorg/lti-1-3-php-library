@@ -2,9 +2,11 @@
 
 namespace Packback\Lti1p3\DeepLinkResources;
 
+use Packback\Lti1p3\Concerns\Arrayable;
+
 class Iframe
 {
-    use HasDimensions;
+    use Arrayable, HasDimensions;
 
     public function __construct(
         private ?string $src = null,
@@ -18,6 +20,15 @@ class Iframe
         return new Iframe();
     }
 
+    public function getArray(): array
+    {
+        return [
+            'width' => $this->width,
+            'height' => $this->height,
+            'src' => $this->src,
+        ];
+    }
+
     public function setSrc(?string $src): self
     {
         $this->src = $src;
@@ -28,22 +39,5 @@ class Iframe
     public function getSrc(): ?string
     {
         return $this->src;
-    }
-
-    public function toArray(): array
-    {
-        $iframe = [];
-
-        if (isset($this->width)) {
-            $iframe['width'] = $this->width;
-        }
-        if (isset($this->height)) {
-            $iframe['height'] = $this->height;
-        }
-        if (isset($this->src)) {
-            $iframe['src'] = $this->src;
-        }
-
-        return $iframe;
     }
 }
