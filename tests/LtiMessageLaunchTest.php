@@ -379,6 +379,108 @@ class LtiMessageLaunchTest extends TestCase
         $actual = $this->messageLaunch->validate();
     }
 
+    public function testALaunchFailsIfNoPublicKeysAreReturned()
+    {
+        $params = [
+            'utf8' => '✓',
+            'id_token' => $this->buildJWT($this->payload, $this->issuer),
+            'state' => static::STATE,
+        ];
+
+        $this->cookie->shouldReceive('getCookie')
+            ->once()->andReturn($params['state']);
+        $this->cache->shouldReceive('checkNonceIsValid')
+            ->once()->andReturn(true);
+        $this->database->shouldReceive('findRegistrationByIssuer')
+            ->once()->andReturn($this->registration);
+        $this->registration->shouldReceive('getClientId')
+            ->once()->andReturn($this->issuer['client_id']);
+        $this->registration->shouldReceive('getKeySetUrl')
+            ->once()->andReturn($this->issuer['key_set_url']);
+        $this->serviceConnector->shouldReceive('makeRequest')
+            ->once()->andReturn(Mockery::mock(Response::class));
+        $this->serviceConnector->shouldReceive('getResponseBody')
+            ->once()->andReturn([]);
+
+        $this->messageLaunch->setRequest($params);
+
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_FETCH_PUBLIC_KEY);
+
+        $this->messageLaunch->validate();
+    }
+
+    public function testALaunchFailsIfNoPublicKeysMatch()
+    {
+        $params = [
+            'utf8' => '✓',
+            'id_token' => $this->buildJWT($this->payload, $this->issuer),
+            'state' => static::STATE,
+        ];
+
+        $this->cookie->shouldReceive('getCookie')
+            ->once()->andReturn($params['state']);
+        $this->cache->shouldReceive('checkNonceIsValid')
+            ->once()->andReturn(true);
+        $this->database->shouldReceive('findRegistrationByIssuer')
+            ->once()->andReturn($this->registration);
+        $this->registration->shouldReceive('getClientId')
+            ->once()->andReturn($this->issuer['client_id']);
+        $this->registration->shouldReceive('getKeySetUrl')
+            ->once()->andReturn($this->issuer['key_set_url']);
+        $this->serviceConnector->shouldReceive('makeRequest')
+            ->once()->andReturn(Mockery::mock(Response::class));
+        $this->serviceConnector->shouldReceive('getResponseBody')
+            ->once()->andReturn([
+                'keys' => [[
+                    'kid' => 'not mine',
+                ]],
+            ]);
+
+        $this->messageLaunch->setRequest($params);
+
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_NO_MATCHING_PUBLIC_KEY);
+
+        $this->messageLaunch->validate();
+    }
+
+    public function testALaunchFailsIfKeyAlgorithmDoesntMatch()
+    {
+        $params = [
+            'utf8' => '✓',
+            'id_token' => $this->buildJWT($this->payload, $this->issuer),
+            'state' => static::STATE,
+        ];
+
+        $this->cookie->shouldReceive('getCookie')
+            ->once()->andReturn($params['state']);
+        $this->cache->shouldReceive('checkNonceIsValid')
+            ->once()->andReturn(true);
+        $this->database->shouldReceive('findRegistrationByIssuer')
+            ->once()->andReturn($this->registration);
+        $this->registration->shouldReceive('getClientId')
+            ->once()->andReturn($this->issuer['client_id']);
+        $this->registration->shouldReceive('getKeySetUrl')
+            ->once()->andReturn($this->issuer['key_set_url']);
+        $this->serviceConnector->shouldReceive('makeRequest')
+            ->once()->andReturn(Mockery::mock(Response::class));
+        $this->serviceConnector->shouldReceive('getResponseBody')
+            ->once()->andReturn([
+                'keys' => [[
+                    'kid' => $this->issuer['kid'],
+                    'kty' => 'kitty',
+                ]],
+            ]);
+
+        $this->messageLaunch->setRequest($params);
+
+        $this->expectException(LtiException::class);
+        $this->expectExceptionMessage(LtiMessageLaunch::ERR_MISMATCHED_ALG_KEY);
+
+        $this->messageLaunch->validate();
+    }
+
     public function testALaunchFailsIfDeploymentIdIsMissing()
     {
         $jwtPayload = $this->payload;
@@ -846,6 +948,30 @@ class LtiMessageLaunchTest extends TestCase
         $actual = $launch->isResourceLaunch();
 
         $this->assertFalse($actual);
+    }
+
+    public function testGetLaunchData()
+    {
+        $payload = $this->payload;
+        $payload[LtiConstants::MESSAGE_TYPE] = LtiMessageLaunch::TYPE_DEEPLINK;
+        $launch = $this->fakeLaunch($payload);
+
+        $actual = $launch->getLaunchData();
+
+        $this->assertEquals($payload, $actual);
+    }
+
+    public function testGetLaunchId()
+    {
+        $expected = 'launch_id';
+
+        $payload = $this->payload;
+        $payload[LtiConstants::MESSAGE_TYPE] = LtiMessageLaunch::TYPE_DEEPLINK;
+        $launch = $this->fakeLaunch($payload, $expected);
+
+        $actual = $launch->getLaunchId();
+
+        $this->assertEquals($expected, $actual);
     }
 
     public function tesGetLaunchDataForALaunch()

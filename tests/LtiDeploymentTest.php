@@ -18,6 +18,13 @@ class LtiDeploymentTest extends TestCase
         $this->assertInstanceOf(LtiDeployment::class, $this->deployment);
     }
 
+    public function testCreatesANewInstance()
+    {
+        $deployment = LtiDeployment::new($this->id);
+
+        $this->assertInstanceOf(LtiDeployment::class, $deployment);
+    }
+
     public function testItGetsDeploymentId()
     {
         $result = $this->deployment->getDeploymentId();
