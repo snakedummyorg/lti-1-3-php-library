@@ -306,7 +306,7 @@ class LtiServiceConnectorTest extends TestCase
             ->times(2)->andReturn($this->requestPayload);
         // Doesn't find a matching link in on the second header, so only updates the URL once
         $this->request->shouldReceive('setUrl')
-            ->once()->andReturn($this->request);
+            ->twice()->andReturn($this->request);
 
         // Two responses come back
         $this->client->shouldReceive('request')
