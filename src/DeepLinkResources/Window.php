@@ -2,9 +2,11 @@
 
 namespace Packback\Lti1p3\DeepLinkResources;
 
+use Packback\Lti1p3\Concerns\Arrayable;
+
 class Window
 {
-    use HasDimensions;
+    use Arrayable, HasDimensions;
 
     public function __construct(
         private ?string $target_name = null,
@@ -17,6 +19,16 @@ class Window
     public static function new(): self
     {
         return new Window();
+    }
+
+    public function getArray(): array
+    {
+        return [
+            'targetName' => $this->target_name,
+            'width' => $this->width,
+            'height' => $this->height,
+            'windowFeatures' => $this->window_features,
+        ];
     }
 
     public function setTargetName(?string $targetName): self
@@ -41,25 +53,5 @@ class Window
     public function getWindowFeatures(): ?string
     {
         return $this->window_features;
-    }
-
-    public function toArray(): array
-    {
-        $window = [];
-
-        if (isset($this->target_name)) {
-            $window['targetName'] = $this->target_name;
-        }
-        if (isset($this->width)) {
-            $window['width'] = $this->width;
-        }
-        if (isset($this->height)) {
-            $window['height'] = $this->height;
-        }
-        if (isset($this->window_features)) {
-            $window['windowFeatures'] = $this->window_features;
-        }
-
-        return $window;
     }
 }
