@@ -173,7 +173,7 @@ class ResourceTest extends TestCase
     {
         $result = $this->resource->getIframe();
 
-        $this->assertEquals(null, $result);
+        $this->assertNull($result);
     }
 
     public function testItSetsIframe()
@@ -184,6 +184,57 @@ class ResourceTest extends TestCase
 
         $this->assertSame($this->resource, $result);
         $this->assertEquals($expected, $this->resource->getIframe());
+    }
+
+    public function testItGetsWindow()
+    {
+        $result = $this->resource->getWindow();
+
+        $this->assertNull($result);
+    }
+
+    public function testItSetsWindow()
+    {
+        $expected = new Window();
+
+        $result = $this->resource->setWindow($expected);
+
+        $this->assertSame($this->resource, $result);
+        $this->assertEquals($expected, $this->resource->getWindow());
+    }
+
+    public function testItGetsAvailabilityInterval()
+    {
+        $result = $this->resource->getAvailabilityInterval();
+
+        $this->assertNull($result);
+    }
+
+    public function testItSetsAvailabilityInterval()
+    {
+        $expected = new DateTimeInterval();
+
+        $result = $this->resource->setAvailabilityInterval($expected);
+
+        $this->assertSame($this->resource, $result);
+        $this->assertEquals($expected, $this->resource->getAvailabilityInterval());
+    }
+
+    public function testItGetsSubmissionInterval()
+    {
+        $result = $this->resource->getSubmissionInterval();
+
+        $this->assertNull($result);
+    }
+
+    public function testItSetsSubmissionInterval()
+    {
+        $expected = new DateTimeInterval();
+
+        $result = $this->resource->setSubmissionInterval($expected);
+
+        $this->assertSame($this->resource, $result);
+        $this->assertEquals($expected, $this->resource->getSubmissionInterval());
     }
 
     public function testItCreatesArrayWithoutOptionalProperties()
