@@ -163,20 +163,11 @@ class LtiServiceConnector implements ILtiServiceConnector
         $nextUrl = $request->getUrl();
 
         while ($nextUrl) {
+            $request->setUrl($nextUrl);
             $response = $this->makeServiceRequest($registration, $scopes, $request);
-
-            if (isset($key)) {
-                $page_results = $response['body'][$key] ?? [];
-            } else {
-                $page_results = $response['body'] ?? [];
-            }
-
-            $results = array_merge($results, $page_results);
-
+            $pageResults = $this->getResultsFromResponse($response, $key);
+            $results = array_merge($results, $pageResults);
             $nextUrl = $this->getNextUrl($response['headers']);
-            if ($nextUrl) {
-                $request->setUrl($nextUrl);
-            }
         }
 
         return $results;
@@ -239,6 +230,15 @@ class LtiServiceConnector implements ILtiServiceConnector
         $scopeKey = md5(implode('|', $scopes));
 
         return $registration->getIssuer().$registration->getClientId().$scopeKey;
+    }
+
+    private function getResultsFromResponse(array $response, ?string $key = null): array
+    {
+        if (isset($key)) {
+            return $response['body'][$key] ?? [];
+        }
+
+        return $response['body'] ?? [];
     }
 
     private function getNextUrl(array $headers): ?string
