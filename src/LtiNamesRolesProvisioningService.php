@@ -14,7 +14,7 @@ class LtiNamesRolesProvisioningService extends LtiAbstractService
     }
 
     /**
-     * @param  array  $options An array of options that can be passed with the context_membership_url such as rlid, since, etc.
+     * @param  array  $options  An array of options that can be passed with the context_membership_url such as rlid, since, etc.
      */
     public function getMembers(array $options = []): array
     {
