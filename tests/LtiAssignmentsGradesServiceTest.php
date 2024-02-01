@@ -97,4 +97,58 @@ class LtiAssignmentsGradesServiceTest extends TestCase
 
         $this->assertEquals($response, $result);
     }
+
+    public function testItCreatesALineItem()
+    {
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
+            'lineitems' => 'https://lms.example.com/context/2923/lineitems/',
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $ltiLineitemData = [
+            'id' => 'https://lms.example.com/context/2923/lineitems/23',
+        ];
+
+        $response = [
+            'body' => $ltiLineitemData,
+        ];
+
+        $this->connector->shouldReceive('makeServiceRequest')
+            ->once()->andReturn($response);
+
+        $expected = new LtiLineitem($ltiLineitemData);
+
+        $result = $service->createLineitem(new LtiLineitem($ltiLineitemData));
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testItUpdatesALineItem()
+    {
+        $serviceData = [
+            'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
+            'lineitems' => 'https://lms.example.com/context/2923/lineitems/',
+        ];
+
+        $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $ltiLineitemData = [
+            'id' => 'https://lms.example.com/context/2923/lineitems/23',
+        ];
+
+        $response = [
+            'body' => $ltiLineitemData,
+        ];
+
+        $this->connector->shouldReceive('makeServiceRequest')
+            ->once()->andReturn($response);
+
+        $expected = new LtiLineitem($ltiLineitemData);
+
+        $result = $service->updateLineitem(new LtiLineitem($ltiLineitemData));
+
+        $this->assertEquals($expected, $result);
+    }
 }
