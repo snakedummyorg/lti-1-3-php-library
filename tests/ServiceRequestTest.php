@@ -9,6 +9,7 @@ class ServiceRequestTest extends TestCase
     private $method = ServiceRequest::METHOD_GET;
     private $url = 'https://example.com';
     private $type = ServiceRequest::TYPE_AUTH;
+    private $request;
 
     public function setUp(): void
     {

@@ -6,6 +6,7 @@ use Packback\Lti1p3\Lti1p1Key;
 
 class Lti1p1KeyTest extends TestCase
 {
+    private $key;
     public function setUp(): void
     {
         $this->key = new Lti1p1Key();

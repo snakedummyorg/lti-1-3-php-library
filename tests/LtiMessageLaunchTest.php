@@ -40,6 +40,8 @@ class LtiMessageLaunchTest extends TestCase
     private array $issuer;
     private array $key;
     private array $payload;
+    private $migrationDatabase;
+    private $deployment;
 
     public function setUp(): void
     {

@@ -141,6 +141,9 @@ class Lti13CertificationTest extends TestCase
     private $issuer;
     private $key;
     private array $payload;
+    private $cache;
+    private $cookie;
+    private $serviceConnector;
 
     public function setUp(): void
     {

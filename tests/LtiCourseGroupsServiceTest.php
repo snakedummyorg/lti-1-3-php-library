@@ -9,6 +9,8 @@ use Packback\Lti1p3\LtiCourseGroupsService;
 
 class LtiCourseGroupsServiceTest extends TestCase
 {
+    private $connector;
+    private $registration;
     public function setUp(): void
     {
         $this->connector = Mockery::mock(ILtiServiceConnector::class);

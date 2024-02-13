@@ -40,6 +40,18 @@ class LtiServiceConnectorTest extends TestCase
      * @var LtiServiceConnector
      */
     private $connector;
+    private $responseStatus;
+    private $responseBody;
+    private $responseHeaders;
+    private $request;
+    private $requestPayload;
+    private $requestHeaders;
+    private $body;
+    private $url;
+    private $method;
+    private $token;
+    private $scopes;
+    private $streamInterface;
 
     public function setUp(): void
     {

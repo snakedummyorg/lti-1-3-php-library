@@ -7,6 +7,8 @@ use Tests\TestCase;
 
 class IconTest extends TestCase
 {
+    private $imageUrl;
+    private $icon;
     public function setUp(): void
     {
         $this->imageUrl = 'https://example.com/image.png';

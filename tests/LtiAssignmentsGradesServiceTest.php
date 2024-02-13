@@ -13,6 +13,8 @@ use Packback\Lti1p3\LtiLineitem;
 
 class LtiAssignmentsGradesServiceTest extends TestCase
 {
+    private $connector;
+    private $registration;
     public function setUp(): void
     {
         $this->connector = Mockery::mock(ILtiServiceConnector::class);
@@ -452,7 +454,7 @@ class LtiAssignmentsGradesServiceTest extends TestCase
         $this->assertEquals($response, $result);
     }
 
-    public function testItGetsALineItems()
+    public function testItGetsALineItem()
     {
         $serviceData = [
             'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
@@ -475,5 +477,7 @@ class LtiAssignmentsGradesServiceTest extends TestCase
             ->once()->andReturn($response);
 
         $result = $service->getLineItems();
+
+        $this->assertEquals($expected, $result);
     }
 }
