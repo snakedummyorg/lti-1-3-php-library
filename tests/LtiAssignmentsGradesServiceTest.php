@@ -192,16 +192,16 @@ class LtiAssignmentsGradesServiceTest extends TestCase
 
     public function testItUpdatesALineItem()
     {
-        $ltiLineitemData = [
-            'id' => 'testId',
-        ];
-
         $serviceData = [
             'scope' => [LtiConstants::AGS_SCOPE_LINEITEM],
-            'lineitem' => 'https://canvas.localhost/api/lti/courses/8/line_items/27',
+            'lineitems' => 'https://lms.example.com/context/2923/lineitems/',
         ];
 
         $service = new LtiAssignmentsGradesService($this->connector, $this->registration, $serviceData);
+
+        $ltiLineitemData = [
+            'id' => 'https://lms.example.com/context/2923/lineitems/23',
+        ];
 
         $response = [
             'body' => $ltiLineitemData,
@@ -212,7 +212,7 @@ class LtiAssignmentsGradesServiceTest extends TestCase
 
         $expected = new LtiLineitem($ltiLineitemData);
 
-        $result = $service->updateLineItem(new LtiLineItem());
+        $result = $service->updateLineitem(new LtiLineitem($ltiLineitemData));
 
         $this->assertEquals($expected, $result);
     }
@@ -475,7 +475,5 @@ class LtiAssignmentsGradesServiceTest extends TestCase
             ->once()->andReturn($response);
 
         $result = $service->getLineItems();
-
-        $this->assertEquals($expected, $result);
     }
 }

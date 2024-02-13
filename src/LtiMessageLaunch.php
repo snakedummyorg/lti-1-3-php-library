@@ -55,7 +55,7 @@ class LtiMessageLaunch
     private array $jwt;
     private ?ILtiRegistration $registration;
     private ?ILtiDeployment $deployment;
-    private string $launch_id;
+    public string $launch_id;
 
     // See https://www.imsglobal.org/spec/security/v1p1#approved-jwt-signing-algorithms.
     private static $ltiSupportedAlgs = [
