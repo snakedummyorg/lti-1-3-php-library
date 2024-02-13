@@ -11,11 +11,6 @@ parameters:
             path: src/LtiMessageLaunch.php
 
         -
-            message: "#Access to an undefined property (Tests|Certification)\\\\#"
-            paths:
-                - tests/*
-
-        -
             message: "#Call to an undefined method Mockery\\\\#"
             paths:
                 - tests/*
