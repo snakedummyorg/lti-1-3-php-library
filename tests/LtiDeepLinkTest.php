@@ -2,14 +2,13 @@
 
 namespace Tests;
 
-use DOMDocument;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Mockery;
+use Packback\Lti1p3\DeepLinkResources\Resource;
 use Packback\Lti1p3\Interfaces\ILtiRegistration;
 use Packback\Lti1p3\LtiConstants;
 use Packback\Lti1p3\LtiDeepLink;
-use Packback\Lti1p3\LtiDeepLinkResource;
 
 class LtiDeepLinkTest extends TestCase
 {
@@ -18,12 +17,12 @@ class LtiDeepLinkTest extends TestCase
     public const DEPLOYMENT_ID = 'deployment-id';
     public const LTI_RESOURCE_ARRAY = ['resource'];
     private $registrationMock;
-    private $ltiResourceMock;
+    private $resourceMock;
 
     protected function setUp(): void
     {
         $this->registrationMock = Mockery::mock(ILtiRegistration::class);
-        $this->ltiResourceMock = Mockery::mock(LtiDeepLinkResource::class);
+        $this->resourceMock = Mockery::mock(Resource::class);
     }
 
     public function testItInstantiates()
@@ -41,7 +40,7 @@ class LtiDeepLinkTest extends TestCase
 
         $deepLink = new LtiDeepLink($this->registrationMock, self::DEPLOYMENT_ID, []);
 
-        $result = $deepLink->getResponseJwt([$this->ltiResourceMock]);
+        $result = $deepLink->getResponseJwt([$this->resourceMock]);
 
         $publicKey = new Key(file_get_contents(__DIR__.'/data/public.key'), 'RS256');
         $resultPayload = JWT::decode($result, $publicKey);
@@ -62,7 +61,7 @@ class LtiDeepLinkTest extends TestCase
 
         $deepLink = new LtiDeepLink($this->registrationMock, self::DEPLOYMENT_ID, []);
 
-        $result = $deepLink->getResponseJwt([$this->ltiResourceMock]);
+        $result = $deepLink->getResponseJwt([$this->resourceMock]);
 
         $publicKey = new Key(file_get_contents(__DIR__.'/data/public.key'), 'RS256');
         $resultPayload = JWT::decode($result, $publicKey);
@@ -80,73 +79,12 @@ class LtiDeepLinkTest extends TestCase
             'data' => $dataValue,
         ]);
 
-        $result = $deepLink->getResponseJwt([$this->ltiResourceMock]);
+        $result = $deepLink->getResponseJwt([$this->resourceMock]);
 
         $publicKey = new Key(file_get_contents(__DIR__.'/data/public.key'), 'RS256');
         $resultPayload = JWT::decode($result, $publicKey);
 
         $this->assertEquals($dataValue, $resultPayload->{LtiConstants::DL_DATA});
-    }
-
-    public function testItGeneratesResponseForm()
-    {
-        $resources = [$this->ltiResourceMock];
-
-        $deepLinkReturnUrl = 'https://example.com/return';
-        $deepLinkArgs = [
-            Mockery::mock(ILtiRegistration::class),
-            self::DEPLOYMENT_ID,
-            ['deep_link_return_url' => $deepLinkReturnUrl],
-        ];
-        $responseJwt = 'example-jwt';
-        $deepLink = Mockery::mock(LtiDeepLink::class, $deepLinkArgs)->makePartial()
-            ->shouldReceive('getResponseJwt')
-            ->with($resources)
-            ->once()
-            ->andReturn($responseJwt)
-            ->getMock();
-
-        // The method directly echoes HTML output without returning it,
-        // so the only way to capture content is through an output buffer
-        ob_start();
-        $deepLink->outputResponseForm($resources);
-        $result = ob_get_contents();
-        ob_end_clean();
-
-        // This is required because the method does not output a well-formed HTML/XML document
-        $xmlWrapperTag = 'body';
-
-        $resultDocument = new DOMDocument();
-        $resultDocument->loadXML("<{$xmlWrapperTag}>{$result}</{$xmlWrapperTag}>");
-
-        $expectedDocument = new DOMDocument();
-
-        $wrapperElement = $expectedDocument->createElement($xmlWrapperTag);
-
-        $formElement = $expectedDocument->createElement('form');
-        $formElement->setAttribute('id', 'auto_submit');
-        $formElement->setAttribute('action', $deepLinkReturnUrl);
-        $formElement->setAttribute('method', 'POST');
-
-        $jwtInputElement = $expectedDocument->createElement('input');
-        $jwtInputElement->setAttribute('type', 'hidden');
-        $jwtInputElement->setAttribute('name', 'JWT');
-        $jwtInputElement->setAttribute('value', $responseJwt);
-        $formElement->appendChild($jwtInputElement);
-
-        $submitInputElement = $expectedDocument->createElement('input');
-        $submitInputElement->setAttribute('type', 'submit');
-        $submitInputElement->setAttribute('name', 'Go');
-        $formElement->appendChild($submitInputElement);
-
-        $wrapperElement->appendChild($formElement);
-
-        $scriptElement = $expectedDocument->createElement('script', "document.getElementById('auto_submit').submit();");
-        $wrapperElement->appendChild($scriptElement);
-
-        $expectedDocument->appendChild($wrapperElement);
-
-        $this->assertXmlStringEqualsXmlString($expectedDocument->saveXML(), $resultDocument->saveXML());
     }
 
     private function setupMocksExpectations(): void
@@ -168,7 +106,7 @@ class LtiDeepLinkTest extends TestCase
             ->once()
             ->andReturn('kid');
 
-        $this->ltiResourceMock
+        $this->resourceMock
             ->shouldReceive('toArray')
             ->once()
             ->andReturn(self::LTI_RESOURCE_ARRAY);

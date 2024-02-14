@@ -40,6 +40,18 @@ class LtiServiceConnectorTest extends TestCase
      * @var LtiServiceConnector
      */
     private $connector;
+    private $responseStatus;
+    private $responseBody;
+    private $responseHeaders;
+    private $request;
+    private $requestPayload;
+    private $requestHeaders;
+    private $body;
+    private $url;
+    private $method;
+    private $token;
+    private $scopes;
+    private $streamInterface;
 
     public function setUp(): void
     {
@@ -100,7 +112,7 @@ class LtiServiceConnectorTest extends TestCase
         ]);
 
         $this->cache->shouldReceive('getAccessToken')
-            ->once()->andReturn(false);
+            ->once()->andReturn();
         $this->client->shouldReceive('request')
             ->once()->andReturn($this->response);
         $this->response->shouldReceive('getBody')
@@ -111,7 +123,7 @@ class LtiServiceConnectorTest extends TestCase
 
         $result = $this->connector->getAccessToken($registration, ['scopeKey']);
 
-        $this->assertEquals($result, $this->token);
+        $this->assertEquals($this->token, $result);
     }
 
     public function testItMakesAServiceRequest()
@@ -306,7 +318,7 @@ class LtiServiceConnectorTest extends TestCase
             ->times(2)->andReturn($this->requestPayload);
         // Doesn't find a matching link in on the second header, so only updates the URL once
         $this->request->shouldReceive('setUrl')
-            ->once()->andReturn($this->request);
+            ->twice()->andReturn($this->request);
 
         // Two responses come back
         $this->client->shouldReceive('request')

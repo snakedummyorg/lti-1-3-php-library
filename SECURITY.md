@@ -2,10 +2,11 @@
 
 ## Supported Versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.0.x   | :white_check_mark: |
-| < 5.0   | :x:                |
+| Version | Supported                         |
+| ------- | --------------------------------- |
+| 6.0.x   | :white_check_mark: Active support |
+| 5.7.x   | :wrench: Security fixes only      |
+| < 5.7   | :x: End of life                   |
 
 ## Reporting a Vulnerability
 

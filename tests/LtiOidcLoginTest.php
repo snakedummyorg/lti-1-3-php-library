@@ -6,12 +6,17 @@ use Mockery;
 use Packback\Lti1p3\Interfaces\ICache;
 use Packback\Lti1p3\Interfaces\ICookie;
 use Packback\Lti1p3\Interfaces\IDatabase;
+use Packback\Lti1p3\Interfaces\ILtiRegistration;
 use Packback\Lti1p3\LtiMessageLaunch;
 use Packback\Lti1p3\LtiOidcLogin;
 use Packback\Lti1p3\OidcException;
 
 class LtiOidcLoginTest extends TestCase
 {
+    private $cache;
+    private $cookie;
+    private $database;
+    private $oidcLogin;
     public function setUp(): void
     {
         $this->cache = Mockery::mock(ICache::class);
@@ -43,7 +48,7 @@ class LtiOidcLoginTest extends TestCase
 
     public function testItValidatesARequest()
     {
-        $expected = 'expected';
+        $expected = Mockery::mock(ILtiRegistration::class);
         $request = [
             'iss' => 'Issuer',
             'login_hint' => 'LoginHint',
@@ -111,7 +116,37 @@ class LtiOidcLoginTest extends TestCase
         $this->oidcLogin->validateOidcLogin($request);
     }
 
-    /*
-     * @todo Finish testing
-     */
+    public function testGetAuthParams()
+    {
+        $this->cookie->shouldReceive('setCookie')
+            ->once();
+        $this->cache->shouldReceive('cacheNonce')
+            ->once();
+
+        $launchUrl = 'https://example.com/launch';
+        $clientId = 'ClientId';
+        $expected = [
+            'scope' => 'openid',
+            'response_type' => 'id_token',
+            'response_mode' => 'form_post',
+            'prompt' => 'none',
+            'client_id' => $clientId,
+            'redirect_uri' => $launchUrl,
+            'login_hint' => 'LoginHint',
+            'lti_message_hint' => 'LtiMessageHint',
+        ];
+        $request = [
+            'login_hint' => 'LoginHint',
+            'lti_message_hint' => 'LtiMessageHint',
+        ];
+
+        $result = $this->oidcLogin->getAuthParams($launchUrl, $clientId, $request);
+
+        // These are cryptographically random, so just assert they exist
+        $this->assertArrayHasKey('state', $result);
+        $this->assertArrayHasKey('nonce', $result);
+        // No remove them and check equality
+        unset($result['state'], $result['nonce']);
+        $this->assertEquals($expected, $result);
+    }
 }

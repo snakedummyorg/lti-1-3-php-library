@@ -2,8 +2,11 @@
 
 namespace Packback\Lti1p3;
 
+use Packback\Lti1p3\Concerns\JsonStringable;
+
 class LtiLineitem
 {
+    use JsonStringable;
     private $id;
     private $score_maximum;
     private $label;
@@ -27,10 +30,17 @@ class LtiLineitem
         $this->grades_released = $lineitem['gradesReleased'] ?? null;
     }
 
-    public function __toString()
+    /**
+     * Static function to allow for method chaining without having to assign to a variable first.
+     */
+    public static function new(?array $lineItem = null): self
     {
-        // Additionally, includes the call back to filter out only NULL values
-        return json_encode(array_filter([
+        return new LtiLineitem($lineItem);
+    }
+
+    public function getArray(): array
+    {
+        return [
             'id' => $this->id,
             'scoreMaximum' => $this->score_maximum,
             'label' => $this->label,
@@ -40,15 +50,7 @@ class LtiLineitem
             'startDateTime' => $this->start_date_time,
             'endDateTime' => $this->end_date_time,
             'gradesReleased' => $this->grades_released,
-        ], '\Packback\Lti1p3\Helpers\Helpers::checkIfNullValue'));
-    }
-
-    /**
-     * Static function to allow for method chaining without having to assign to a variable first.
-     */
-    public static function new()
-    {
-        return new LtiLineitem();
+        ];
     }
 
     public function getId()
@@ -56,7 +58,7 @@ class LtiLineitem
         return $this->id;
     }
 
-    public function setId($value)
+    public function setId($value): self
     {
         $this->id = $value;
 
@@ -68,7 +70,7 @@ class LtiLineitem
         return $this->label;
     }
 
-    public function setLabel($value)
+    public function setLabel($value): self
     {
         $this->label = $value;
 
@@ -80,7 +82,7 @@ class LtiLineitem
         return $this->score_maximum;
     }
 
-    public function setScoreMaximum($value)
+    public function setScoreMaximum($value): self
     {
         $this->score_maximum = $value;
 
@@ -92,7 +94,7 @@ class LtiLineitem
         return $this->resource_id;
     }
 
-    public function setResourceId($value)
+    public function setResourceId($value): self
     {
         $this->resource_id = $value;
 
@@ -104,7 +106,7 @@ class LtiLineitem
         return $this->resource_link_id;
     }
 
-    public function setResourceLinkId($value)
+    public function setResourceLinkId($value): self
     {
         $this->resource_link_id = $value;
 
@@ -116,7 +118,7 @@ class LtiLineitem
         return $this->tag;
     }
 
-    public function setTag($value)
+    public function setTag($value): self
     {
         $this->tag = $value;
 
@@ -128,7 +130,7 @@ class LtiLineitem
         return $this->start_date_time;
     }
 
-    public function setStartDateTime($value)
+    public function setStartDateTime($value): self
     {
         $this->start_date_time = $value;
 
@@ -140,7 +142,7 @@ class LtiLineitem
         return $this->end_date_time;
     }
 
-    public function setEndDateTime($value)
+    public function setEndDateTime($value): self
     {
         $this->end_date_time = $value;
 

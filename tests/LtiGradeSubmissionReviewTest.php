@@ -6,6 +6,8 @@ use Packback\Lti1p3\LtiGradeSubmissionReview;
 
 class LtiGradeSubmissionReviewTest extends TestCase
 {
+    private $gradeReview;
+
     public function setUp(): void
     {
         $this->gradeReview = new LtiGradeSubmissionReview();
@@ -14,6 +16,13 @@ class LtiGradeSubmissionReviewTest extends TestCase
     public function testItInstantiates()
     {
         $this->assertInstanceOf(LtiGradeSubmissionReview::class, $this->gradeReview);
+    }
+
+    public function testCreatesANewInstance()
+    {
+        $review = LtiGradeSubmissionReview::new();
+
+        $this->assertInstanceOf(LtiGradeSubmissionReview::class, $review);
     }
 
     public function testItGetsReviewableStatus()

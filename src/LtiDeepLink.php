@@ -7,18 +7,14 @@ use Packback\Lti1p3\Interfaces\ILtiRegistration;
 
 class LtiDeepLink
 {
-    private $registration;
-    private $deployment_id;
-    private $deep_link_settings;
-
-    public function __construct(ILtiRegistration $registration, string $deployment_id, array $deep_link_settings)
-    {
-        $this->registration = $registration;
-        $this->deployment_id = $deployment_id;
-        $this->deep_link_settings = $deep_link_settings;
+    public function __construct(
+        private ILtiRegistration $registration,
+        private string $deployment_id,
+        private array $deep_link_settings
+    ) {
     }
 
-    public function getResponseJwt($resources)
+    public function getResponseJwt(array $resources): string
     {
         $message_jwt = [
             'iss' => $this->registration->getClientId(),
@@ -41,24 +37,5 @@ class LtiDeepLink
         }
 
         return JWT::encode($message_jwt, $this->registration->getToolPrivateKey(), 'RS256', $this->registration->getKid());
-    }
-
-    /**
-     * @deprecated
-     */
-    public function outputResponseForm($resources)
-    {
-        trigger_error('Method '.__METHOD__.' is deprecated', E_USER_DEPRECATED);
-
-        $jwt = $this->getResponseJwt($resources);
-        $formActionUrl = $this->deep_link_settings['deep_link_return_url'];
-
-        echo <<<HTML
-<form id="auto_submit" action="{$formActionUrl}" method="POST">
-    <input type="hidden" name="JWT" value="{$jwt}" />
-    <input type="submit" name="Go" />
-</form>
-<script>document.getElementById('auto_submit').submit();</script>
-HTML;
     }
 }

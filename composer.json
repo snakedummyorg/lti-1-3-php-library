@@ -21,15 +21,16 @@
         }
     ],
     "require": {
-        "firebase/php-jwt": "^5.5|^6.0",
+        "firebase/php-jwt": "^6.6",
         "guzzlehttp/guzzle": "^7.0",
         "phpseclib/phpseclib": "^3.0"
     },
     "require-dev": {
-        "jubeki/laravel-code-style": "^1.0|^2.0",
         "mockery/mockery": "^1.4",
         "nesbot/carbon": "^2.43",
-        "phpunit/phpunit": "^9.5"
+        "laravel/pint": "^1.0",
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^9.0|^10.0"
     },
     "autoload": {
         "psr-4": {
@@ -43,7 +44,10 @@
     },
     "scripts": {
         "test": "phpunit",
-        "lint": "php-cs-fixer fix -v --dry-run",
-        "lint-fix": "php-cs-fixer fix -v"
+        "lint": [
+            "pint --test",
+            "phpstan analyse"
+        ],
+        "lint-fix": "pint -v"
     }
 }
